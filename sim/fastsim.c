@@ -639,13 +639,14 @@ int do_assemble2(program *program, program2 * program2)
   int marume;
   int count = 0;
   int firstflag = 1;
+  int printflag  = 0;
   
   while (1) {
     pc = nextpc;
 
     if(cnt % 10000000 == 0)
       {
-	printf("%lld\n", cnt);
+        printf("%lld\n", cnt);
       }
     cnt++;
     
@@ -902,15 +903,22 @@ int do_assemble2(program *program, program2 * program2)
     */
     //命令が存在しなかった場合error parseでやっているのでいらない。
     //printf("ist = %d\n",iname);
-        count++;
-    if(count < 10000){
-    printf("%d  [%d] ",count,pc);
-    print_instruction(program->insts[pc]);
-    //if(count % 20 == 0){
-      print_register();
-      //}
+    
+    if(pc == 1535){
+      printflag = 1;
     }
-   
+    
+    if(printflag == 1){ 
+      count++;
+      if(count < 10000){
+        printf("%d  [%d] ",count,pc);
+        print_instruction(program->insts[pc]);
+        //if(count % 20 == 0){
+        print_register();
+        //}
+      }
+    }
+    
     nextpc++;
 
 
