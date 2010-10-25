@@ -1,6 +1,6 @@
 (****************************************************************)
 (*                                                              *)
-(* Ray Tracing Program for (Mini) Objective Caml                *)
+(* Ray Tracing Pogram for (Mini) Objective Caml                *)
 (*                                                              *)
 (* Original Program by Ryoji Kawamichi                          *)
 (* Arranged for Chez Scheme by Motohico Nanano                  *)
@@ -1926,7 +1926,7 @@ let rec write_ppm_header _ =
   (
     
     print_char 80; (* 'P' *)
-    print_char (48 + 3); (* +6 if binary *) (* 48 = '0' *)
+    print_char (48 + 6); (* +6 if binary *) (* 48 = '0' *)
       print_char 10;
     
     print_int image_size.(0);
@@ -1952,15 +1952,9 @@ in
 let rec write_rgb _ =
   write_rgb_element rgb.(0); (* Red   *)
   
-    print_char 32;
-  
   write_rgb_element rgb.(1); (* Green *)
   
-    print_char 32;
-  
   write_rgb_element rgb.(2); (* Blue  *)
-  
-    print_char 10
   
 in
 
