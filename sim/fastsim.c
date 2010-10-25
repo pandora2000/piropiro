@@ -885,11 +885,11 @@ int do_assemble2(program *program, program2 * program2)
     else if (iname == PTF) {
       marume = (int) (freg[ist.name[1]] + 0.5);
       if(marume > 255){
-        fprintf(out_fp,"%d",255);
+        fprintf(out_fp,"%c",255);
       }else if (marume < 0){
-        fprintf(out_fp,"%d",0);
+        fprintf(out_fp,"%c",0);
       }else{
-        fprintf(out_fp,"%d",marume);
+        fprintf(out_fp,"%c",(char)marume);
       }
     }
     else {//if (iname == 41) {
@@ -911,10 +911,10 @@ int do_assemble2(program *program, program2 * program2)
     if(printflag == 1){ 
       count++;
       if(count < 10000){
-        printf("%d  [%d] ",count,pc);
-        print_instruction(program->insts[pc]);
+        //printf("%d  [%d] ",count,pc);
+        //print_instruction(program->insts[pc]);
         //if(count % 20 == 0){
-        print_register();
+        //print_register();
         //}
       }
     }
