@@ -443,8 +443,8 @@ let f oc foc istest memext memin memout memsp memhp floffset (Prog(fl, fundefs, 
 	  [
 	    finst0 (soii Nnop);
 	    finst0 (soii Nnop);
-(*	    finst3 (soii Naddi) regs.(0) zreg (string_of_int 0xaa);
-	    finst1 (soii Npc) regs.(0);*)
+	    finst3 (soii Naddi) regs.(0) zreg (string_of_int 0xaa);
+	    finst1 (soii Npc) regs.(0);
 	    (*スタックポインタ初期化*)
 	    finst3 (soii Naddi) spreg zreg (string_of_int memsp);
 	    (*ヒープポインタ初期化*)
