@@ -1,5 +1,7 @@
 	nop
 	nop
+	addi	r4 r0 170
+	ptc	r4
 	addi	r2 r0 100
 	addi	r3 r0 17000
 	muli	r3 r3 10
