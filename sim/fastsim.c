@@ -638,6 +638,7 @@ int do_assemble2(program *program, program2 * program2)
   int iname, arg1, arg2, arg3;
   int marume;
   int count = 0;
+  int firstflag = 1;
   
   while (1) {
     pc = nextpc;
@@ -869,7 +870,16 @@ int do_assemble2(program *program, program2 * program2)
       //freg[ist.name[1]] = buffer.d;
     }
     else if (iname == PTC) {
-      fprintf(out_fp,"%c",regist[ist.name[1]]);
+      /*最初のOXAAは無視する*/
+      if(firstflag == 1){
+        if(regist[ist.name[1]] != 170){
+          printf("first char is not 0xAA!!: %c\n",regist[ist.name[1]]);
+          exit(1);
+        }
+        firstflag = 0;
+      }else{
+        fprintf(out_fp,"%c",regist[ist.name[1]]);
+      }
     }
     else if (iname == PTF) {
       marume = (int) (freg[ist.name[1]] + 0.5);
