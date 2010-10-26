@@ -34,7 +34,6 @@ type block = bid * ((t list) * (bid list))
 type func = block list
 type prog = func list
 type ptyp = I | F
-type tl_or_nto = T | N of bid
 
 let merge_alist x y =
   List.fold_left (fun a b ->
@@ -46,69 +45,72 @@ let ptyp_of_type = function Type.Float -> F | _ -> I
 
 exception IllegalPattern
 exception NestedLet
+exception FatalError
 
-let rec each_conv blks cblk cbid rids tl e =
-  let rid = List.hd rids in
+let rec each_conv cblk cbid nbid rid e =
+  let sel_if x y z w = function
+    | Closure.IfEq _ -> IfEq (x, y, z, w)
+    | Closure.IfLE _ -> IfLE (x, y, z, w)
+    | _ -> raise FatalError in
+  let nextid = function Some x -> [x] | None -> [] in
+  let imm_conv n = function
+    | Closure.Unit -> []
+    | Closure.Int x -> [Addzi (n, x)]
+    | Closure.Float x -> [FLoad (n, x)]
+    | Closure.Neg x -> [Subz (n, x)]
+    | Closure.Add (x, y) -> [Add (n, x, y)]
+    | Closure.Sub (x, y) -> [Sub (n, x, y)]
+    | Closure.Mul (x, y) -> [Mul (n, x, y)]
+    | Closure.FNeg x -> [FSubz (n, x)]
+    | Closure.FAdd (x, y) -> [FAdd (n, x, y)]
+    | Closure.FSub (x, y) -> [FSub (n, x, y)]
+    | Closure.FMul (x, y) -> [FMul (n, x, y)]
+    | Closure.FDiv (x, y) -> [FDiv (n, x, y)]
+    | Closure.Floor x -> [Flr (n, x)]
+    | Closure.Float_of_int x -> [Foi (n, x)]
+    | Closure.Var x -> 
+	(*本当はnをxで置き換えちゃえばいい*)
+	(*てかこの操作はClosureのままでもできるだろう*)
+	[Var x]
+    | Closure.AppDir (Id.L x, y) -> [Call ([n], x, y)]
+    | Closure.Tuple x -> [Tuple (n, x)]
+    | Closure.Get (x, y) -> [Get (n, x, y)]
+    | Closure.Put (x, y, z) -> [Put (x, y, z)]
+    | Closure.ExtArray (Id.L x) -> [ExtArray (n, x)]
+    | Closure.ExtTuple x -> [ExtTuple (n, x)]
+    | Closure.IfEq _ | Closure.IfLE _
+    | Closure.Let _ | Closure.LetTuple _
+    | Closure.MakeCls _ | Closure.AppCls _ -> raise FatalError in
     match e with
-      | Closure.Unit -> (blks, [], [])
-      | Closure.Int x -> (blks, [rid, I], [Addzi (rid, x)])
-      | Closure.Float x -> (blks, [rid, F], [FLoad (rid, x)])
-      | Closure.Neg x -> (blks, [rid, I], [Subz (rid, x)])
-      | Closure.Add (x, y) -> (blks, [rid, I], [Add (rid, x, y)])
-      | Closure.Sub (x, y) -> (blks, [rid, I], [Sub (rid, x, y)])
-      | Closure.Mul (x, y) -> (blks, [rid, I], [Mul (rid, x, y)])
-      | Closure.FNeg x -> (blks, [rid, F], [FSubz (rid, x)])
-      | Closure.FAdd (x, y) -> (blks, [rid, F], [FAdd (rid, x, y)])
-      | Closure.FSub (x, y) -> (blks, [rid, F], [FSub (rid, x, y)])
-      | Closure.FMul (x, y) -> (blks, [rid, F], [FMul (rid, x, y)])
-      | Closure.FDiv (x, y) -> (blks, [rid, F], [FDiv (rid, x, y)])
-      | Closure.Floor x -> (blks, [rid, F], [Flr (rid, x)])
-      | Closure.Float_of_int x -> (blks, [rid, F], [Foi (rid, x)])
-	  (*tekito kokokara*)
-      | Closure.Var x -> 
-	  (*本当はnをxで置き換えちゃえばいい*)
-	  (blks, [rid, I(*tekito*)], [Var x])
-      | Closure.AppDir (Id.L x, y) -> (blks, [rid, I(*tekito*)], [Call ([rid], x, y)])
-      | Closure.Tuple x -> (blks, [rid, I], [Tuple (rid, x)])
-      | Closure.Get (x, y) -> (blks, [rid, I(*tekito*)], [Get (rid, x, y)])
-      | Closure.Put (x, y, z) -> (blks, [], [Put (x, y, z)])
-      | Closure.ExtArray (Id.L x) -> (blks, [rid, I], [ExtArray (rid, x)])
-      | Closure.ExtTuple x -> (blks, [rid, I], [ExtTuple (rid, x)])
-	  (*kokomade*)
-      | Closure.IfEq (x, y, z, w) ->
-	  let (b, t, e) = if_conv blks rids tl z w in
-	    ((cbid, (cblk @ [IfEq (x, y, t, e)], [t; e])) :: b, [], [])
-      | Closure.IfLE (x, y, z, w) ->
-	  let (b, t, e) = if_conv blks rids tl z w in
-	    ((cbid, (cblk @ [IfLE (x, y, t, e)], [t; e])) :: b, [], [])
-      | Closure.Let ((x, _), z, w) ->
-	  let nbid = genid "let" in
-	  let (b1, _, t1) = each_conv blks cblk cbid [x] (N nbid) z in
-	  let (b2, t, t2) =
-	    if List.mem_assoc nbid b1
-	    then each_conv b1 t1 nbid rids tl w
-	    else each_conv b1 (cblk @ t1) cbid rids tl w in
-	    (b2, t, t2)
+      | Closure.Let ((n, t), e1, e2) ->
+	  (match e1 with
+	     | Closure.IfEq (x, y, z, w) | Closure.IfLE (x, y, z, w) ->
+		 let contid = genid "cont" in
+		 let thenid = genid "then" in
+		 let elseid = genid "else" in
+		 let contblks = each_conv [] contid nbid rid e2 in
+		 let thenblks = each_conv [] thenid (Some contid) n z in
+		 let elseblks = each_conv [] elseid (Some contid) n w in
+		   (cbid, (cblk @ [sel_if x y thenid elseid e1], [thenid; elseid]))
+		   :: (thenblks @ elseblks @ contblks)
+	     | Closure.Let _ | Closure.LetTuple _ -> raise NestedLet
+	     | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
+	     | _ -> each_conv (cblk @ (imm_conv n e1)) cbid nbid rid e2
+	  )
       | Closure.LetTuple (x, z, w) ->
-	  let t = [LetTuple (fst (List.split x), z)] in
-	    each_conv blks (cblk @ t) cbid rids tl w
-      | Closure.MakeCls _
-      | Closure.AppCls _ -> raise IllegalPattern
-and if_conv blks rids tl z w =
-  let tid = genid "then" in
-  let eid = genid "else" in
-  let (b1, _, q) = each_conv blks [] tid rids tl z in
-  let (b2, _, s) = each_conv blks [] eid rids tl w in
-  let mb = merge_alist b1 b2 in
-  let b = 
-    match tl with
-      | T -> [tid, (q, []); eid, (s, [])]
-      | N x -> [tid, (q, [x]); eid, (s, [x])] in
-    (b @ mb, tid, eid)
-      
+	  each_conv (cblk @ [LetTuple (List.map fst x, z)]) cbid nbid rid w
+      | Closure.IfEq (x, y, z, w) | Closure.IfLE (x, y, z, w) ->
+	  let thenid = genid "then" in
+	  let elseid = genid "else" in
+	  let thenblks = each_conv [] thenid nbid rid z in
+	  let elseblks = each_conv [] elseid nbid rid w in
+	    (cbid, (cblk @ [sel_if x y thenid elseid e], [thenid; elseid]))
+	    :: (thenblks @ elseblks)
+      | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
+      | _ -> [cbid, (cblk @ (imm_conv rid e), nextid nbid)]
+	  
 let each_conv (Id.L x, _) z =
-  (*TODO:ridsのセット*)
-  each_conv [] [] x [genid "ret"] T z
+  each_conv [] x None (genid "ret") z
     
 let conv (Closure.Prog (l, t)) =
   let mbid = "min_caml_start" in
@@ -149,11 +151,10 @@ let print_func x =
 
 let print_prog x =
   List.iter print_func x
-
-      
+    
 let f x =
   let k = conv x in
-    print_prog (List.map (fun (x, _, _) -> x) k);
+    print_prog k;
     k
       
 (*タプル最適化*)
