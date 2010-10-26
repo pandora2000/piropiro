@@ -3,8 +3,6 @@ open Printf
 type id = string
 type bid = string
 type t =
-  | Var of id
-  | ExtArray of id
   | Addzi of id * int
   | Subz of id * id
   | Addi of id * id * int
@@ -21,14 +19,20 @@ type t =
   | FDiv of id * id * id
   | Flr of id * id
   | Foi of id * id
-  | Get of id * id * id
-  | Put of id * id * id
+  | Call of (id list) * id * (id list)
+  | Ret of id
   | IfEq of id * id * bid * bid
   | IfLE of id * id * bid * bid
-  | App of (id list) * id * (id list)
-  | Ret of id
+  | Var of id
+  | Tuple of id * (id list)
+  | Get of id * id * id
+  | Put of id * id * id
+  | ExtArray of id * id
+  | ExtTuple of id * id
+  | LetTuple of (id list) * id
 type block = bid * ((t list) * (bid list))
 type func = block list
+type prog = func list
 type ptyp = I | F
 type tl_or_nto = T | N of bid
 
@@ -37,6 +41,8 @@ let merge_alist x y =
 		    if List.mem_assoc (fst b) a then a else b :: a) x y
 
 let genid x = Id.genid x
+
+let ptyp_of_type = function Type.Float -> F | _ -> I
 
 exception IllegalPattern
 exception NestedLet
@@ -58,6 +64,17 @@ let rec each_conv blks cblk cbid rids tl e =
       | Closure.FDiv (x, y) -> (blks, [rid, F], [FDiv (rid, x, y)])
       | Closure.Floor x -> (blks, [rid, F], [Flr (rid, x)])
       | Closure.Float_of_int x -> (blks, [rid, F], [Foi (rid, x)])
+	  (*tekito kokokara*)
+      | Closure.Var x -> 
+	  (*本当はnをxで置き換えちゃえばいい*)
+	  (blks, [rid, I(*tekito*)], [Var x])
+      | Closure.AppDir (Id.L x, y) -> (blks, [rid, I(*tekito*)], [Call ([rid], x, y)])
+      | Closure.Tuple x -> (blks, [rid, I], [Tuple (rid, x)])
+      | Closure.Get (x, y) -> (blks, [rid, I(*tekito*)], [Get (rid, x, y)])
+      | Closure.Put (x, y, z) -> (blks, [], [Put (x, y, z)])
+      | Closure.ExtArray (Id.L x) -> (blks, [rid, I], [ExtArray (rid, x)])
+      | Closure.ExtTuple x -> (blks, [rid, I], [ExtTuple (rid, x)])
+	  (*kokomade*)
       | Closure.IfEq (x, y, z, w) ->
 	  let (b, t, e) = if_conv blks rids tl z w in
 	    ((cbid, (cblk @ [IfEq (x, y, t, e)], [t; e])) :: b, [], [])
@@ -72,14 +89,9 @@ let rec each_conv blks cblk cbid rids tl e =
 	    then each_conv b1 t1 nbid rids tl w
 	    else each_conv b1 (cblk @ t1) cbid rids tl w in
 	    (b2, t, t2)
-    (*  | Closure.Var of Id.t
-      | Closure.AppDir of Id.l * Id.t list
-      | Closure.Tuple of Id.t list
-      | Closure.LetTuple of (Id.t * Type.t) list * Id.t * t
-      | Closure.Get of Id.t * Id.t
-      | Closure.Put of Id.t * Id.t * Id.t
-      | Closure.ExtTuple of Id.t
-      | Closure.ExtArray of Id.l*)
+      | Closure.LetTuple (x, z, w) ->
+	  let t = [LetTuple (fst (List.split x), z)] in
+	    each_conv blks (cblk @ t) cbid rids tl w
       | Closure.MakeCls _
       | Closure.AppCls _ -> raise IllegalPattern
 and if_conv blks rids tl z w =
@@ -100,12 +112,50 @@ let each_conv (Id.L x, _) z =
     
 let conv (Closure.Prog (l, t)) =
   let mbid = "min_caml_start" in
-    (List.map (fun x -> each_conv x.Closure.name x.Closure.body) l,
-     each_conv (Id.L mbid, Type.Unit) t)
+    (List.map (fun x -> each_conv x.Closure.name x.Closure.body) l) @
+      [each_conv (Id.L mbid, Type.Unit) t]
+
+let sotn = function
+  | Addzi _ -> "Addzi" | Subz _ -> "Subz" | Addi _ -> "Addi" | Subi _ -> "Subi"
+  | Muli _ -> "Muli" | Add _ -> "Add" | Sub _ -> "Sub" | Mul _ -> "Mul" | FLoad _ -> "FLoad"
+  | FSubz _ -> "FSubz" | FAdd _ -> "FAdd" | FSub _ -> "FSub" | FMul _ -> "FMul"
+  | FDiv _ -> "FDiv" | Flr _ -> "Flr" | Foi _ -> "Foi" | Call _ -> "Call" | Ret _ -> "Ret"
+  | IfEq _ -> "IfEq" | IfLE _ -> "IfLE" | Var _ -> "Var" | Tuple _ -> "Tuple"
+  | Get _ -> "Get" | Put _ -> "Put" | ExtArray _ -> "ExtArray"
+  | ExtTuple _ -> "ExtTuple" | LetTuple _ -> "LetTuple"
+
+let print_t e =
+  match e with
+    | Addzi (x, y) -> printf "\t%s %s %d\n" (sotn e) x y
+    | FLoad (x, y) -> printf "\t%s %s %f\n" (sotn e) x y
+    | Subz (x, y) | FSubz (x, y) | Flr (x, y) | Foi (x, y)
+    | ExtArray (x, y) | ExtTuple (x, y) ->
+	printf "\t%s %s %s\n" (sotn e) x y
+    | Addi (x, y, z) | Subi (x, y, z) | Muli (x, y, z) ->
+	printf "\t%s %s %s %d\n" (sotn e) x y z
+    | Add (x, y, z) | Sub (x, y, z) | Mul (x, y, z)
+    | FAdd (x, y, z) | FSub (x, y, z) | FMul (x, y, z) | FDiv (x, y, z)
+    | Get (x, y, z) | Put (x, y, z) ->
+	printf "\t%s %s %s %s\n" (sotn e) x y z
+    | Ret x | Var x -> printf "\t%s %s\n" (sotn e) x
+    | _ -> printf "\t%s\n" (sotn e)
+
+let print_block (x, (y, z)) =
+  printf "%s -> (%s)\n" x (String.concat ", " z);
+  List.iter print_t y
+
+let print_func x =
+  List.iter print_block x
+
+let print_prog x =
+  List.iter print_func x
+
       
-let f x = conv x
-
-
+let f x =
+  let k = conv x in
+    print_prog (List.map (fun (x, _, _) -> x) k);
+    k
+      
 (*タプル最適化*)
 (*
   ・関数呼び出し
