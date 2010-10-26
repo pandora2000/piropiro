@@ -96,6 +96,7 @@ let lexbuf outchan foutchan boutchan a = (* バッファをコンパイルしてチャンネルへ
       Asm.print_prog stdout h;
     *)
   let i = Emit.f outchan foutchan !istest memext memin memout memsp memhp floffset h in
+    ignore (Opt.f f);
     
     
 (*    
