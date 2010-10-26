@@ -34,12 +34,12 @@ int main(int argc, char *argv[])
 	}
       else if(state == 2)
 	{
-	  fprintf(out_fp, "%da ", ic);
+	  fprintf(out_fp, "%d ", ic);
 	  state = 3;
 	}
       else if(state == 3)
 	{
-	  fprintf(out_fp, "%db ", ic);
+	  fprintf(out_fp, "%d ", ic);
 	  state = 4;
 	}
       else
