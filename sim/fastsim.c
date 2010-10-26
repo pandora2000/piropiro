@@ -138,6 +138,19 @@ void print_label(label * label)
   return;
 }
 
+char *get_label_from_index(program *program, int index)
+{
+  int j;
+     
+  for (j = 0; j < program->label_count; ++j) {
+    if (program->labels[j]->index == index) {
+      return program->labels[j]->name;
+    }
+  }
+
+  return NULL;
+}
+
 void print_label_from_index(program *program, int index)
 {
   int j;
@@ -577,10 +590,10 @@ program2 *parse_all2(program * program)
       PARSE_INST_8("return", 41)
       PARSE_INST_8("bp", 42)
 
-            PARSE_INST_12("rdi", RDI)
-            PARSE_INST_13("rdf", RDF)
-            PARSE_INST_12("ptc", PTC)
-            PARSE_INST_13("ptf", PTF)      
+      PARSE_INST_12("rdi", RDI)
+      PARSE_INST_13("rdf", RDF)
+      PARSE_INST_12("ptc", PTC)
+      PARSE_INST_13("ptf", PTF)      
     else {
       printf("Error : this is iligal inst!: %s\n", iname);
       exit(1);
@@ -754,19 +767,20 @@ int do_assemble2(program *program, program2 * program2)
       memory[regist[ist.name[2]] + ist.name[3]].i =  regist[ist.name[1]];
     }
 
-    else if (iname == 25) {
-      //memory_check
-      /*
-	if (check_memory(regist[ist.name[2]] + ist.name[3])
-	== ACSESS_BAD) {
-	printf("Error:ACSESS_BAD :\n");
-	//printf("%d\n", iname);
-	exit(1);
-	}
-      */
-      freg[ist.name[1]] =
-	memory[regist[ist.name[2]] + ist.name[3]].d;
-    }
+    else if (iname == 25)
+      {
+	//memory_check
+	/*
+	  if (check_memory(regist[ist.name[2]] + ist.name[3])
+	  == ACSESS_BAD) {
+	  printf("Error:ACSESS_BAD :\n");
+	  //printf("%d\n", iname);
+	  exit(1);
+	  }
+	*/
+	freg[ist.name[1]] =
+	  memory[regist[ist.name[2]] + ist.name[3]].d;
+      }
 
     else if (iname == 26) {
       //memory_check
@@ -855,7 +869,7 @@ int do_assemble2(program *program, program2 * program2)
 
     /*JUMP命令 */
     else if (iname == 39) {
-	  nextpc = ist.name[1] - 1;
+      nextpc = ist.name[1] - 1;
     }
     else if (iname == 40) {
       nextpc = ist.name[1] - 1;

@@ -31,7 +31,7 @@ type t =
   | ExtTuple of id * id
   | LetTuple of (id list) * id
 type block = bid * ((t list) * (bid list))
-type func = block list
+type func = (id list) * (id list) * (block list)
 type prog = func list
 type ptyp = I | F
 
@@ -109,13 +109,18 @@ let rec each_conv cblk cbid nbid rid e =
       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
       | _ -> [cbid, (cblk @ (imm_conv rid e), nextid nbid)]
 	  
-let each_conv (Id.L x, _) z =
+let each_conv rid (Id.L x, _) z =
   each_conv [] x None (genid "ret") z
     
 let conv (Closure.Prog (l, t)) =
   let mbid = "min_caml_start" in
-    (List.map (fun x -> each_conv x.Closure.name x.Closure.body) l) @
-      [each_conv (Id.L mbid, Type.Unit) t]
+  let mrid = genid "mret" in
+    (List.map (fun x ->
+		 let rid = genid "ret" in
+		   ([rid],
+		    List.map fst x.Closure.args,
+		    each_conv rid x.Closure.name x.Closure.body)) l) @
+      [[mrid], [], each_conv mrid (Id.L mbid, Type.Unit) t]
 
 let sotn = function
   | Addzi _ -> "Addzi" | Subz _ -> "Subz" | Addi _ -> "Addi" | Subi _ -> "Subi"
@@ -128,26 +133,31 @@ let sotn = function
 
 let print_t e =
   match e with
-    | Addzi (x, y) -> printf "\t%s %s %d\n" (sotn e) x y
-    | FLoad (x, y) -> printf "\t%s %s %f\n" (sotn e) x y
+    | Addzi (x, y) -> printf "\t\t%s %s %d\n" (sotn e) x y
+    | FLoad (x, y) -> printf "\t\t%s %s %f\n" (sotn e) x y
     | Subz (x, y) | FSubz (x, y) | Flr (x, y) | Foi (x, y)
     | ExtArray (x, y) | ExtTuple (x, y) ->
-	printf "\t%s %s %s\n" (sotn e) x y
+	printf "\t\t%s %s %s\n" (sotn e) x y
     | Addi (x, y, z) | Subi (x, y, z) | Muli (x, y, z) ->
-	printf "\t%s %s %s %d\n" (sotn e) x y z
+	printf "\t\t%s %s %s %d\n" (sotn e) x y z
     | Add (x, y, z) | Sub (x, y, z) | Mul (x, y, z)
     | FAdd (x, y, z) | FSub (x, y, z) | FMul (x, y, z) | FDiv (x, y, z)
     | Get (x, y, z) | Put (x, y, z) ->
-	printf "\t%s %s %s %s\n" (sotn e) x y z
-    | Ret x | Var x -> printf "\t%s %s\n" (sotn e) x
-    | _ -> printf "\t%s\n" (sotn e)
+	printf "\t\t%s %s %s %s\n" (sotn e) x y z
+    | Ret x | Var x -> printf "\t\t%s %s\n" (sotn e) x
+    | IfEq (x, y, _, _) | IfLE (x, y, _, _) -> printf "\t\t%s %s %s\n" (sotn e) x y
+    | Call (x, y, z) ->
+	printf "\t\t%s (%s) <- %s (%s)\n" (sotn e)
+	  (String.concat ", " x) y (String.concat ", " z)
+    | _ -> printf "\t\t%s\n" (sotn e)
 
 let print_block (x, (y, z)) =
-  printf "%s -> (%s)\n" x (String.concat ", " z);
+  printf "\t%s -> (%s)\n" x (String.concat ", " z);
   List.iter print_t y
 
-let print_func x =
-  List.iter print_block x
+let print_func (x, y, z) =
+  printf "(%s) <- (%s)\n" (String.concat ", " x) (String.concat ", " y);
+  List.iter print_block z
 
 let print_prog x =
   List.iter print_func x
