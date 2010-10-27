@@ -21,15 +21,15 @@ type t =
   | IfLE of id * id * bid * bid
   | IfFEq of id * id * bid * bid
   | IfFLE of id * id * bid * bid
-  | Var of id * id(* *)
-  | Tuple of id * (id list)(* *)
+  | Var of id * id
+  | Tuple of id * (id list)
   | Get of id * id * id
   | Put of id * id * id
   | FGet of id * id * id
   | FPut of id * id * id
-  | ExtArray of id * id(* *)
-  | ExtTuple of id * id(* *)
-  | LetTuple of (id list) * id(* *)
+  | ExtArray of id * id
+  | ExtTuple of id * id
+  | LetTuple of (id list) * id
 type block = bid * ((t list) * (bid list))
 type func = bid * (id list) * (id list) * (block list)
 type ent_func = bid * block list
@@ -146,35 +146,73 @@ let conv (Closure.Prog (l, t)) =
      (mbid, each_conv mrid Type.Unit mbid M.empty t))
 
 (*次のラベルと式を返す*)
-let peach_rconv bid blks tenv = 
-  let (cblk, _) = List.assoc bid blks in
+let rec peach_rconv bid blks tenv =
+  let sel_if x y z w = function
+    | IfEq _ | IfFEq _ -> Closure.IfEq (x, y, z, w)
+    | IfLE _ | IfFLE _ -> Closure.IfLE (x, y, z, w)
+    | _ -> raise FatalError in
+  let imm_rconv = function
+    | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | LetTuple _ -> raise FatalError
+    | Addzi (x, y) -> (x, Type.Int, Closure.Int y)
+    | Subz (x, y) -> (x, Type.Int, Closure.Neg y)
+    | Add (x, y, z) -> (x, Type.Int, Closure.Add (y, z))
+    | Sub (x, y, z) -> (x, Type.Int, Closure.Sub (y, z))
+    | Mul (x, y, z) -> (x, Type.Int, Closure.Mul (y, z))
+    | FLoad (x, y) -> (x, Type.Float, Closure.Float y)
+    | FSubz (x, y) -> (x, Type.Float, Closure.FNeg y)
+    | FAdd (x, y, z) -> (x, Type.Float, Closure.FAdd (y, z))
+    | FSub (x, y, z) -> (x, Type.Float, Closure.FSub (y, z))
+    | FMul (x, y, z) -> (x, Type.Float, Closure.FMul (y, z))
+    | FDiv (x, y, z) -> (x, Type.Float, Closure.FDiv (y, z))
+    | Flr (x, y) -> (x, Type.Float, Closure.Floor y)
+    | Foi (x, y) -> (x, Type.Float, Closure.Float_of_int y)
+    | Call (x, y, z) -> (x, M.find y tenv, Closure.AppDir (Id.L y, z))
+    | Var (x, y) -> (x, M.find x tenv, Closure.Var y)
+    | Tuple (x, y) -> (x, M.find x tenv, Closure.Tuple y)
+    | Get (x, y, z) | FGet (x, y, z) ->
+	(x, M.find x tenv, Closure.Get (y, z))
+    | Put (x, y, z) | FPut (x, y, z) ->
+	(genid "put", Type.Unit, Closure.Put (x, y, z))
+    | ExtArray (x, y) -> (x, M.find x tenv, Closure.ExtArray (Id.L y))
+    | ExtTuple (x, y) -> (x, M.find x tenv, Closure.ExtTuple y) in
+  let (cblk, nbids) = List.assoc bid blks in
   let r =
     List.fold_right
       (fun e -> function
-	 | None -> None
+	 | None ->
+	     (match e with
+		| LetTuple _ -> raise FatalError
+		| IfEq (x, y, z, w) | IfLE (x, y, z, w)
+		| IfFEq (x, y, z, w) | IfFLE (x, y, z, w) ->
+		    let (n, thenexp) = peach_rconv z blks tenv in
+		    let (_, elseexp) = peach_rconv w blks tenv in
+		      Some (
+			(match n with
+			   | None -> None
+			   | Some n ->
+			       let (m, contexp) = peach_rconv n blks tenv in m),
+			sel_if x y thenexp elseexp e)
+		| _ ->
+		    let (_, _, ex) = imm_rconv e in
+		      Some (
+			(match nbids with
+			   | [] -> None
+			   | [x] -> Some x
+			   | _ -> raise FatalError),
+			ex))
 	 | Some (nbid, exp) ->
-	     let (n, t, e) =
-	       match e with
-		 | Addzi (x, y) -> (x, Type.Int, Closure.Int y)
-		 | Subz (x, y) -> (x, Type.Int, Closure.Neg y)
-		 | Add (x, y, z) -> (x, Type.Int, Closure.Add (y, z))
-		 | Sub (x, y, z) -> (x, Type.Int, Closure.Sub (y, z))
-		 | Mul (x, y, z) -> (x, Type.Int, Closure.Mul (y, z))
-		 | FLoad (x, y) -> (x, Type.Float, Closure.Float y)
-		 | FSubz (x, y) -> (x, Type.Float, Closure.FNeg y)
-		 | FAdd (x, y, z) -> (x, Type.Float, Closure.FAdd (y, z))
-		 | FSub (x, y, z) -> (x, Type.Float, Closure.FSub (y, z))
-		 | FMul (x, y, z) -> (x, Type.Float, Closure.FMul (y, z))
-		 | FDiv (x, y, z) -> (x, Type.Float, Closure.FDiv (y, z))
-		 | Flr (x, y) -> (x, Type.Float, Closure.Floor y)
-		 | Foi (x, y) -> (x, Type.Float, Closure.Float_of_int y)
-		 | Call (x, y, z) -> (x, M.find y tenv, Closure.AppDir (Id.L y, z))
-		 | Var (x, y) -> (x, M.find x tenv, Closure.Var y)
-	     in
-	       Some (n, e)
+	     Some
+	       (nbid,
+		match e with
+		  | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ -> raise FatalError
+		  | LetTuple (x, y) ->
+		      Closure.LetTuple (List.map (fun x -> (x, M.find x tenv)) x, y, exp)
+		  | _ ->
+		      let (n, t, ex) = imm_rconv e in
+			Closure.Let ((n, t), ex, exp))
       ) cblk None in
     match r with
-      | None -> raise NoExpression
+      | None -> (None, Closure.Unit)
       | Some r -> r
 
 let each_rconv (bid, rl, al, blks) tenv =
