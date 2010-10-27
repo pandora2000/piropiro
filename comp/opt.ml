@@ -3,6 +3,7 @@ open Printf
 type id = string
 type bid = string
 type t =
+  | Unit of id
   | Addzi of id * int
   | Subz of id * id
   | Add of id * id * id
@@ -37,8 +38,7 @@ type prog = (func list) * ent_func
 type ptyp = I | F
 
 let merge_alist x y =
-  List.fold_left (fun a b ->
-		    if List.mem_assoc (fst b) a then a else b :: a) x y
+  List.fold_left (fun a b -> if List.mem_assoc (fst b) a then a else b :: a) x y
 
 let genid x = Id.genid x
 
@@ -49,23 +49,36 @@ exception NestedLet
 exception UnsupportedComparison
 exception NoExpression
 exception FatalError
+exception MyNotFound
+exception MyNotFound2
+exception MyNotFound3
+exception MyNotFound4
+exception MyNotFound5
+exception MyNotFound6
+exception MyNotFound7
+exception MyNotFound8
+exception MyNotFound9
+exception MyNotFound10
 
 let rec each_conv cblk cbid nbid rid rtyp env e =
-  let sel_if x y z w env = function
-    | Closure.IfEq _ ->
-	(match M.find x env with
-	   | Type.Float -> IfFEq (x, y, z, w)
-	   | Type.Int -> IfEq (x, y, z, w)
-	   | _ -> raise UnsupportedComparison)
-    | Closure.IfLE _ ->
-	(match M.find x env with
-	   | Type.Float -> IfFLE (x, y, z, w)
-	   | Type.Int -> IfLE (x, y, z, w)
-	   | _ -> raise UnsupportedComparison)
-    | _ -> raise FatalError in
+  let sel_if x y z w env e =
+    try
+      match e with
+	| Closure.IfEq _ ->
+	    (match M.find x env with
+	       | Type.Float -> IfFEq (x, y, z, w)
+	       | Type.Int | Type.Bool -> IfEq (x, y, z, w)
+	       | _ -> raise UnsupportedComparison)
+	| Closure.IfLE _ ->
+	    (match M.find x env with
+	       | Type.Float -> IfFLE (x, y, z, w)
+	       | Type.Int | Type.Bool -> IfLE (x, y, z, w)
+	       | _ -> raise UnsupportedComparison)
+	| _ -> raise FatalError 
+    with Not_found -> raise MyNotFound in
   let nextid = function Some x -> [x] | None -> [] in
   let imm_conv n t = function
-    | Closure.Unit -> []
+    | Closure.Unit -> [Unit n]
     | Closure.Int x -> [Addzi (n, x)]
     | Closure.Float x -> [FLoad (n, x)]
     | Closure.Neg x -> [Subz (n, x)]
@@ -134,16 +147,17 @@ let each_conv rid rtyp x env z =
 let conv (Closure.Prog (l, t)) =
   let mbid = "min_caml_start" in
   let mrid = genid "mret" in
-    ((List.map (fun { Closure.name = (Id.L x, y); Closure.args = z; Closure.formal_fv = _;
-		      Closure.body = w } ->
-		  let rid = genid "ret" in
-		  let rtyp = match y with Type.Fun (z, w) -> w | _ -> raise FatalError in
-		    (x, [rid],
-		     List.map fst z,
-		     each_conv rid rtyp x
-		       (M.add x y (M.add_list z M.empty))
-		       w)) l),
-     (mbid, each_conv mrid Type.Unit mbid M.empty t))
+  let (p, q) = List.split
+    (List.map (fun { Closure.name = (Id.L x, y); Closure.args = z; Closure.formal_fv = _;
+		     Closure.body = w } ->
+		 let rid = genid "ret" in
+		 let rtyp = match y with Type.Fun (_, w) -> w | _ -> raise FatalError in
+		   ((rid, rtyp), (x, [rid],
+				  List.map fst z,
+				  each_conv rid rtyp x
+				    (M.add x y (M.add_list z M.empty))
+				    w))) l) in
+    (p, (q, (mbid, each_conv mrid Type.Unit mbid M.empty t)))
 
 (*次のラベルと式を返す*)
 let rec peach_rconv bid blks tenv =
@@ -151,30 +165,53 @@ let rec peach_rconv bid blks tenv =
     | IfEq _ | IfFEq _ -> Closure.IfEq (x, y, z, w)
     | IfLE _ | IfFLE _ -> Closure.IfLE (x, y, z, w)
     | _ -> raise FatalError in
-  let imm_rconv = function
-    | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | LetTuple _ -> raise FatalError
-    | Addzi (x, y) -> (x, Type.Int, Closure.Int y)
-    | Subz (x, y) -> (x, Type.Int, Closure.Neg y)
-    | Add (x, y, z) -> (x, Type.Int, Closure.Add (y, z))
-    | Sub (x, y, z) -> (x, Type.Int, Closure.Sub (y, z))
-    | Mul (x, y, z) -> (x, Type.Int, Closure.Mul (y, z))
-    | FLoad (x, y) -> (x, Type.Float, Closure.Float y)
-    | FSubz (x, y) -> (x, Type.Float, Closure.FNeg y)
-    | FAdd (x, y, z) -> (x, Type.Float, Closure.FAdd (y, z))
-    | FSub (x, y, z) -> (x, Type.Float, Closure.FSub (y, z))
-    | FMul (x, y, z) -> (x, Type.Float, Closure.FMul (y, z))
-    | FDiv (x, y, z) -> (x, Type.Float, Closure.FDiv (y, z))
-    | Flr (x, y) -> (x, Type.Float, Closure.Floor y)
-    | Foi (x, y) -> (x, Type.Float, Closure.Float_of_int y)
-    | Call (x, y, z) -> (x, M.find y tenv, Closure.AppDir (Id.L y, z))
-    | Var (x, y) -> (x, M.find x tenv, Closure.Var y)
-    | Tuple (x, y) -> (x, M.find x tenv, Closure.Tuple y)
-    | Get (x, y, z) | FGet (x, y, z) ->
-	(x, M.find x tenv, Closure.Get (y, z))
-    | Put (x, y, z) | FPut (x, y, z) ->
-	(genid "put", Type.Unit, Closure.Put (x, y, z))
-    | ExtArray (x, y) -> (x, M.find x tenv, Closure.ExtArray (Id.L y))
-    | ExtTuple (x, y) -> (x, M.find x tenv, Closure.ExtTuple y) in
+  let imm_rconv e =
+    try
+      match e with
+	| IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | LetTuple _ -> raise FatalError
+	| Unit x -> (x, Type.Unit, Closure.Unit)
+	| Addzi (x, y) -> (x, Type.Int, Closure.Int y)
+	| Subz (x, y) -> (x, Type.Int, Closure.Neg y)
+	| Add (x, y, z) -> (x, Type.Int, Closure.Add (y, z))
+	| Sub (x, y, z) -> (x, Type.Int, Closure.Sub (y, z))
+	| Mul (x, y, z) -> (x, Type.Int, Closure.Mul (y, z))
+	| FLoad (x, y) -> (x, Type.Float, Closure.Float y)
+	| FSubz (x, y) -> (x, Type.Float, Closure.FNeg y)
+	| FAdd (x, y, z) -> (x, Type.Float, Closure.FAdd (y, z))
+	| FSub (x, y, z) -> (x, Type.Float, Closure.FSub (y, z))
+	| FMul (x, y, z) -> (x, Type.Float, Closure.FMul (y, z))
+	| FDiv (x, y, z) -> (x, Type.Float, Closure.FDiv (y, z))
+	| Flr (x, y) -> (x, Type.Float, Closure.Floor y)
+	| Foi (x, y) -> (x, Type.Float, Closure.Float_of_int y)
+	| Call (x, y, z) ->
+	    (try
+	       (x, M.find x tenv, Closure.AppDir (Id.L y, z))
+	     with Not_found -> printf "%s %s\n" x y; raise MyNotFound10)
+	| Var (x, y) ->
+	    (try
+	       (x, M.find x tenv, Closure.Var y)
+	     with Not_found -> raise MyNotFound7)
+	| Tuple (x, y) ->
+	    (try
+	       (x, M.find x tenv, Closure.Tuple y)
+	     with Not_found -> raise MyNotFound8)
+	| Get (x, y, z) | FGet (x, y, z) ->
+	    (try
+	       (x, M.find x tenv, Closure.Get (y, z))
+	     with Not_found -> raise MyNotFound9)
+	| Put (x, y, z) | FPut (x, y, z) ->
+	    (try
+	       (genid "put", Type.Unit, Closure.Put (x, y, z))
+	     with Not_found -> raise MyNotFound6)
+	| ExtArray (x, y) ->
+	    (try
+	       (x, M.find x tenv, Closure.ExtArray (Id.L y))
+	     with Not_found -> raise MyNotFound4)
+	| ExtTuple (x, y) ->
+	    (try
+	       (x, M.find x tenv, Closure.ExtTuple y)
+	     with Not_found -> raise MyNotFound5)
+    with Not_found -> raise MyNotFound2 in
   let (cblk, nbids) = List.assoc bid blks in
   let r =
     List.fold_right
@@ -206,7 +243,9 @@ let rec peach_rconv bid blks tenv =
 		match e with
 		  | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ -> raise FatalError
 		  | LetTuple (x, y) ->
-		      Closure.LetTuple (List.map (fun x -> (x, M.find x tenv)) x, y, exp)
+		      (try
+			 Closure.LetTuple (List.map (fun x -> (x, M.find x tenv)) x, y, exp)
+		       with Not_found -> raise MyNotFound3)
 		  | _ ->
 		      let (n, t, ex) = imm_rconv e in
 			Closure.Let ((n, t), ex, exp))
@@ -217,10 +256,12 @@ let rec peach_rconv bid blks tenv =
 
 let each_rconv (bid, rl, al, blks) tenv =
   let (_, b) = peach_rconv bid blks tenv in
-    { Closure.name = (Id.L bid, Type.Unit); Closure.args = [];
+    { Closure.name = (Id.L bid, M.find bid tenv);
+      Closure.args = List.map (fun x -> (x, M.find x tenv)) al;
       Closure.formal_fv = []; Closure.body = b }
 
-let ent_rconv (nm, blks) t = Closure.Int 0
+let ent_rconv (nm, blks) tenv =
+  snd (peach_rconv nm blks tenv)
 
 let rconv (l, t) tenv =
   Closure.Prog (List.map (fun x -> each_rconv x tenv) l, ent_rconv t tenv)
@@ -252,7 +293,7 @@ let make_total_env (Closure.Prog (l, e)) =
     (List.fold_left (fun a b -> M.union (each_make_total_env b) a) M.empty l)
 
 let sotn = function
-  | Addzi _ -> "Addzi" | Subz _ -> "Subz"
+  | Addzi _ -> "Addzi" | Subz _ -> "Subz" | Unit _ -> "Unit"
   | Add _ -> "Add" | Sub _ -> "Sub" | Mul _ -> "Mul" | FLoad _ -> "FLoad"
   | FSubz _ -> "FSubz" | FAdd _ -> "FAdd" | FSub _ -> "FSub" | FMul _ -> "FMul"
   | FDiv _ -> "FDiv" | Flr _ -> "Flr" | Foi _ -> "Foi" | Call _ -> "Call"
@@ -263,6 +304,7 @@ let sotn = function
 
 let print_t e =
   match e with
+    | Unit x -> printf "\t\t%s %s\n" (sotn e) x
     | Addzi (x, y) -> printf "\t\t%s %s %d\n" (sotn e) x y
     | FLoad (x, y) -> printf "\t\t%s %s %f\n" (sotn e) x y
     | Subz (x, y) | FSubz (x, y) | Flr (x, y) | Foi (x, y)
@@ -292,15 +334,15 @@ let print_prog (x, (y, z)) =
   print_func (y, [], [], z)
     
 let f x =
-  let k = conv x in
+  let (_, k) = conv x in
     print_prog k;
     k
       
 let g x =
-  let k = conv x in
-  let tenv = make_total_env x in
+  let (p, k) = conv x in
+  let tenv = M.add_list p (make_total_env x) in
     rconv k tenv
-      
+
 (*タプル最適化*)
 (*
   ・関数呼び出し

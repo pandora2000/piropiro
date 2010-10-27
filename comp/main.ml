@@ -87,16 +87,19 @@ let lexbuf outchan foutchan boutchan a = (* バッファをコンパイルしてチャンネルへ
   let d = Alpha.f c in
   let e = iter !limit d in
   let f = Closure.f e in
-  let g = Virtual.f memin memout memext al f in
-  let h = RegAlloc.f g in
+  let pp = Opt.g f in
+(*  let h = RegAlloc.f g in*)
     (*
       Closure.print_prog stdout f;
       KNormal.print_prog stdout e;
       Asm.print_prog stdout g;
       Asm.print_prog stdout h;
     *)
-  let i = Emit.f outchan foutchan !istest memext memin memout memsp memhp floffset h in
-    ignore (Opt.f f);
+(*  let i = Emit.f outchan foutchan !istest memext memin memout memsp memhp floffset h in*)
+    (*ignore (Opt.f f);*)
+(*      Closure.print_prog stdout f;*)
+      Closure.print_prog stdout pp;
+  let g = Virtual.f memin memout memext al pp in
     
     
 (*    
