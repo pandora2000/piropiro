@@ -20,16 +20,19 @@ type t =
   | Flr of id * id
   | Foi of id * id
   | Call of (id list) * id * (id list)
-  | Ret of id
   | IfEq of id * id * bid * bid
   | IfLE of id * id * bid * bid
-  | Var of id
-  | Tuple of id * (id list)
+  | IfFEq of id * id * bid * bid
+  | IfFLE of id * id * bid * bid
+  | Var of id(* *)
+  | Tuple of id * (id list)(* *)
   | Get of id * id * id
   | Put of id * id * id
-  | ExtArray of id * id
-  | ExtTuple of id * id
-  | LetTuple of (id list) * id
+  | FGet of id * id * id
+  | FPut of id * id * id
+  | ExtArray of id * id(* *)
+  | ExtTuple of id * id(* *)
+  | LetTuple of (id list) * id(* *)
 type block = bid * ((t list) * (bid list))
 type func = (id list) * (id list) * (block list)
 type prog = func list
@@ -45,15 +48,24 @@ let ptyp_of_type = function Type.Float -> F | _ -> I
 
 exception IllegalPattern
 exception NestedLet
+exception UnsupportedComparison
 exception FatalError
 
-let rec each_conv cblk cbid nbid rid e =
-  let sel_if x y z w = function
-    | Closure.IfEq _ -> IfEq (x, y, z, w)
-    | Closure.IfLE _ -> IfLE (x, y, z, w)
+let rec each_conv cblk cbid nbid rid rtyp env e =
+  let sel_if x y z w env = function
+    | Closure.IfEq _ ->
+	(match M.find x env with
+	   | Type.Float -> IfFEq (x, y, z, w)
+	   | Type.Int -> IfEq (x, y, z, w)
+	   | _ -> raise UnsupportedComparison)
+    | Closure.IfLE _ ->
+	(match M.find x env with
+	   | Type.Float -> IfFLE (x, y, z, w)
+	   | Type.Int -> IfLE (x, y, z, w)
+	   | _ -> raise UnsupportedComparison)
     | _ -> raise FatalError in
   let nextid = function Some x -> [x] | None -> [] in
-  let imm_conv n = function
+  let imm_conv n t = function
     | Closure.Unit -> []
     | Closure.Int x -> [Addzi (n, x)]
     | Closure.Float x -> [FLoad (n, x)]
@@ -74,8 +86,14 @@ let rec each_conv cblk cbid nbid rid e =
 	[Var x]
     | Closure.AppDir (Id.L x, y) -> [Call ([n], x, y)]
     | Closure.Tuple x -> [Tuple (n, x)]
-    | Closure.Get (x, y) -> [Get (n, x, y)]
-    | Closure.Put (x, y, z) -> [Put (x, y, z)]
+    | Closure.Get (x, y) ->
+	(match t with
+	   | Type.Float -> [FGet (n, x, y)]
+	   | _ -> [Get (n, x, y)])
+    | Closure.Put (x, y, z) ->
+	(match t with
+	   | Type.Float -> [FPut (x, y, z)]
+	   | _ -> [Put (x, y, z)])
     | Closure.ExtArray (Id.L x) -> [ExtArray (n, x)]
     | Closure.ExtTuple x -> [ExtTuple (n, x)]
     | Closure.IfEq _ | Closure.IfLE _
@@ -83,51 +101,58 @@ let rec each_conv cblk cbid nbid rid e =
     | Closure.MakeCls _ | Closure.AppCls _ -> raise FatalError in
     match e with
       | Closure.Let ((n, t), e1, e2) ->
-	  (match e1 with
-	     | Closure.IfEq (x, y, z, w) | Closure.IfLE (x, y, z, w) ->
-		 let contid = genid "cont" in
-		 let thenid = genid "then" in
-		 let elseid = genid "else" in
-		 let contblks = each_conv [] contid nbid rid e2 in
-		 let thenblks = each_conv [] thenid (Some contid) n z in
-		 let elseblks = each_conv [] elseid (Some contid) n w in
-		   (cbid, (cblk @ [sel_if x y thenid elseid e1], [thenid; elseid]))
-		   :: (thenblks @ elseblks @ contblks)
-	     | Closure.Let _ | Closure.LetTuple _ -> raise NestedLet
-	     | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
-	     | _ -> each_conv (cblk @ (imm_conv n e1)) cbid nbid rid e2
-	  )
+	  let nenv = M.add n t env in
+	    (match e1 with
+	       | Closure.IfEq (x, y, z, w) | Closure.IfLE (x, y, z, w) ->
+		   let contid = genid "cont" in
+		   let thenid = genid "then" in
+		   let elseid = genid "else" in
+		   let contblks = each_conv [] contid nbid rid rtyp nenv e2 in
+		   let thenblks = each_conv [] thenid (Some contid) n t env z in
+		   let elseblks = each_conv [] elseid (Some contid) n t env w in
+		     (cbid, (cblk @ [sel_if x y thenid elseid env e1], [thenid; elseid]))
+		     :: (thenblks @ elseblks @ contblks)
+	       | Closure.Let _ | Closure.LetTuple _ -> raise NestedLet
+	       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
+	       | _ -> each_conv (cblk @ (imm_conv n t e1)) cbid nbid rid rtyp nenv e2
+	    )
       | Closure.LetTuple (x, z, w) ->
-	  each_conv (cblk @ [LetTuple (List.map fst x, z)]) cbid nbid rid w
+	  each_conv (cblk @ [LetTuple (List.map fst x, z)]) cbid nbid rid rtyp
+	    (M.add_list x env) w
       | Closure.IfEq (x, y, z, w) | Closure.IfLE (x, y, z, w) ->
 	  let thenid = genid "then" in
 	  let elseid = genid "else" in
-	  let thenblks = each_conv [] thenid nbid rid z in
-	  let elseblks = each_conv [] elseid nbid rid w in
-	    (cbid, (cblk @ [sel_if x y thenid elseid e], [thenid; elseid]))
+	  let thenblks = each_conv [] thenid nbid rid rtyp env z in
+	  let elseblks = each_conv [] elseid nbid rid rtyp env w in
+	    (cbid, (cblk @ [sel_if x y thenid elseid env e], [thenid; elseid]))
 	    :: (thenblks @ elseblks)
       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
-      | _ -> [cbid, (cblk @ (imm_conv rid e), nextid nbid)]
+      | _ -> [cbid, (cblk @ (imm_conv rid rtyp e), nextid nbid)]
 	  
-let each_conv rid (Id.L x, _) z =
-  each_conv [] x None (genid "ret") z
+let each_conv rid rtyp x env z =
+  each_conv [] x None rid rtyp env z
     
 let conv (Closure.Prog (l, t)) =
   let mbid = "min_caml_start" in
   let mrid = genid "mret" in
-    (List.map (fun x ->
+    (List.map (fun { Closure.name = (Id.L x, y); Closure.args = z; Closure.formal_fv = _;
+		     Closure.body = w } ->
 		 let rid = genid "ret" in
+		 let rtyp = match y with Type.Fun (z, w) -> w | _ -> raise FatalError in
 		   ([rid],
-		    List.map fst x.Closure.args,
-		    each_conv rid x.Closure.name x.Closure.body)) l) @
-      [[mrid], [], each_conv mrid (Id.L mbid, Type.Unit) t]
+		    List.map fst z,
+		    each_conv rid rtyp x
+		      (M.add x y (M.add_list z M.empty))
+		      w)) l) @
+      [[mrid], [], each_conv mrid Type.Unit mbid M.empty t]
 
 let sotn = function
   | Addzi _ -> "Addzi" | Subz _ -> "Subz" | Addi _ -> "Addi" | Subi _ -> "Subi"
   | Muli _ -> "Muli" | Add _ -> "Add" | Sub _ -> "Sub" | Mul _ -> "Mul" | FLoad _ -> "FLoad"
   | FSubz _ -> "FSubz" | FAdd _ -> "FAdd" | FSub _ -> "FSub" | FMul _ -> "FMul"
-  | FDiv _ -> "FDiv" | Flr _ -> "Flr" | Foi _ -> "Foi" | Call _ -> "Call" | Ret _ -> "Ret"
+  | FDiv _ -> "FDiv" | Flr _ -> "Flr" | Foi _ -> "Foi" | Call _ -> "Call"
   | IfEq _ -> "IfEq" | IfLE _ -> "IfLE" | Var _ -> "Var" | Tuple _ -> "Tuple"
+  | IfFEq _ -> "IfFEq" | IfFLE _ -> "IfFLE" | FGet _ -> "FGet" | FPut _ -> "FPut"
   | Get _ -> "Get" | Put _ -> "Put" | ExtArray _ -> "ExtArray"
   | ExtTuple _ -> "ExtTuple" | LetTuple _ -> "LetTuple"
 
@@ -142,10 +167,11 @@ let print_t e =
 	printf "\t\t%s %s %s %d\n" (sotn e) x y z
     | Add (x, y, z) | Sub (x, y, z) | Mul (x, y, z)
     | FAdd (x, y, z) | FSub (x, y, z) | FMul (x, y, z) | FDiv (x, y, z)
-    | Get (x, y, z) | Put (x, y, z) ->
+    | Get (x, y, z) | Put (x, y, z) | FGet (x, y, z) | FPut (x, y, z) ->
 	printf "\t\t%s %s %s %s\n" (sotn e) x y z
-    | Ret x | Var x -> printf "\t\t%s %s\n" (sotn e) x
-    | IfEq (x, y, _, _) | IfLE (x, y, _, _) -> printf "\t\t%s %s %s\n" (sotn e) x y
+    | IfEq (x, y, _, _) | IfLE (x, y, _, _) 
+    | IfFEq (x, y, _, _) | IfFLE (x, y, _, _) ->
+	printf "\t\t%s %s %s\n" (sotn e) x y
     | Call (x, y, z) ->
 	printf "\t\t%s (%s) <- %s (%s)\n" (sotn e)
 	  (String.concat ", " x) y (String.concat ", " z)
