@@ -18,10 +18,10 @@ type t =
   | Flr of id * id
   | Foi of id * id
   | Call of id * id * (id list)
-  | IfEq of id * id * bid * bid
-  | IfLE of id * id * bid * bid
-  | IfFEq of id * id * bid * bid
-  | IfFLE of id * id * bid * bid
+  | IfEq of id * id * id * bid * bid
+  | IfLE of id * id * id * bid * bid
+  | IfFEq of id * id * id * bid * bid
+  | IfFLE of id * id * id * bid * bid
   | Var of id * id
   | Tuple of id * (id list)
   | Get of id * id * id
@@ -61,18 +61,18 @@ exception MyNotFound9
 exception MyNotFound10
 
 let rec each_conv cblk cbid nbid rid rtyp env e =
-  let sel_if x y z w env e =
+  let sel_if r x y z w env e =
     try
       match e with
 	| Closure.IfEq _ ->
 	    (match M.find x env with
-	       | Type.Float -> IfFEq (x, y, z, w)
-	       | Type.Int | Type.Bool -> IfEq (x, y, z, w)
+	       | Type.Float -> IfFEq (r, x, y, z, w)
+	       | Type.Int | Type.Bool -> IfEq (r, x, y, z, w)
 	       | _ -> raise UnsupportedComparison)
 	| Closure.IfLE _ ->
 	    (match M.find x env with
-	       | Type.Float -> IfFLE (x, y, z, w)
-	       | Type.Int | Type.Bool -> IfLE (x, y, z, w)
+	       | Type.Float -> IfFLE (r, x, y, z, w)
+	       | Type.Int | Type.Bool -> IfLE (r, x, y, z, w)
 	       | _ -> raise UnsupportedComparison)
 	| _ -> raise FatalError 
     with Not_found -> raise MyNotFound in
@@ -123,7 +123,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 		   let contblks = each_conv [] contid nbid rid rtyp nenv e2 in
 		   let thenblks = each_conv [] thenid (Some contid) n t env z in
 		   let elseblks = each_conv [] elseid (Some contid) n t env w in
-		     (cbid, (cblk @ [sel_if x y thenid elseid env e1], [thenid; elseid]))
+		     (cbid, (cblk @ [sel_if n x y thenid elseid env e1], [thenid; elseid]))
 		     :: (thenblks @ elseblks @ contblks)
 	       | Closure.Let _ | Closure.LetTuple _ -> raise NestedLet
 	       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
@@ -136,7 +136,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 	  let elseid = genid "else" in
 	  let thenblks = each_conv [] thenid nbid rid rtyp env z in
 	  let elseblks = each_conv [] elseid nbid rid rtyp env w in
-	    (cbid, (cblk @ [sel_if x y thenid elseid env e], [thenid; elseid]))
+	    (cbid, (cblk @ [sel_if rid x y thenid elseid env e], [thenid; elseid]))
 	    :: (thenblks @ elseblks)
       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
       | _ -> [cbid, (cblk @ (imm_conv rid rtyp e), nextid nbid)]
@@ -157,7 +157,7 @@ let conv (Closure.Prog (l, t)) =
 				  each_conv rid rtyp x
 				    (M.add x y (M.add_list z M.empty))
 				    w))) l) in
-    (p, (q, (mbid, each_conv mrid Type.Unit mbid M.empty t)))
+    ((mrid, Type.Unit) :: p, (q, (mbid, each_conv mrid Type.Unit mbid M.empty t)))
 
 (*次のラベルと式を返す*)
 let rec peach_rconv bid blks tenv =
@@ -219,16 +219,17 @@ let rec peach_rconv bid blks tenv =
 	 | None ->
 	     (match e with
 		| LetTuple _ -> raise FatalError
-		| IfEq (x, y, z, w) | IfLE (x, y, z, w)
-		| IfFEq (x, y, z, w) | IfFLE (x, y, z, w) ->
+		| IfEq (r, x, y, z, w) | IfLE (r, x, y, z, w)
+		| IfFEq (r, x, y, z, w) | IfFLE (r, x, y, z, w) ->
 		    let (n, thenexp) = peach_rconv z blks tenv in
 		    let (_, elseexp) = peach_rconv w blks tenv in
-		      Some (
-			(match n with
-			   | None -> None
-			   | Some n ->
-			       let (m, contexp) = peach_rconv n blks tenv in m),
-			sel_if x y thenexp elseexp e)
+		    let expif = sel_if x y thenexp elseexp e in
+		      (match n with
+			 | None -> Some (None, expif)
+			 | Some n -> 
+			     let (m, contexp) = peach_rconv n blks tenv in
+			       Some (m, Closure.Let ((r, M.find r tenv), expif, contexp))
+		      )
 		| _ ->
 		    let (_, _, ex) = imm_rconv e in
 		      Some (
@@ -314,9 +315,9 @@ let print_t e =
     | FAdd (x, y, z) | FSub (x, y, z) | FMul (x, y, z) | FDiv (x, y, z)
     | Get (x, y, z) | Put (x, y, z) | FGet (x, y, z) | FPut (x, y, z) ->
 	printf "\t\t%s %s %s %s\n" (sotn e) x y z
-    | IfEq (x, y, _, _) | IfLE (x, y, _, _) 
-    | IfFEq (x, y, _, _) | IfFLE (x, y, _, _) ->
-	printf "\t\t%s %s %s\n" (sotn e) x y
+    | IfEq (r, x, y, _, _) | IfLE (r, x, y, _, _) 
+    | IfFEq (r, x, y, _, _) | IfFLE (r, x, y, _, _) ->
+	printf "\t\t%s %s %s %s\n" (sotn e) r x y
     | Call (x, y, z) ->
 	printf "\t\t%s (%s) <- %s (%s)\n" (sotn e) x y (String.concat ", " z)
     | _ -> printf "\t\t%s\n" (sotn e)

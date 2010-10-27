@@ -88,50 +88,50 @@ let lexbuf outchan foutchan boutchan a = (* バッファをコンパイルしてチャンネルへ
   let e = iter !limit d in
   let f = Closure.f e in
   let pp = Opt.g f in
-(*  let h = RegAlloc.f g in*)
+  let g = Virtual.f memin memout memext al pp in
+      let h = RegAlloc.f g in
     (*
       Closure.print_prog stdout f;
       KNormal.print_prog stdout e;
       Asm.print_prog stdout g;
       Asm.print_prog stdout h;
     *)
-(*  let i = Emit.f outchan foutchan !istest memext memin memout memsp memhp floffset h in*)
-    (*ignore (Opt.f f);*)
-(*      Closure.print_prog stdout f;*)
-      Closure.print_prog stdout pp;
-  let g = Virtual.f memin memout memext al pp in
+      let i = Emit.f outchan foutchan !istest memext memin memout memsp memhp floffset h in
+    (*    ignore (Opt.f f);*)
+    (*      Closure.print_prog stdout f;*)
+    (*      Closure.print_prog stdout pp;*)
     
     
-(*    
-    output_string outchan (prep (Emit.string_of_alist i));
+    (*    
+	  output_string outchan (prep (Emit.string_of_alist i));
 
-    output_string foutchan (Emit.string_of_flist i);
-*)
-(*
-  output_string boutchan (Emit.string_of_binary i);
-*)
+	  output_string foutchan (Emit.string_of_flist i);
+    *)
+    (*
+      output_string boutchan (Emit.string_of_binary i);
+    *)
     
-(*    
-      output_string stdout j;
-*)
-      (*
+    (*    
+	  output_string stdout j;
+    *)
+    (*
       print_newline ();
-	output_string stdout (sprintf "%d\n"
-      *)
+      output_string stdout (sprintf "%d\n"
+    *)
     ()
-    (*
-let string s = lexbuf stdout (Lexing.from_string s) (* 文字列をコンパイルして標準出力に表示する (caml2html: main_string) *)
-    *)
-    (*
-let file f = (* ファイルをコンパイルしてファイルに出力する (caml2html: main_file) *)
-  let inchan = open_in f in
-  let outchan = stdout in
-    try
-      lexbuf outchan (Lexing.from_channel inchan);
-      close_in inchan;
-      close_out outchan;
-    with e -> (close_in inchan; close_out outchan; raise e)
-    *)
+      (*
+	let string s = lexbuf stdout (Lexing.from_string s) (* 文字列をコンパイルして標準出力に表示する (caml2html: main_string) *)
+      *)
+      (*
+	let file f = (* ファイルをコンパイルしてファイルに出力する (caml2html: main_file) *)
+	let inchan = open_in f in
+	let outchan = stdout in
+	try
+	lexbuf outchan (Lexing.from_channel inchan);
+	close_in inchan;
+	close_out outchan;
+	with e -> (close_in inchan; close_out outchan; raise e)
+      *)
 
 
       
@@ -158,4 +158,4 @@ let () = (* ここからコンパイラの実行が開始される (caml2html: main_entry) *)
       lexbuf ofile fofile bofile q;
       close_out ofile;
       close_out fofile
-      
+	
