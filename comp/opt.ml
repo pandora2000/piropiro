@@ -14,33 +14,21 @@ exception NestedLet
 exception UnsupportedComparison
 exception NoExpression
 exception FatalError
-exception MyNotFound
-exception MyNotFound2
-exception MyNotFound3
-exception MyNotFound4
-exception MyNotFound5
-exception MyNotFound6
-exception MyNotFound7
-exception MyNotFound8
-exception MyNotFound9
-exception MyNotFound10
 
 let rec each_conv cblk cbid nbid rid rtyp env e =
   let sel_if r x y z w v env e =
-    try
-      match e with
-	| Closure.IfEq _ ->
-	    (match M.find x env with
-	       | Type.Float -> IfFEq (r, x, y, z, w, v)
-	       | Type.Int | Type.Bool -> IfEq (r, x, y, z, w, v)
-	       | _ -> raise UnsupportedComparison)
-	| Closure.IfLE _ ->
-	    (match M.find x env with
-	       | Type.Float -> IfFLE (r, x, y, z, w, v)
-	       | Type.Int | Type.Bool -> IfLE (r, x, y, z, w, v)
-	       | _ -> raise UnsupportedComparison)
-	| _ -> raise FatalError 
-    with Not_found -> raise MyNotFound in
+    match e with
+      | Closure.IfEq _ ->
+	  (match M.find x env with
+	     | Type.Float -> IfFEq (r, x, y, z, w, v)
+	     | Type.Int | Type.Bool -> IfEq (r, x, y, z, w, v)
+	     | _ -> raise UnsupportedComparison)
+      | Closure.IfLE _ ->
+	  (match M.find x env with
+	     | Type.Float -> IfFLE (r, x, y, z, w, v)
+	     | Type.Int | Type.Bool -> IfLE (r, x, y, z, w, v)
+	     | _ -> raise UnsupportedComparison)
+      | _ -> raise FatalError in
   let nextid = function Some x -> [x] | None -> [] in
   let imm_conv n t = function
     | Closure.Unit -> []
@@ -62,7 +50,6 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 	(*てかこの操作はClosureのままでもできるだろう*)
 	(*それはいろんな問題があるなぁ*)
 	[Var (n, x)]
-    | Closure.AppDir (Id.L x, y) -> [Call (n, x, y)]
     | Closure.Tuple x -> [Tuple (n, x)]
     | Closure.Get (x, y) ->
 	(match t with
@@ -74,7 +61,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 	   | _ -> [Put (x, y, z)])
     | Closure.ExtArray (Id.L x) -> [ExtArray (n, x)]
     | Closure.ExtTuple x -> [ExtTuple (n, x)]
-    | Closure.IfEq _ | Closure.IfLE _
+    | Closure.IfEq _ | Closure.IfLE _ | Closure.AppDir _
     | Closure.Let _ | Closure.LetTuple _
     | Closure.MakeCls _ | Closure.AppCls _ -> raise FatalError in
     match e with
@@ -91,6 +78,11 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 		     (cbid, (cblk @ [sel_if n x y thenid elseid (Some contid) env e1],
 			     [thenid; elseid]))
 		     :: (thenblks @ elseblks @ contblks)
+	       | Closure.AppDir (Id.L x, y) ->
+		   let clcontid = genid "clcont" in
+		   let contblks = each_conv [] clcontid nbid rid rtyp nenv e2 in
+		     (cbid, (cblk @ [Call (n, x, y, Some clcontid)], [x]))
+		     :: contblks
 	       | Closure.Let _ | Closure.LetTuple _ -> raise NestedLet
 	       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
 	       | _ -> each_conv (cblk @ (imm_conv n t e1)) cbid nbid rid rtyp nenv e2)
@@ -104,6 +96,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 	  let elseblks = each_conv [] elseid nbid rid rtyp env w in
 	    (cbid, (cblk @ [sel_if rid x y thenid elseid None env e], [thenid; elseid]))
 	    :: (thenblks @ elseblks)
+      | Closure.AppDir (Id.L x, y) -> [cbid, (cblk @ [Call (rid, x, y, None)], [x])]
       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
       | _ -> [cbid, (cblk @ (imm_conv rid rtyp e), nextid nbid)]
 	  
@@ -131,51 +124,28 @@ let rec p_each_rconv bid blks tenv =
     | IfLE _ | IfFLE _ -> Closure.IfLE (x, y, z, w)
     | _ -> raise FatalError in
   let imm_rconv e =
-    try
-      match e with
-	| IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | LetTuple _ -> raise FatalError
-	| Addzi (x, y) -> (x, Type.Int, Closure.Int y)
-	| Subz (x, y) -> (x, Type.Int, Closure.Neg y)
-	| Add (x, y, z) -> (x, Type.Int, Closure.Add (y, z))
-	| Sub (x, y, z) -> (x, Type.Int, Closure.Sub (y, z))
-	| Mul (x, y, z) -> (x, Type.Int, Closure.Mul (y, z))
-	| FLoad (x, y) -> (x, Type.Float, Closure.Float y)
-	| FSubz (x, y) -> (x, Type.Float, Closure.FNeg y)
-	| FAdd (x, y, z) -> (x, Type.Float, Closure.FAdd (y, z))
-	| FSub (x, y, z) -> (x, Type.Float, Closure.FSub (y, z))
-	| FMul (x, y, z) -> (x, Type.Float, Closure.FMul (y, z))
-	| FDiv (x, y, z) -> (x, Type.Float, Closure.FDiv (y, z))
-	| Flr (x, y) -> (x, Type.Float, Closure.Floor y)
-	| Foi (x, y) -> (x, Type.Float, Closure.Float_of_int y)
-	| Call (x, y, z) ->
-	    (try
-	       (x, M.find x tenv, Closure.AppDir (Id.L y, z))
-	     with Not_found -> printf "%s %s\n" x y; raise MyNotFound10)
-	| Var (x, y) ->
-	    (try
-	       (x, M.find x tenv, Closure.Var y)
-	     with Not_found -> raise MyNotFound7)
-	| Tuple (x, y) ->
-	    (try
-	       (x, M.find x tenv, Closure.Tuple y)
-	     with Not_found -> raise MyNotFound8)
-	| Get (x, y, z) | FGet (x, y, z) ->
-	    (try
-	       (x, M.find x tenv, Closure.Get (y, z))
-	     with Not_found -> raise MyNotFound9)
-	| Put (x, y, z) | FPut (x, y, z) ->
-	    (try
-	       (genid "put", Type.Unit, Closure.Put (x, y, z))
-	     with Not_found -> raise MyNotFound6)
-	| ExtArray (x, y) ->
-	    (try
-	       (x, M.find x tenv, Closure.ExtArray (Id.L y))
-	     with Not_found -> raise MyNotFound4)
-	| ExtTuple (x, y) ->
-	    (try
-	       (x, M.find x tenv, Closure.ExtTuple y)
-	     with Not_found -> raise MyNotFound5)
-    with Not_found -> raise MyNotFound2 in
+    match e with
+      | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | LetTuple _ | Call _ -> raise FatalError
+      | Addzi (x, y) -> (x, Type.Int, Closure.Int y)
+      | Subz (x, y) -> (x, Type.Int, Closure.Neg y)
+      | Add (x, y, z) -> (x, Type.Int, Closure.Add (y, z))
+      | Sub (x, y, z) -> (x, Type.Int, Closure.Sub (y, z))
+      | Mul (x, y, z) -> (x, Type.Int, Closure.Mul (y, z))
+      | FLoad (x, y) -> (x, Type.Float, Closure.Float y)
+      | FSubz (x, y) -> (x, Type.Float, Closure.FNeg y)
+      | FAdd (x, y, z) -> (x, Type.Float, Closure.FAdd (y, z))
+      | FSub (x, y, z) -> (x, Type.Float, Closure.FSub (y, z))
+      | FMul (x, y, z) -> (x, Type.Float, Closure.FMul (y, z))
+      | FDiv (x, y, z) -> (x, Type.Float, Closure.FDiv (y, z))
+      | Flr (x, y) -> (x, Type.Float, Closure.Floor y)
+      | Foi (x, y) -> (x, Type.Float, Closure.Float_of_int y)
+      | Var (x, y) -> (x, M.find x tenv, Closure.Var y)
+      | Tuple (x, y) -> (x, M.find x tenv, Closure.Tuple y)
+      | Get (x, y, z) | FGet (x, y, z) -> (x, M.find x tenv, Closure.Get (y, z))
+      | Put (x, y, z) | FPut (x, y, z) -> (genid "put", Type.Unit, Closure.Put (x, y, z))
+      | ExtArray (x, y) -> (x, M.find x tenv, Closure.ExtArray (Id.L y))
+      | ExtTuple (x, y) -> (x, M.find x tenv, Closure.ExtTuple y)
+  in
   let (cblk, _) = List.assoc bid blks in
   let r =
     List.fold_right
@@ -194,15 +164,20 @@ let rec p_each_rconv bid blks tenv =
 			   | Some n ->
 			       let contexp = p_each_rconv n blks tenv in
 				 Closure.Let ((r, M.find r tenv), expif, contexp))
+		  | Call (r, x, y, z) ->
+		      let expcall = Closure.AppDir (Id.L x, y) in
+			(match z with
+			   | None -> expcall
+			   | Some n ->
+			       let contexp = p_each_rconv n blks tenv in
+				 Closure.Let ((r, M.find r tenv), expcall, contexp))
 		  | _ -> let (_, _, ex) = imm_rconv e in ex)
 	 | Some exp ->
 	     Some (
 	       match e with
-		 | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ -> raise FatalError
+		 | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | Call _ -> raise FatalError
 		 | LetTuple (x, y) ->
-		     (try
-			Closure.LetTuple (List.map (fun x -> (x, M.find x tenv)) x, y, exp)
-		      with Not_found -> raise MyNotFound3)
+		     Closure.LetTuple (List.map (fun x -> (x, M.find x tenv)) x, y, exp)
 		 | _ ->
 		     let (n, t, ex) = imm_rconv e in
 		       Closure.Let ((n, t), ex, exp))
@@ -276,10 +251,10 @@ let print_t oc e =
     | FAdd (x, y, z) | FSub (x, y, z) | FMul (x, y, z) | FDiv (x, y, z)
     | Get (x, y, z) | Put (x, y, z) | FGet (x, y, z) | FPut (x, y, z) ->
 	fprintf oc "\t\t%s %s %s %s\n" (sotn e) x y z
-    | IfEq (r, x, y, _, _, _) | IfLE (r, x, y, _, _, _) 
+    | IfEq (r, x, y, _, _, _) | IfLE (r, x, y, _, _, _)
     | IfFEq (r, x, y, _, _, _) | IfFLE (r, x, y, _, _, _) ->
 	fprintf oc "\t\t%s %s %s %s\n" (sotn e) r x y
-    | Call (x, y, z) ->
+    | Call (x, y, z, _) ->
 	fprintf oc "\t\t%s (%s) <- %s (%s)\n" (sotn e) x y (String.concat ", " z)
     | _ -> fprintf oc "\t\t%s\n" (sotn e)
 
@@ -298,20 +273,3 @@ let print_prog oc (x, (y, z)) =
 let f x =
   let p = normal x in
     reverse p
-
-(*タプル最適化*)
-(*
-  ・関数呼び出し
-  引数を全て展開する
-  ・関数定義
-  引数を全て展開する
-  要素を全て束縛し直し、環境にTupleが束縛されている変数と新たに束縛された変数のペアを追加
-  ・Tuple
-  要素を全て束縛し直し、環境にTupleが束縛されている変数と新たに束縛された変数のペアを追加
-  ・LetTuple
-  ・関数全体
-  Tupleが使われているところに要素毎の変数を使う
-  ・返り値
-  複数取れるようにする
-  タプルの場合は全ての要素
-*)

@@ -103,7 +103,8 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
 	    | Type.Float -> Ans(Fadd(fzreg, x))
 	    | _ -> Ans(Add(zreg, x)))
        with Not_found -> raise MyNotFound3)
-	
+	(*
+	  (*実装するには機械語を生成し、生成するときアドレスを埋め込む必要あり*)
   | Closure.MakeCls((x, t), { Closure.entry = l; Closure.actual_fv = ys }, e2) -> (* クロージャの生成 (caml2html: virtual_makecls) *)
       (* Closureのアドレスをセットしてから、自由変数の値をストア *)
       let e2' = g (M.add x t env) e2 in
@@ -120,13 +121,17 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
 	Let((x, t), Add(zreg, hpreg),
 	    Let((hpreg, Type.Int), Addi(hpreg, offset),
 		let z = Id.genid "l" in
-		  Let((z, Type.Int), SetL(l),
+		  Let((z, Type.Int), Add(zreg, l),
 		      seq(Store(z, x, 0),
 			  store_fv))))
   | Closure.AppCls(x, ys) ->
-      let (int, float) = separate (List.map (fun y -> (y, M.find y env)) ys) in
+      let (int, float) = separate (List.map (fun y ->
+					       try
+						 (y, M.find y env)
+					       with Not_found -> (y, Type.Unit)
+					    ) ys) in
 	Ans(CallCls(x, int, float))
-	  
+	*)
   | Closure.MakeCls _ | Closure.AppCls _ -> raise Exit3
   | Closure.AppDir(Id.L(x), ys) ->
       (*引数をint listとfloat listに分けてるだけ*)
@@ -287,26 +292,22 @@ let ca =
 		     Ans(Add(zreg, ar))))));
       ret = Type.Array(Type.Int) }
 
-(*TODO:動作確認*)
 let ri =
   { name = Id.L "min_caml_read_int"; args = []; fargs = [];
     body = Ans(Ri);
     ret = Type.Int }
 
-(*TODO:動作確認*)
 let rf =
   { name = Id.L "min_caml_read_float"; args = []; fargs = [];
     body = Ans(Rf);
     ret = Type.Float }
 
-(*TODO:動作確認*)
 let pi =
   let num = Id.genid "num" in
     { name = Id.L "min_caml_print_char"; args = [num]; fargs = [];
       body = Ans(Pc num);
       ret = Type.Unit }
 
-(*TODO:動作確認*)
 let pf =
   let num = Id.genid "num" in
     { name = Id.L "min_caml_print_float"; args = []; fargs = [num];
