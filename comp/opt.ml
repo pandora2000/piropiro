@@ -1,41 +1,6 @@
 open Printf
+open Optt
 
-type id = string
-type bid = string
-type t =
-  | Unit of id
-  | Addzi of id * int
-  | Subz of id * id
-  | Add of id * id * id
-  | Sub of id * id * id
-  | Mul of id * id * id
-  | FLoad of id * float
-  | FSubz of id * id
-  | FAdd of id * id * id
-  | FSub of id * id * id
-  | FMul of id * id * id
-  | FDiv of id * id * id
-  | Flr of id * id
-  | Foi of id * id
-  | Call of id * id * (id list)
-  | IfEq of id * id * id * bid * bid * (bid option)
-  | IfLE of id * id * id * bid * bid * (bid option)
-  | IfFEq of id * id * id * bid * bid * (bid option)
-  | IfFLE of id * id * id * bid * bid * (bid option)
-  | Var of id * id
-  | Tuple of id * (id list)
-  | Get of id * id * id
-  | Put of id * id * id
-  | FGet of id * id * id
-  | FPut of id * id * id
-  | ExtArray of id * id
-  | ExtTuple of id * id
-  | LetTuple of (id list) * id
-type block = bid * ((t list) * (bid list))
-type func = bid * (id list) * (id list) * (block list)
-type ent_func = bid * block list
-type prog = (func list) * ent_func
-type ptyp = I | F
 
 let merge_alist x y =
   List.fold_left (fun a b -> if List.mem_assoc (fst b) a then a else b :: a) x y
@@ -78,7 +43,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
     with Not_found -> raise MyNotFound in
   let nextid = function Some x -> [x] | None -> [] in
   let imm_conv n t = function
-    | Closure.Unit -> [Unit n]
+    | Closure.Unit -> []
     | Closure.Int x -> [Addzi (n, x)]
     | Closure.Float x -> [FLoad (n, x)]
     | Closure.Neg x -> [Subz (n, x)]
@@ -169,7 +134,6 @@ let rec p_each_rconv bid blks tenv =
     try
       match e with
 	| IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | LetTuple _ -> raise FatalError
-	| Unit x -> (x, Type.Unit, Closure.Unit)
 	| Addzi (x, y) -> (x, Type.Int, Closure.Int y)
 	| Subz (x, y) -> (x, Type.Int, Closure.Neg y)
 	| Add (x, y, z) -> (x, Type.Int, Closure.Add (y, z))
@@ -283,9 +247,16 @@ let each_make_total_env { Closure.name = (Id.L x, t);
 let make_total_env (Closure.Prog (l, e)) =
   M.union (exp_make_total_env e)
     (List.fold_left (fun a b -> M.union (each_make_total_env b) a) M.empty l)
+    
+let normal x =
+  let (a, b) = conv x in
+    (b, M.add_list a (make_total_env x))
+
+let reverse (a, tenv) =
+  rconv a tenv
 
 let sotn = function
-  | Addzi _ -> "Addzi" | Subz _ -> "Subz" | Unit _ -> "Unit"
+  | Addzi _ -> "Addzi" | Subz _ -> "Subz"
   | Add _ -> "Add" | Sub _ -> "Sub" | Mul _ -> "Mul" | FLoad _ -> "FLoad"
   | FSubz _ -> "FSubz" | FAdd _ -> "FAdd" | FSub _ -> "FSub" | FMul _ -> "FMul"
   | FDiv _ -> "FDiv" | Flr _ -> "Flr" | Foi _ -> "Foi" | Call _ -> "Call"
@@ -296,7 +267,6 @@ let sotn = function
 
 let print_t oc e =
   match e with
-    | Unit x -> fprintf oc "\t\t%s %s\n" (sotn e) x
     | Addzi (x, y) -> fprintf oc "\t\t%s %s %d\n" (sotn e) x y
     | FLoad (x, y) -> fprintf oc "\t\t%s %s %f\n" (sotn e) x y
     | Subz (x, y) | FSubz (x, y) | Flr (x, y) | Foi (x, y)
@@ -324,16 +294,10 @@ let print_func oc (n, x, y, z) =
 let print_prog oc (x, (y, z)) =
   List.iter (print_func oc) x;
   print_func oc (y, [], [], z)
-    
-let f oc x =
-  let (_, k) = conv x in
-    print_prog oc k;
-    k
-      
-let g x =
-  let (p, k) = conv x in
-  let tenv = M.add_list p (make_total_env x) in
-    rconv k tenv
+
+let f x =
+  let p = normal x in
+    reverse p
 
 (*タプル最適化*)
 (*

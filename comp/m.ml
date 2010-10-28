@@ -3,7 +3,7 @@
 module M =
   Map.Make
     (struct
-      type t = Id.t
+      type t = string
       let compare = compare
     end)
 include M

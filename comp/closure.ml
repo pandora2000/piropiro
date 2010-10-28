@@ -207,16 +207,15 @@ let rec sop level e =
 		 (String.concat ", "
 		    (List.map (fun (a, b) -> sprintf "%s : %s" a (Type.string_of_t b)) x))
 		 y (nsop z))
-	    (*
-	      | MakeCls ((x, y), z, w) ->
-	      
-	      sol (sprintf "%s(%s : %s, (%s, (%s)))\n%s"
-	      (tostr e) x (Type.string_of_t y) (ltostr z.entry)
-	      (String.concat ", " z.actual_fv) (nsop w))
-	      | AppCls (x, y) ->
-	      sol (sprintf "%s(%s, (%s))\n" (tostr e) x (String.concat ", " y))
-	    *)
-      | MakeCls _ | AppCls _ -> raise Exit2
+      | MakeCls ((x, y), z, w) ->
+	  
+	  sol (sprintf "%s(%s : %s, (%s, (%s)))\n%s"
+		 (tostr e) x (Type.string_of_t y) (ltostr z.entry)
+		 (String.concat ", " z.actual_fv) (nsop w))
+      | AppCls (x, y) ->
+	  sol (sprintf "%s(%s, (%s))\n" (tostr e) x (String.concat ", " y))
+	    
+      (*      | MakeCls _ | AppCls _ -> raise Exit2*)
       | AppDir (Id.L x, y) ->
 	  sol (sprintf "%s(%s, (%s))\n" (tostr e) x (String.concat ", " y))
 	    

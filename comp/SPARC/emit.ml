@@ -146,10 +146,10 @@ and g' e =(* 各命令のアセンブリ生成 (caml2html: emit_gprime) *)
       | NonTail(_), Nop -> []
       | NonTail(x), Floor(y) | NonTail(x), Float_of_int(y) ->
 	  [finst2 n x y]
-(*      | NonTail(_), Pc(y) | NonTail(_), Pf(y) ->
-	  [finst1 n y]
-      | NonTail(x), Ri | NonTail(x), Rf ->
-	  [finst1 n x]*)
+	    (*      | NonTail(_), Pc(y) | NonTail(_), Pf(y) ->
+		    [finst1 n y]
+		    | NonTail(x), Ri | NonTail(x), Rf ->
+		    [finst1 n x]*)
       | NonTail(_), Pc(y) | NonTail(_), Pf(y) ->
 	  [finst1 n y]
       | NonTail(x), Ri | NonTail(x), Rf ->
@@ -440,41 +440,47 @@ let f oc foc istest memext memin memout memsp memhp floffset (Prog(fl, fundefs, 
     let ret =
       List.flatten
 	[
-	  [
-	    finst0 (soii Nnop);
-	    finst0 (soii Nnop);
-	    finst3 (soii Naddi) regs.(0) zreg (string_of_int 0xaa);
-	    finst1 (soii Npc) regs.(0);
-	    (*スタックポインタ初期化*)
-	    finst3 (soii Naddi) spreg zreg (string_of_int memsp);
-	    (*ヒープポインタ初期化*)
-	    (*memhpは大きいのでとりあえずTODO:*)
-	    finst3 (soii Naddi) hpreg zreg (string_of_int (memhp / 10));
-	    finst3 (soii Nmuli) hpreg hpreg (string_of_int 10);
-	    (*出力データポインタ初期化*)
-	    finst3 (soii Naddi) regs.(0) zreg (string_of_int (memout + 1));
-	    finst3 (soii Sti) regs.(0) zreg (string_of_int memout);
-	  ];
-	  (*外部変数領域初期化*)
-	  ear;
-	  [finst1 (soii Jump) lmain];
-	  (List.flatten (List.map (fun fundef -> h fundef) fundefs));
-	  [flabel lmain];
-	  (stackset := S.empty;
-	   stackmap := [];
-	   g (NonTail(regs.(0)), e))
-	] in
-    let ret =
-      List.map (fun x ->
-		  if x.nm = (soii Fld) && not (is_reg x.a2) then
-		    try
-		      for i = 0 to Array.length fli - 1 do
-			if (match fli.(i) with (Id.L y, _) -> y) = x.a2 then
-			  (x.a2 <- zreg; x.a3 <- string_of_int (i + floffset); raise Exit)
-		      done; x
-		    with Exit -> x
-		  else x) ret in
-    let ret = (ret, snd (List.split fl)) in
-      output_string oc (string_of_alist ret);
-      output_string foc (string_of_flist ret);
-      output_string foc "FFFFFFFF\n"
+	  (if istest then [] else 
+	     (List.flatten
+		[
+		  [
+		    (*CPU安定のため*)
+		    finst0 (soii Nnop);
+		    finst0 (soii Nnop);
+		    (*0xaa送信*)
+		    finst3 (soii Naddi) regs.(0) zreg (string_of_int 0xaa);
+		    finst1 (soii Npc) regs.(0);
+		    (*スタックポインタ初期化*)
+		    finst3 (soii Naddi) spreg zreg (string_of_int memsp);
+		    (*ヒープポインタ初期化*)
+		    (*memhpは大きいのでとりあえずTODO:*)
+		    finst3 (soii Naddi) hpreg zreg (string_of_int (memhp / 10));
+		    finst3 (soii Nmuli) hpreg hpreg (string_of_int 10);
+		    (*出力データポインタ初期化*)
+		    finst3 (soii Naddi) regs.(0) zreg (string_of_int (memout + 1));
+		    finst3 (soii Sti) regs.(0) zreg (string_of_int memout);
+		  ];
+		  (*外部変数領域初期化*)
+		  ear;
+		]));
+	   [finst1 (soii Jump) lmain];
+	   (List.flatten (List.map (fun fundef -> h fundef) fundefs));
+	   [flabel lmain];
+	   (stackset := S.empty;
+	    stackmap := [];
+	    g (NonTail(regs.(0)), e))
+	  ] in
+	let ret =
+	  List.map (fun x ->
+		      if x.nm = (soii Fld) && not (is_reg x.a2) then
+			try
+			  for i = 0 to Array.length fli - 1 do
+			    if (match fli.(i) with (Id.L y, _) -> y) = x.a2 then
+			      (x.a2 <- zreg; x.a3 <- string_of_int (i + floffset); raise Exit)
+			  done; x
+			with Exit -> x
+		      else x) ret in
+	let ret = (ret, snd (List.split fl)) in
+	  output_string oc (string_of_alist ret);
+	  output_string foc (string_of_flist ret);
+	  output_string foc "FFFFFFFF\n"

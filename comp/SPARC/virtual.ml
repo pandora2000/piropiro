@@ -98,55 +98,63 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
 	concat e1' (x, t1) e2'
   | Closure.Var(x) ->
       (try
-      (match M.find x env with
-	 | Type.Unit -> Ans(Nop)
-	 | Type.Float -> Ans(Fadd(fzreg, x))
-	 | _ -> Ans(Add(zreg, x)))
+	 (match M.find x env with
+	    | Type.Unit -> Ans(Nop)
+	    | Type.Float -> Ans(Fadd(fzreg, x))
+	    | _ -> Ans(Add(zreg, x)))
        with Not_found -> raise MyNotFound3)
-	(*ここは実際作られない本当？TODO:*)
-	(*
-	  | Closure.MakeCls((x, t), { Closure.entry = l; Closure.actual_fv = ys }, e2) -> (* クロージャの生成 (caml2html: virtual_makecls) *)
-	(* Closureのアドレスをセットしてから、自由変数の値をストア *)
-	  let e2' = g (M.add x t env) e2 in
-	  let offset, store_fv =
-	  expand
-	  (List.map (fun y -> (y, M.find y env)) ys)
-	  (4, e2')
-	  (fun y offset store_fv -> seq(StDF(y, x, C(offset)), store_fv))
-	  (fun y _ offset store_fv -> seq(St(y, x, C(offset)), store_fv)) in
-	  Let((x, t), Mov(reg_hp),
-	  Let((reg_hp, Type.Int), Add(reg_hp, C(align offset)),
-	  let z = Id.genid "l" in
-	  Let((z, Type.Int), SetL(l),
-	  seq(St(z, x, C(0)),
-	  store_fv))))
-	  | Closure.AppCls(x, ys) ->
-	  let (int, float) = separate (List.map (fun y -> (y, M.find y env)) ys) in
-	  Ans(CallCls(x, int, float))
-	*)
+	
+  | Closure.MakeCls((x, t), { Closure.entry = l; Closure.actual_fv = ys }, e2) -> (* クロージャの生成 (caml2html: virtual_makecls) *)
+      (* Closureのアドレスをセットしてから、自由変数の値をストア *)
+      let e2' = g (M.add x t env) e2 in
+      let offset, store_fv =
+	expand
+	  (List.map (fun y ->
+		       try
+			 (y, M.find y env)
+		       with Not_found -> (y, Type.Unit)
+		    ) ys)
+	  (1, e2')
+	  (fun y offset store_fv -> seq(Fstore(y, x, offset), store_fv))
+	  (fun y _ offset store_fv -> seq(Store(y, x, offset), store_fv)) in
+	Let((x, t), Add(zreg, hpreg),
+	    Let((hpreg, Type.Int), Addi(hpreg, offset),
+		let z = Id.genid "l" in
+		  Let((z, Type.Int), SetL(l),
+		      seq(Store(z, x, 0),
+			  store_fv))))
+  | Closure.AppCls(x, ys) ->
+      let (int, float) = separate (List.map (fun y -> (y, M.find y env)) ys) in
+	Ans(CallCls(x, int, float))
+	  
   | Closure.MakeCls _ | Closure.AppCls _ -> raise Exit3
   | Closure.AppDir(Id.L(x), ys) ->
       (*引数をint listとfloat listに分けてるだけ*)
       (try
-      let (int, float) = separate (List.map (fun y -> (y, M.find y env)) ys) in
-	Ans(CallDir(Id.L(x), int, float))
+	 let (int, float) = separate (List.map (fun y ->
+						  (*Unit型は消すので環境に無い可能性あり*)
+						  try
+						    (y, M.find y env)
+						  with Not_found -> (y, Type.Unit)
+					       ) ys) in
+	   Ans(CallDir(Id.L(x), int, float))
        with Not_found -> printf "%s\n" (String.concat ", " ys); raise MyNotFound4)
-	  (*ここまで*)
-	  (*tupleの方針:K正規化後の段階でタプルを全部平坦にして、その後関数適用における
-	    タプルも全部展開する*)
-	  
+	(*ここまで*)
+	(*tupleの方針:K正規化後の段階でタプルを全部平坦にして、その後関数適用における
+	  タプルも全部展開する*)
+	
   | Closure.Tuple(xs) -> (* 組の生成 (caml2html: virtual_tuple) *)
       (try
-      let y = Id.genid "tpl" in
-      let (offset, store) =
-	expand
-	  (List.map (fun x -> (x, M.find x env)) xs)
-	  (0, Ans(Add(zreg, y)))
-	  (fun x offset store -> seq(Fstore(x, y, offset), store))
-	  (fun x _ offset store -> seq(Store(x, y, offset), store)) in
-	Let((y, Type.Tuple(List.map (fun x -> M.find x env) xs)), Add(zreg, hpreg),
-	    Let((hpreg, Type.Int), Addi(hpreg, offset),
-		store))
+	 let y = Id.genid "tpl" in
+	 let (offset, store) =
+	   expand
+	     (List.map (fun x -> (x, M.find x env)) xs)
+	     (0, Ans(Add(zreg, y)))
+	     (fun x offset store -> seq(Fstore(x, y, offset), store))
+	     (fun x _ offset store -> seq(Store(x, y, offset), store)) in
+	   Let((y, Type.Tuple(List.map (fun x -> M.find x env) xs)), Add(zreg, hpreg),
+	       Let((hpreg, Type.Int), Addi(hpreg, offset),
+		   store))
        with Not_found -> raise MyNotFound5)
   | Closure.LetTuple(xts, y, e2) ->
       let s = Closure.fv e2 in
@@ -163,32 +171,32 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
 	load
   | Closure.Get(x, y) -> (* 配列の読み出し (caml2html: virtual_get) *)
       (try
-      let offset = Id.genid "get" in
-	(match M.find x env with
-	   | Type.Array(Type.Unit) -> Ans(Nop)
-	   | Type.Array(Type.Float) ->
-	       (*TODO:WATCH:たとえばディスプレースメントをレジスタで出来ればこの辺が速くなる*)
-	       Let((offset, Type.Int), Add(x, y),
-		   Ans(Fload(offset, 0)))
-	   | Type.Array(_) ->
-	       Let((offset, Type.Int), Add(x, y),
-		   Ans(Load(offset, 0)))
-	   | _ -> assert false)
+	 let offset = Id.genid "get" in
+	   (match M.find x env with
+	      | Type.Array(Type.Unit) -> Ans(Nop)
+	      | Type.Array(Type.Float) ->
+		  (*TODO:WATCH:たとえばディスプレースメントをレジスタで出来ればこの辺が速くなる*)
+		  Let((offset, Type.Int), Add(x, y),
+		      Ans(Fload(offset, 0)))
+	      | Type.Array(_) ->
+		  Let((offset, Type.Int), Add(x, y),
+		      Ans(Load(offset, 0)))
+	      | _ -> assert false)
        with Not_found -> raise MyNotFound6)
   | Closure.Put(x, y, z) ->
       (try
-      let offset = Id.genid "put" in
-	(match M.find x env with
-	   | Type.Array(Type.Unit) -> Ans(Nop)
-	   | Type.Array(Type.Float) ->
-	       Let((offset, Type.Int), Add(x, y),
-		   Ans(Fstore(z, offset, 0)))
-	   | Type.Array(_) ->
-	       Let((offset, Type.Int), Add(x, y),
-		   Ans(Store(z, offset, 0)))
-	   | _ -> assert false)
+	 let offset = Id.genid "put" in
+	   (match M.find x env with
+	      | Type.Array(Type.Unit) -> Ans(Nop)
+	      | Type.Array(Type.Float) ->
+		  Let((offset, Type.Int), Add(x, y),
+		      Ans(Fstore(z, offset, 0)))
+	      | Type.Array(_) ->
+		  Let((offset, Type.Int), Add(x, y),
+		      Ans(Store(z, offset, 0)))
+	      | _ -> assert false)
        with Not_found -> raise MyNotFound7)
-	  (*TODO:*)
+	(*TODO:*)
   | Closure.ExtArray(Id.L(x)) ->
       let y = "min_caml_" ^ x in
 	(
