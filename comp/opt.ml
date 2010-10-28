@@ -18,10 +18,10 @@ type t =
   | Flr of id * id
   | Foi of id * id
   | Call of id * id * (id list)
-  | IfEq of id * id * id * bid * bid
-  | IfLE of id * id * id * bid * bid
-  | IfFEq of id * id * id * bid * bid
-  | IfFLE of id * id * id * bid * bid
+  | IfEq of id * id * id * bid * bid * (bid option)
+  | IfLE of id * id * id * bid * bid * (bid option)
+  | IfFEq of id * id * id * bid * bid * (bid option)
+  | IfFLE of id * id * id * bid * bid * (bid option)
   | Var of id * id
   | Tuple of id * (id list)
   | Get of id * id * id
@@ -61,18 +61,18 @@ exception MyNotFound9
 exception MyNotFound10
 
 let rec each_conv cblk cbid nbid rid rtyp env e =
-  let sel_if r x y z w env e =
+  let sel_if r x y z w v env e =
     try
       match e with
 	| Closure.IfEq _ ->
 	    (match M.find x env with
-	       | Type.Float -> IfFEq (r, x, y, z, w)
-	       | Type.Int | Type.Bool -> IfEq (r, x, y, z, w)
+	       | Type.Float -> IfFEq (r, x, y, z, w, v)
+	       | Type.Int | Type.Bool -> IfEq (r, x, y, z, w, v)
 	       | _ -> raise UnsupportedComparison)
 	| Closure.IfLE _ ->
 	    (match M.find x env with
-	       | Type.Float -> IfFLE (r, x, y, z, w)
-	       | Type.Int | Type.Bool -> IfLE (r, x, y, z, w)
+	       | Type.Float -> IfFLE (r, x, y, z, w, v)
+	       | Type.Int | Type.Bool -> IfLE (r, x, y, z, w, v)
 	       | _ -> raise UnsupportedComparison)
 	| _ -> raise FatalError 
     with Not_found -> raise MyNotFound in
@@ -123,7 +123,8 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 		   let contblks = each_conv [] contid nbid rid rtyp nenv e2 in
 		   let thenblks = each_conv [] thenid (Some contid) n t env z in
 		   let elseblks = each_conv [] elseid (Some contid) n t env w in
-		     (cbid, (cblk @ [sel_if n x y thenid elseid env e1], [thenid; elseid]))
+		     (cbid, (cblk @ [sel_if n x y thenid elseid (Some contid) env e1],
+			     [thenid; elseid]))
 		     :: (thenblks @ elseblks @ contblks)
 	       | Closure.Let _ | Closure.LetTuple _ -> raise NestedLet
 	       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
@@ -136,7 +137,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 	  let elseid = genid "else" in
 	  let thenblks = each_conv [] thenid nbid rid rtyp env z in
 	  let elseblks = each_conv [] elseid nbid rid rtyp env w in
-	    (cbid, (cblk @ [sel_if rid x y thenid elseid env e], [thenid; elseid]))
+	    (cbid, (cblk @ [sel_if rid x y thenid elseid None env e], [thenid; elseid]))
 	    :: (thenblks @ elseblks)
       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
       | _ -> [cbid, (cblk @ (imm_conv rid rtyp e), nextid nbid)]
@@ -159,8 +160,7 @@ let conv (Closure.Prog (l, t)) =
 				    w))) l) in
     ((mrid, Type.Unit) :: p, (q, (mbid, each_conv mrid Type.Unit mbid M.empty t)))
 
-(*次のラベルと式を返す*)
-let rec peach_rconv bid blks tenv =
+let rec p_each_rconv bid blks tenv =
   let sel_if x y z w = function
     | IfEq _ | IfFEq _ -> Closure.IfEq (x, y, z, w)
     | IfLE _ | IfFLE _ -> Closure.IfLE (x, y, z, w)
@@ -212,57 +212,48 @@ let rec peach_rconv bid blks tenv =
 	       (x, M.find x tenv, Closure.ExtTuple y)
 	     with Not_found -> raise MyNotFound5)
     with Not_found -> raise MyNotFound2 in
-  let (cblk, nbids) = List.assoc bid blks in
+  let (cblk, _) = List.assoc bid blks in
   let r =
     List.fold_right
       (fun e -> function
 	 | None ->
-	     (match e with
-		| LetTuple _ -> raise FatalError
-		| IfEq (r, x, y, z, w) | IfLE (r, x, y, z, w)
-		| IfFEq (r, x, y, z, w) | IfFLE (r, x, y, z, w) ->
-		    let (n, thenexp) = peach_rconv z blks tenv in
-		    let (_, elseexp) = peach_rconv w blks tenv in
-		    let expif = sel_if x y thenexp elseexp e in
-		      (match n with
-			 | None -> Some (None, expif)
-			 | Some n -> 
-			     let (m, contexp) = peach_rconv n blks tenv in
-			       Some (m, Closure.Let ((r, M.find r tenv), expif, contexp))
-		      )
-		| _ ->
-		    let (_, _, ex) = imm_rconv e in
-		      Some (
-			(match nbids with
-			   | [] -> None
-			   | [x] -> Some x
-			   | _ -> raise FatalError),
-			ex))
-	 | Some (nbid, exp) ->
-	     Some
-	       (nbid,
-		match e with
-		  | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ -> raise FatalError
-		  | LetTuple (x, y) ->
-		      (try
-			 Closure.LetTuple (List.map (fun x -> (x, M.find x tenv)) x, y, exp)
-		       with Not_found -> raise MyNotFound3)
-		  | _ ->
-		      let (n, t, ex) = imm_rconv e in
-			Closure.Let ((n, t), ex, exp))
+	     Some 
+	       (match e with
+		  | LetTuple _ -> raise FatalError
+		  | IfEq (r, x, y, z, w, v) | IfLE (r, x, y, z, w, v)
+		  | IfFEq (r, x, y, z, w, v) | IfFLE (r, x, y, z, w, v) ->
+		      let thenexp = p_each_rconv z blks tenv in
+		      let elseexp = p_each_rconv w blks tenv in
+		      let expif = sel_if x y thenexp elseexp e in
+			(match v with
+			   | None -> expif
+			   | Some n ->
+			       let contexp = p_each_rconv n blks tenv in
+				 Closure.Let ((r, M.find r tenv), expif, contexp))
+		  | _ -> let (_, _, ex) = imm_rconv e in ex)
+	 | Some exp ->
+	     Some (
+	       match e with
+		 | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ -> raise FatalError
+		 | LetTuple (x, y) ->
+		     (try
+			Closure.LetTuple (List.map (fun x -> (x, M.find x tenv)) x, y, exp)
+		      with Not_found -> raise MyNotFound3)
+		 | _ ->
+		     let (n, t, ex) = imm_rconv e in
+		       Closure.Let ((n, t), ex, exp))
       ) cblk None in
     match r with
-      | None -> (None, Closure.Unit)
+      | None -> Closure.Unit
       | Some r -> r
 
 let each_rconv (bid, rl, al, blks) tenv =
-  let (_, b) = peach_rconv bid blks tenv in
-    { Closure.name = (Id.L bid, M.find bid tenv);
-      Closure.args = List.map (fun x -> (x, M.find x tenv)) al;
-      Closure.formal_fv = []; Closure.body = b }
+  { Closure.name = (Id.L bid, M.find bid tenv);
+    Closure.args = List.map (fun x -> (x, M.find x tenv)) al;
+    Closure.formal_fv = []; Closure.body = p_each_rconv bid blks tenv }
 
 let ent_rconv (nm, blks) tenv =
-  snd (peach_rconv nm blks tenv)
+  p_each_rconv nm blks tenv
 
 let rconv (l, t) tenv =
   Closure.Prog (List.map (fun x -> each_rconv x tenv) l, ent_rconv t tenv)
@@ -303,40 +294,40 @@ let sotn = function
   | Get _ -> "Get" | Put _ -> "Put" | ExtArray _ -> "ExtArray"
   | ExtTuple _ -> "ExtTuple" | LetTuple _ -> "LetTuple"
 
-let print_t e =
+let print_t oc e =
   match e with
-    | Unit x -> printf "\t\t%s %s\n" (sotn e) x
-    | Addzi (x, y) -> printf "\t\t%s %s %d\n" (sotn e) x y
-    | FLoad (x, y) -> printf "\t\t%s %s %f\n" (sotn e) x y
+    | Unit x -> fprintf oc "\t\t%s %s\n" (sotn e) x
+    | Addzi (x, y) -> fprintf oc "\t\t%s %s %d\n" (sotn e) x y
+    | FLoad (x, y) -> fprintf oc "\t\t%s %s %f\n" (sotn e) x y
     | Subz (x, y) | FSubz (x, y) | Flr (x, y) | Foi (x, y)
     | ExtArray (x, y) | ExtTuple (x, y) ->
-	printf "\t\t%s %s %s\n" (sotn e) x y
+	fprintf oc "\t\t%s %s %s\n" (sotn e) x y
     | Add (x, y, z) | Sub (x, y, z) | Mul (x, y, z)
     | FAdd (x, y, z) | FSub (x, y, z) | FMul (x, y, z) | FDiv (x, y, z)
     | Get (x, y, z) | Put (x, y, z) | FGet (x, y, z) | FPut (x, y, z) ->
-	printf "\t\t%s %s %s %s\n" (sotn e) x y z
-    | IfEq (r, x, y, _, _) | IfLE (r, x, y, _, _) 
-    | IfFEq (r, x, y, _, _) | IfFLE (r, x, y, _, _) ->
-	printf "\t\t%s %s %s %s\n" (sotn e) r x y
+	fprintf oc "\t\t%s %s %s %s\n" (sotn e) x y z
+    | IfEq (r, x, y, _, _, _) | IfLE (r, x, y, _, _, _) 
+    | IfFEq (r, x, y, _, _, _) | IfFLE (r, x, y, _, _, _) ->
+	fprintf oc "\t\t%s %s %s %s\n" (sotn e) r x y
     | Call (x, y, z) ->
-	printf "\t\t%s (%s) <- %s (%s)\n" (sotn e) x y (String.concat ", " z)
-    | _ -> printf "\t\t%s\n" (sotn e)
+	fprintf oc "\t\t%s (%s) <- %s (%s)\n" (sotn e) x y (String.concat ", " z)
+    | _ -> fprintf oc "\t\t%s\n" (sotn e)
 
-let print_block (x, (y, z)) =
-  printf "\t%s -> (%s)\n" x (String.concat ", " z);
-  List.iter print_t y
+let print_block oc (x, (y, z)) =
+  fprintf oc "\t%s -> (%s)\n" x (String.concat ", " z);
+  List.iter (print_t oc) y
 
-let print_func (n, x, y, z) =
-  printf "%s: (%s) <- (%s)\n" n (String.concat ", " x) (String.concat ", " y);
-  List.iter print_block z
+let print_func oc (n, x, y, z) =
+  fprintf oc "%s: (%s) <- (%s)\n" n (String.concat ", " x) (String.concat ", " y);
+  List.iter (print_block oc) z
 
-let print_prog (x, (y, z)) =
-  List.iter print_func x;
-  print_func (y, [], [], z)
+let print_prog oc (x, (y, z)) =
+  List.iter (print_func oc) x;
+  print_func oc (y, [], [], z)
     
-let f x =
+let f oc x =
   let (_, k) = conv x in
-    print_prog k;
+    print_prog oc k;
     k
       
 let g x =

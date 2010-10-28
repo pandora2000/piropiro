@@ -89,18 +89,25 @@ let lexbuf outchan foutchan boutchan a = (* バッファをコンパイルしてチャンネルへ
   let f = Closure.f e in
   let pp = Opt.g f in
   let g = Virtual.f memin memout memext al pp in
-      let h = RegAlloc.f g in
+  let h = RegAlloc.f g in
     (*
       Closure.print_prog stdout f;
       KNormal.print_prog stdout e;
       Asm.print_prog stdout g;
       Asm.print_prog stdout h;
     *)
-      let i = Emit.f outchan foutchan !istest memext memin memout memsp memhp floffset h in
-    (*    ignore (Opt.f f);*)
-    (*      Closure.print_prog stdout f;*)
-    (*      Closure.print_prog stdout pp;*)
-    
+  let i = Emit.f outchan foutchan !istest memext memin memout memsp memhp floffset h in
+    (*
+  let dvir = open_out "dvir" in
+  let dbcls = open_out "dbcls" in
+  let dacls = open_out "dacls" in
+        ignore (Opt.f dvir f);
+          Closure.print_prog dbcls f;
+          Closure.print_prog dacls pp;
+	  close_out dvir;
+	  close_out dbcls;
+	  close_out dacls;
+    *)
     
     (*    
 	  output_string outchan (prep (Emit.string_of_alist i));
