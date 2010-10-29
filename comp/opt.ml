@@ -81,7 +81,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 	       | Closure.AppDir (Id.L x, y) ->
 		   let clcontid = genid "clcont" in
 		   let contblks = each_conv [] clcontid nbid rid rtyp nenv e2 in
-		     (cbid, (cblk @ [Call (n, x, y, Some clcontid)], [x]))
+		     (cbid, (cblk @ [Call (n, x, y, Some clcontid)], [clcontid]))
 		     :: contblks
 	       | Closure.Let _ | Closure.LetTuple _ -> raise NestedLet
 	       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
@@ -96,7 +96,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 	  let elseblks = each_conv [] elseid nbid rid rtyp env w in
 	    (cbid, (cblk @ [sel_if rid x y thenid elseid None env e], [thenid; elseid]))
 	    :: (thenblks @ elseblks)
-      | Closure.AppDir (Id.L x, y) -> [cbid, (cblk @ [Call (rid, x, y, None)], [x])]
+      | Closure.AppDir (Id.L x, y) -> [cbid, (cblk @ [Call (rid, x, y, None)], [])]
       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
       | _ -> [cbid, (cblk @ (imm_conv rid rtyp e), nextid nbid)]
 	  
