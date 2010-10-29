@@ -784,12 +784,14 @@ int do_assemble2(program *program, program2 * program2)
 
     else if (iname == 26) {
       //memory_check
+      /*
       if (check_memory(regist[ist.name[2]] + ist.name[3])
 	  == ACSESS_BAD) {
 	printf("Error:ACSESS_BAD :\n");
 	// printf("%d\n", iname);
 	exit(1);
-      }
+	}
+      */
       memory[regist[ist.name[2]] + ist.name[3]].d =
 	freg[ist.name[1]];
     }
@@ -917,11 +919,12 @@ int do_assemble2(program *program, program2 * program2)
     */
     //命令が存在しなかった場合error parseでやっているのでいらない。
     //printf("ist = %d\n",iname);
-    
+    /*
     if(pc == 1535){
       printflag = 1;
     }
-    
+    */
+    /*
     if(printflag == 1){ 
       count++;
       if(count < 10000){
@@ -931,7 +934,8 @@ int do_assemble2(program *program, program2 * program2)
         //print_register();
         //}
       }
-    }
+      }
+    */
     
     nextpc++;
 
