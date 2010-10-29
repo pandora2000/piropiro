@@ -2299,14 +2299,10 @@ let rec rt size_x size_y =
   image_size.(0) <- size_x;
   image_size.(1) <- size_y;
   (*インライン展開と定数伝播で消えると思う*)
-  (*さらに変更*)
-  (*TODO*)
-  image_center.(0) <- 64;
-  image_center.(1) <- 64;
-  (*
+  
   image_center.(0) <- size_x / 2;
     image_center.(1) <- size_y / 2;
-  *)
+  
  scan_pitch.(0) <- 128.0 /. float_of_int size_x;
  let prev = create_pixelline () in
  let cur  = create_pixelline () in

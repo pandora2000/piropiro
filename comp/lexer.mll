@@ -35,7 +35,9 @@ rule token = parse
 | '+' (* +.より後回しにしなくても良い? 最長一致? *)
     { PLUS }
 | "*"
-	    { AST }
+	{ AST }
+| "/"
+{ SLASH }
 | "-."
     { MINUS_DOT }
 | "+."
