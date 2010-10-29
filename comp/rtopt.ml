@@ -2300,6 +2300,7 @@ let rec rt size_x size_y =
   image_size.(1) <- size_y;
   (*インライン展開と定数伝播で消えると思う*)
   (*さらに変更*)
+  (*TODO*)
   image_center.(0) <- 64;
   image_center.(1) <- 64;
   (*

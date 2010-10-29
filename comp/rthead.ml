@@ -86,7 +86,7 @@ let rec isqrt a x n =
 let rec sqrt a = a *. (isqrt a
 			 (if a <= 1.0 then 1.0 else 1.0 /. a)
 			 15) in
-  (*とりあえず3桁*)
+  (*TODO:とりあえず3桁*)
 let rec sdiv10 x y =
   if (x - 10) < 0 then y else sdiv10 (x - 10) (y + 1) in
 let rec div10 x = sdiv10 x 0 in
