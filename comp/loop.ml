@@ -24,35 +24,47 @@ open Optt
   ただし、その関数が自分自身だけを呼んでいる場合は、最適化の余地があり、
   かつインライン展開されきらない。
 *)
-(*
-let make_cfg ((bid, rids, aids, blks) : func) =
-  List.fold_left
-    (fun a b ->
-       let (ts, bs) = List.assoc b blks in
-	 match List.nth ts (List.length ts - 1) with
-*)
 
-(*
 (*制御フローグラフ作成*)
-(*配列とforで全部やった方がいいね*)
-let make_cfg ((bid, rids, aids, blks) : func) =
-  let blks = get_blocks prog in
-  let block_of id = List.assoc s blks in
-  let next_bids_of id = let (_, (_, n)) = block_of id in n in
-  let next g =
+let make_cfg ((sbid, rids, aids, blks) : func) =
+  let pred x al =
+    fst (List.split (List.find_all (fun (_, b) -> List.mem x b) al)) in
+  let alist =
     List.fold_left
-      (fun a ((id, _) as b) ->
-	 let (bid, (el, bl)) = block_of id in
-	   match bl with _ :: _ -> b :: a
+      (fun a (bid, (ts, bs)) ->
+	 (bid, (match List.nth ts (List.length ts - 1) with
+		  | Call (_, y, _, _) when y = sbid -> [sbid]
+		  | _ -> []) @ bs) :: a) [] blks in
+    List.map (fun (a, b) -> (a, (pred a alist, b))) alist
+
+(*上位者を求める*)
+let solve_doms s nodes =
+  let merge_list x y =
+    List.fold_left (fun a b -> if List.mem b a then a else b :: a) x y in
+  let all = fst (List.split nodes) in
+  let rec cap_list l m =
+    List.fold_left (fun a b -> if List.mem b l then b :: a else a) [] m in
+  let rec cap_lists l =
+    List.fold_left (fun a b -> cap_list a b) all l in
   let prev = ref [] in
-  let cur = ref [s, next_bids_of s] in
+  let cur = ref (List.map (fun x -> (x, all)) all) in
+    cur := List.map (fun ((x, _) as y) -> if x = s then (s, [s]) else y) !cur;
     while !prev <> !cur do
       prev := !cur;
-      cur := next !cur
+      cur := List.map
+	(fun (x, (y, _)) ->
+	   if x = s then (s, [s])
+	   else (x, merge_list [x] (cap_lists (List.map (fun x -> List.assoc x !cur) y)))) nodes
     done; !cur
-*)
-(*
-let all_doms s nodes =
-  let prev = ref ([], 
-    while
-*)    
+
+let get_imm_doms s nodes =
+  let doms = solve_doms s nodes in
+    List.map
+      (fun (x, w) ->
+	 if x = s then (s, None)
+	 else 
+	   (x,
+	    Some (List.find
+		    (fun (y, z) -> y <> x && List.mem y w &&
+		       not (List.exists (fun u -> u <> x && not (List.mem u z)) w))
+		    doms))) doms
