@@ -159,6 +159,6 @@ let print_loop (h, l) =
 let print_loops ls = List.iter print_loop ls
   
 let print_loops_of_func f =
-      print_cfg_of_func f;
-    print_doms_of_func f;
-      print_loops (loops_of_func f)
+ (* print_cfg_of_func f;
+  print_doms_of_func f;
+  print_loops *)ignore (loops_of_func f)

@@ -1,2 +1,0 @@
-elimTpl.cmo: 
-elimTpl.cmx: 
