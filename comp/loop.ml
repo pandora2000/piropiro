@@ -1,5 +1,6 @@
 open Printf
 open Optt
+open List
 
 (*NOTICE:新しいidを作る場合envに追加しなければいけないことに注意*)
 
@@ -21,50 +22,143 @@ open Optt
   他から呼ばれていない関数（正確に言えば、どこからも呼ばれていないか、
   唯一の関数から呼ばれてかつその関数は自分自身ではないような関数）
   は必ずインライン展開するようにしておけば、コード量の増加もそれほどない。
-  ただし、その関数が自分自身だけを呼んでいる場合は、最適化の余地があり、
+  ただし、その関数が自分自身と他の唯一の関数からのみ呼ばれている場合は、最適化の余地があり、
   かつインライン展開されきらない。
+  もし、その関数が自分自身を呼ぶ場所が末尾であるならば、その関数をループとしてそれを呼ぶ
+  唯一の他の関数に埋め込むという方法でCallをなくすことが出来る。
 *)
+
+(*
+  関数型言語なのでループは常に関数の先頭がヘッダとなる！！
+*)
+
+type dtree =
+  | Leaf of bid
+  | Node of dtree list
+      
+let merge_list x y =
+  fold_left (fun a b -> if mem b a then a else b :: a) x y
+    
+let cap_list l m =
+  fold_left (fun a b -> if mem b l then b :: a else a) [] m
+
+let rem_list l m =
+  fold_left (fun a b -> if mem b m then a else b :: a) [] l
+
+let fpfunc s f =
+  let prev = ref [] in
+  let cur = ref s in
+    while !prev <> !cur do
+      prev := !cur;
+      cur := f !cur
+    done; !cur
 
 (*制御フローグラフ作成*)
 let make_cfg ((sbid, rids, aids, blks) : func) =
   let pred x al =
-    fst (List.split (List.find_all (fun (_, b) -> List.mem x b) al)) in
+    fst (split (find_all (fun (_, b) -> mem x b) al)) in
   let alist =
-    List.fold_left
+    fold_left
       (fun a (bid, (ts, bs)) ->
-	 (bid, (match List.nth ts (List.length ts - 1) with
-		  | Call (_, y, _, _) when y = sbid -> [sbid]
-		  | _ -> []) @ bs) :: a) [] blks in
-    List.map (fun (a, b) -> (a, (pred a alist, b))) alist
+	 (bid, (if ts = [] then bs
+		else
+		  match nth ts (length ts - 1) with
+		      (*自分自身への末尾Callのときのみ考慮*)
+		    | Call (_, y, _, _) when y = sbid && bs = [] -> [sbid]
+		    | _ -> []) @ bs) :: a) [] blks in
+    map (fun (a, b) -> (a, (pred a alist, b))) alist
 
 (*上位者を求める*)
 let solve_doms s nodes =
-  let merge_list x y =
-    List.fold_left (fun a b -> if List.mem b a then a else b :: a) x y in
-  let all = fst (List.split nodes) in
-  let rec cap_list l m =
-    List.fold_left (fun a b -> if List.mem b l then b :: a else a) [] m in
+  let all = fst (split nodes) in
   let rec cap_lists l =
-    List.fold_left (fun a b -> cap_list a b) all l in
-  let prev = ref [] in
-  let cur = ref (List.map (fun x -> (x, all)) all) in
-    cur := List.map (fun ((x, _) as y) -> if x = s then (s, [s]) else y) !cur;
-    while !prev <> !cur do
-      prev := !cur;
-      cur := List.map
-	(fun (x, (y, _)) ->
-	   if x = s then (s, [s])
-	   else (x, merge_list [x] (cap_lists (List.map (fun x -> List.assoc x !cur) y)))) nodes
-    done; !cur
+    fold_left (fun a b -> cap_list a b) all l in
+    fpfunc (map (fun x -> (x, all)) all)
+      (fun prev ->
+	 map
+	   (fun (x, (y, _)) ->
+	      if x = s then (s, [s])
+	      else (x, merge_list [x] (cap_lists
+					 (map (fun x -> assoc x prev) y)))) nodes)
 
+(*(*要debug*)いる？*)
 let get_imm_doms s nodes =
   let doms = solve_doms s nodes in
-    List.map
+    map
       (fun (x, w) ->
 	 if x = s then (s, None)
 	 else 
 	   (x,
-	    Some (List.find
-		    (fun (y, z) -> y <> x && List.mem y w &&
-		       not (List.exists (fun u -> u <> x && not (List.mem u z)) w))
-		    doms))) doms
+	    Some (fst (find
+			 (fun (y, z) -> y <> x && mem y w &&
+			    not (exists (fun u -> u <> x && not (mem u z)) w))
+			 doms)))) doms
+
+(*(*要debug*)いる？*)
+let get_doms_tree s nodes =
+  let idoms = get_imm_doms s nodes in
+  let rec make_tree s =
+    let succs = fst (split (find_all (fun (_, x) -> x = Some s) idoms)) in
+      match succs with [] -> Leaf s | x -> Node
+	(map make_tree x) in
+    make_tree s
+
+let get_natural_loops s nodes =
+  let doms = solve_doms s nodes in
+  let rev_branches =
+    fold_left (fun a (x, y) ->
+		 (map (fun z -> (x, z))
+		    (cap_list y (snd (assoc x nodes)))) @ a) [] doms in
+  let nloop_of (n, h) =
+    let doms = solve_doms s nodes in
+      (*xからhを通らずに到達可能なノードのリスト*)
+    let m x =
+      fpfunc [x]
+	(fun prev ->
+	   fold_left
+	     (fun a b ->
+		merge_list (rem_list (snd (assoc b nodes)) [h]) a) prev prev) in
+      (*hを通らずにnに到達可能なノードでhを上位とするノードのリスト*)
+    let m =
+      fold_left (fun a b ->
+		   if mem n (m b) && mem h (assoc b doms) then b :: a else a)
+	[] (map fst nodes) in
+      (h, m) in
+    map nloop_of rev_branches
+      
+let get_loops s nodes =
+  let nloops = get_natural_loops s nodes in
+    List.fold_left
+      (fun a b ->
+	 if mem_assoc b a then a
+	 else
+	   (b, flatten (map snd (find_all (fun (x, _) -> x = b) nloops))) :: a)
+      [] (map fst nloops)
+      
+let loops_of_func ((sbid, _, _, _) as f) =
+  get_loops sbid (make_cfg f)
+
+let print_cfg g =
+  iter (fun (x, (_, y)) ->
+	  printf "%s\n" x;
+	  iter (printf "\t%s\n") y) g
+
+let print_cfg_of_func f = print_cfg (make_cfg f)
+
+let print_doms d =
+  iter (fun (x, y) ->
+	  printf "%s\n" x;
+	  iter (printf "\t%s\n") y) d
+
+let print_doms_of_func ((s, _, _, _) as f) = print_doms (solve_doms s (make_cfg f))
+
+let print_loop (h, l) =
+  printf "%s\n" h;
+  iter (fun x -> if x <> h then printf "\t%s\n" x) l
+    
+let print_loops ls = List.iter print_loop ls
+  
+let print_loops_of_func f =
+      print_cfg_of_func f;
+    print_doms_of_func f;
+      print_loops (loops_of_func f)

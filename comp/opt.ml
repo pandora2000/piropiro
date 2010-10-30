@@ -1,6 +1,6 @@
 open Printf
 open Optt
-
+open Loop
 
 let merge_alist x y =
   List.fold_left (fun a b -> if List.mem_assoc (fst b) a then a else b :: a) x y
@@ -271,5 +271,9 @@ let print_prog oc (x, (y, z)) =
   print_func oc (y, [], [], z)
 
 let f x =
-  let p = normal x in
-    reverse p
+  let (p, env) = normal x in
+    print_prog stdout p;
+    List.iter print_loops_of_func (fst p);
+    let (a, b) = snd p in
+      print_loops_of_func (a, [], [], b);
+      reverse (p, env)
