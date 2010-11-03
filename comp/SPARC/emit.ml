@@ -1,27 +1,6 @@
 open Asm
 open Printf
 
-(*
-  exception UnknownInstruction
-*)
-(*
-  let opcode_of x =
-  match x with
-  | "foi" -> 0b010101 | "floor" -> 0b010110(*仮*)
-  | "nop" -> 0b000000 | "add" -> 0b000001 | "sub" -> 0b000010
-  | "mul" -> 0b000011 | "and" -> 0b000100 | "or" -> 0b000101
-  | "nor" -> 0b000110 | "xor" -> 0b000111| "addi" -> 0b001001
-  | "subi" -> 0b001010 | "muli" -> 0b001011 | "andi" -> 0b001100
-  | "ori" -> 0b001101 | "nori" -> 0b001110 | "xori" -> 0b001111
-  | "fadd" -> 0b010000 | "fsub" -> 0b010001| "fmul" -> 0b010010
-  | "finv" -> 0b010011 | "fsqrt" -> 0b010100 | "fdiv" -> 0b010011
-  | "ldi" -> 0b011001 | "store" -> 0b011011 | "fldi" -> 0b011101
-  | "fstore" -> 0b011111 | "beq" -> 0b100000 | "bne" -> 0b100001
-  | "bgt" -> 0b100010 | "blt" -> 0b100011 | "fbeq" -> 0b100100
-  | "fbne" -> 0b100101 | "fbgt" -> 0b100110 | "fblt" -> 0b100111
-  | "jump" -> 0b110000 | "call" -> 0b110100 | "return" -> 0b111000
-  | _ -> raise UnknownInstruction
-*)
 
 type inst = Ret | Ldi | Fld | Sti | Fst | Call | Jump | Bne | Bgt | Blt | Fbne | Fbgt |
     Nadd | Nfadd | Nnop | Naddi | Nmuli | Npc
@@ -56,7 +35,7 @@ let string_of_inst = function
   | Ori _ -> "ori" | Nori _ -> "nori" | Xori _ -> "xori" | Fadd _ -> (soii Nfadd)
   | Fsub _ -> "fsub" | Fmul _ -> "fmul" | Finv _ -> "finv" | Fsqrt _ -> "fsqrt"
   | Fdiv _ -> "fdiv" | Load _ -> (soii Ldi) | Store _ ->  (soii Sti) | Fload _ -> (soii Fld)
-  | Fstore _ ->  (soii Fst) | IfEq _ -> "IfEq" | IfLE _ -> "IfLE" | IfGE _ -> "IfGE"
+  | Fstore _ ->  (soii Fst) | IfEq _ -> "IfEq" | IfLE _ -> "IfLE"
   | IfFEq _ -> "IfEFq" | IfFLE _ -> "IfFLE" | CallCls _ -> "CallCls" | CallDir _ -> "CallDir"
   | Save _ -> "Save" | Restore _ -> "Restore"
 
@@ -100,23 +79,8 @@ let rec shuffle sw xys =
 					     xys)
       | xys, acyc -> acyc @ shuffle sw xys
 
-(*nameだとかぶっちゃってエラー起きる*)
 type a = { nm : string; ac : int; a1 : string;
 	   mutable a2 : string; mutable a3 : string; mutable index : int }
-
-exception UnknownInstruction
-  
-let print_a a =
-  if a.ac = 0 then
-    printf "%s\n" a.nm
-  else if a.ac = 1 then
-    printf "%s %s\n" a.nm a.a1
-  else if a.ac = 2 then
-    printf "%s %s %s\n" a.nm a.a1 a.a2
-  else if a.ac = 3 then
-    printf "%s %s %s %s\n" a.nm a.a1 a.a2 a.a3
-  else
-    printf "%s:\n" a.nm
       
 (*相対jumpの距離について*)
 (*TODO:a1,a3が数字の時値が範囲内にあるか確かめる*)
@@ -197,8 +161,6 @@ and g' e =(* 各命令のアセンブリ生成 (caml2html: emit_gprime) *)
 	  g'_tail_if e1 e2 x y' (soii Bne)
       | Tail, IfLE(x, y', e1, e2) ->
 	  g'_tail_if e1 e2 x y' (soii Bgt)
-      | Tail, IfGE(x, y', e1, e2) ->
-	  g'_tail_if e1 e2 x y' (soii Blt)
       | Tail, IfFEq(x, y, e1, e2) ->
 	  g'_tail_if e1 e2 x y (soii Fbne)
       | Tail, IfFLE(x, y, e1, e2) ->
@@ -207,8 +169,6 @@ and g' e =(* 各命令のアセンブリ生成 (caml2html: emit_gprime) *)
 	  g'_non_tail_if (NonTail(z)) e1 e2 x y' (soii Bne)
       | NonTail(z), IfLE(x, y', e1, e2) ->
 	  g'_non_tail_if (NonTail(z)) e1 e2 x y' (soii Bgt)
-      | NonTail(z), IfGE(x, y', e1, e2) ->
-	  g'_non_tail_if (NonTail(z)) e1 e2 x y' (soii Blt)
       | NonTail(z), IfFEq(x, y, e1, e2) ->
 	  g'_non_tail_if (NonTail(z)) e1 e2 x y (soii Fbne)
       | NonTail(z), IfFLE(x, y, e1, e2) ->
@@ -302,75 +262,7 @@ let string_of_alist (x, _) =
     (String.concat "\n"
        (List.map (fun y -> string_of_a y) x))
 
-let get_label_index y name =
-  (List.find (fun x -> x.nm = name && x.ac = - 1) y).index
 
-exception ImValueOverflow
-exception Exit5
-exception Exit6
-
-(*
-  let string_of_bi_a x l =
-(*  print_endline (string_of_int (get_label_index l "L_fib_11"));
-  print_endline x.nm;*)
-  let p = 
-  if x.ac = - 1 then ""
-  else if x.ac = 0 then
-  let y = opcode_of x.nm in
-  sprintf "%02X000000\n" (y lsl 2)
-  else if x.ac = 1 then
-  try
-  let y = opcode_of x.nm in
-  let z = get_label_index l x.a1 in
-  sprintf "%02X%06X\n" ((y lsl 2) lor (z lsr 24)) (z land 0xffffff)
-  with Not_found ->
-  match x.a1 with
-  | _ -> raise Exit6
-  else if x.ac = 2 then
-  let y = opcode_of x.nm in
-  let z = int_of_reg x.a1 in
-  let w = int_of_reg x.a2 in
-  sprintf "%04X0000\n" ((y lsl 10) lor (z lsl 5) lor w)
-  else if x.ac = 3 then
-  let y = opcode_of x.nm in
-  let z = int_of_reg x.a1 in
-  let w = int_of_reg x.a2 in
-  let u =
-  if is_reg x.a3 then (int_of_reg x.a3) lsl 11
-  else if x.a3.[0] = '-' ||
-  x.a3.[0] = '0' || x.a3.[0] = '1' ||
-  x.a3.[0] = '2' || x.a3.[0] = '3' ||
-  x.a3.[0] = '4' || x.a3.[0] = '5' ||
-  x.a3.[0] = '6' || x.a3.[0] = '7' ||
-  x.a3.[0] = '8' || x.a3.[0] = '9' then
-  int_of_string x.a3
-  else (get_label_index l x.a3) - x.index in
-(*値が幅に収まっているか確かめる*)
-  if u < (- 32768) || u > 32767 then raise ImValueOverflow
-  else
-  sprintf "%04X%04X\n" ((y lsl 10) lor (z lsl 5) lor w) (u land 0xffff)
-  else raise Exit5 in
-(*    print_endline p;*)
-  p
-*)
-(*
-  let string_of_binary (x, _) =
-  let i = ref 0 in
-  List.iter (fun y ->
-  if y.ac = - 1 || (y.nm = (soii Call) &&
-  (
-  try
-  ignore (get_label_index x y.a1); false
-  with Not_found -> true
-  ))
-  then
-  y.index <- !i
-  else 
-  let p = !i in incr i; y.index <- p) x;
-  String.concat ""
-  ((List.map (fun y -> string_of_bi_a y x) x) @
-  ["00000000\n"; "00000000\n"; "00000000\n"; "00000000\n"; "FFFFFFFF\n"])
-*)
 
 let string_of_flist (_, x) =
   (*  print_endline (string_of_int (List.length x));*)
@@ -379,11 +271,6 @@ let string_of_flist (_, x) =
        (List.map (fun y -> Int32.format "%08X" (Int32.bits_of_float y)) x))
 
 
-let prep s =
-  let r = ref "" in
-    for i = 0 to String.length s - 1 do
-      if s.[i] = '%' then () else r := !r ^ (String.make 1 s.[i])
-    done; !r
       
 
       

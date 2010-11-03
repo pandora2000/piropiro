@@ -39,7 +39,6 @@ and exp = (* 一つ一つの命令に対応する式 (caml2html: sparcasm_exp) *)
       (* virtual instructions *)
   | IfEq of Id.t * Id.t * t * t
   | IfLE of Id.t * Id.t * t * t
-  | IfGE of Id.t * Id.t * t * t (* 左右対称ではないので必要 *)
   | IfFEq of Id.t * Id.t * t * t
   | IfFLE of Id.t * Id.t * t * t
       (* closure address, integer arguments, and float arguments *)
@@ -67,7 +66,7 @@ let string_of_vinst = function
   | Ori _ -> "Ori" | Nori _ -> "Nori" | Xori _ -> "Xori" | Fadd _ -> "Fadd"
   | Fsub _ -> "Fsub" | Fmul _ -> "Fmul" | Finv _ -> "Finv" | Fsqrt _ -> "Fsqrt"
   | Fdiv _ -> "Fdiv" | Load _ -> "Load" | Store _ ->  "Store" | Fload _ -> "Fload"
-  | Fstore _ ->  "Fstore" | IfEq _ -> "IfEq" | IfLE _ -> "IfLE" | IfGE _ -> "IfGE"
+  | Fstore _ ->  "Fstore" | IfEq _ -> "IfEq" | IfLE _ -> "IfLE" 
   | IfFEq _ -> "IfEFq" | IfFLE _ -> "IfFLE" | CallCls _ -> "CallCls" | CallDir _ -> "CallDir"
   | Save _ -> "Save" | Restore _ -> "Restore"
   
@@ -89,7 +88,7 @@ let rec soe level e =
 	  sprintf "%s%s(%s, %d)\n" i (son e) x y
       | Store (x, y, z) | Fstore (x, y, z) ->
 	  sprintf "%s%s(%s, %s, %d)\n" i (son e) x y z
-      | IfEq (x, y, z, w) | IfLE (x, y, z, w) | IfGE (x, y, z, w) ->
+      | IfEq (x, y, z, w) | IfLE (x, y, z, w) ->
 	  sprintf "%s%s(%s, %s)\n%s%sElse\n%s" i (son e) x y (sop nl z) i (sop nl w)
       | IfFEq (x, y, z, w) | IfFLE (x, y, z, w) ->
 	  sprintf "%s%s(%s, %s)\n%s%sElse\n%s" i (son e) x y (sop nl z) i (sop nl w)
@@ -159,7 +158,7 @@ let rec fv_exp = function
   | Addi(y, _) | Subi(y, _) | Muli(y, _) | Andi(y, _)
   | Ori(y, _) | Nori(y, _) | Xori(y, _) | Load(y, _) | Fload(y, _) ->
       [y]
-  | IfEq(x, y, e1, e2) | IfLE(x, y, e1, e2) | IfGE(x, y, e1, e2) ->
+  | IfEq(x, y, e1, e2) | IfLE(x, y, e1, e2) ->
       x :: y :: remove_and_uniq S.empty (fv e1 @ fv e2) (* uniq here just for efficiency *)
   | IfFEq(x, y, e1, e2) | IfFLE(x, y, e1, e2) ->
       x :: y :: remove_and_uniq S.empty (fv e1 @ fv e2) (* uniq here just for efficiency *)

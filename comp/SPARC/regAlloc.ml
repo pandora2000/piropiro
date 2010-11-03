@@ -11,7 +11,7 @@ let rec target' src (dest, t) = function
   | Fadd(fzreg, x) when x = src && is_reg dest ->
       assert (t = Type.Float);
       false, [dest]
-  | IfEq(_, _, e1, e2) | IfLE(_, _, e1, e2) | IfGE(_, _, e1, e2)
+  | IfEq(_, _, e1, e2) | IfLE(_, _, e1, e2)
   | IfFEq(_, _, e1, e2) | IfFLE(_, _, e1, e2) ->
       let c1, rs1 = target src (dest, t) e1 in
       let c2, rs2 = target src (dest, t) e2 in
@@ -156,7 +156,6 @@ and g' dest cont regenv = function (* 各命令のレジスタ割り当て (caml2html: regal
   | Fadd(y, x) -> (Ans(Fadd(find y Type.Float regenv, find x Type.Float regenv)), regenv)
   | Fsub(y, x) -> (Ans(Fsub(find y Type.Float regenv, find x Type.Float regenv)), regenv)
   | Fmul(y, x) -> (Ans(Fmul(find y Type.Float regenv, find x Type.Float regenv)), regenv)
-      (*TODO:*)
   | Fdiv(y, x) -> (Ans(Fdiv(find y Type.Float regenv, find x Type.Float regenv)), regenv)
   | Floor(x) -> (Ans(Floor(find x Type.Float regenv)), regenv)
   | Float_of_int(x) -> (Ans(Float_of_int(find x Type.Int regenv)), regenv)
@@ -169,8 +168,6 @@ and g' dest cont regenv = function (* 各命令のレジスタ割り当て (caml2html: regal
       (fun e1' e2' -> IfEq(find x Type.Int regenv, find y Type.Int regenv, e1', e2')) e1 e2
   | IfLE(x, y, e1, e2) as exp -> g'_if dest cont regenv exp
       (fun e1' e2' -> IfLE(find x Type.Int regenv, find y Type.Int regenv, e1', e2')) e1 e2
-  | IfGE(x, y, e1, e2) as exp -> g'_if dest cont regenv exp
-      (fun e1' e2' -> IfGE(find x Type.Int regenv, find y Type.Int regenv, e1', e2')) e1 e2
   | IfFEq(x, y, e1, e2) as exp -> g'_if dest cont regenv exp
       (fun e1' e2' -> IfFEq(find x Type.Float regenv, find y Type.Float regenv, e1', e2')) e1 e2
   | IfFLE(x, y, e1, e2) as exp -> g'_if dest cont regenv exp

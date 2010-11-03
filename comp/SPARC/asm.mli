@@ -34,7 +34,6 @@ and exp = (* 一つ一つの命令に対応する式 (caml2html: sparcasm_exp) *)
       (* virtual instructions *)
   | IfEq of Id.t * Id.t * t * t
   | IfLE of Id.t * Id.t * t * t
-  | IfGE of Id.t * Id.t * t * t (* 左右対称ではないので必要 *)
   | IfFEq of Id.t * Id.t * t * t
   | IfFLE of Id.t * Id.t * t * t
       (* closure address, integer arguments, and float arguments *)

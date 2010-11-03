@@ -3,7 +3,6 @@ let rec fiszero x = if x = 0.0 then true else false in
 let rec fispos x = if x > 0.0 then true else false in
 let rec fisneg x = if x < 0.0 then true else false in
 let rec fabs x = if x < 0.0 then -. x else x in
-  (*flessこれであってるよね？*)
 let rec fless x y = if x < y then true else false in
 let rec fhalf x = x /. 2.0 in
 let rec fneg x = -. x in
@@ -43,7 +42,7 @@ let rec sin x =
 	if x > 0.0 then
 	  if x <= pio4 then psin x
 	  else if x <= pi3o4 then pcos (x -. pio2)
-	  else psin (pi -. x) 
+	  else psin (pi -. x)
 	else
 	  if x >= -. pio4 then psin x
 	  else if x >= -. pi3o4 then -. pcos (pio2 +. x)
@@ -81,11 +80,10 @@ let rec atan x =
     0.8080808080808080808080 *. x11 /. d6 +. 0.761904761904761904761904 *. x9 /. d5
     +. 0.6857142857142857142857 *. x7 /. d4 +. 0.5333333333333333333333333 *. x5 /. d3
     +. 0.6666666666666666666666 *. x3 /. d2 +. x /. d in
-let rec isqrt a x n =
-  if n = 0 then x else isqrt a (x *. (3.0 -. a *. x *. x) /. 2.0) (n - 1) in
-let rec sqrt a = a *. (isqrt a
-			 (if a <= 1.0 then 1.0 else 1.0 /. a)
-			 15) in
+let rec isqrt a p x =
+  if fabs (x -. p) < 2.0e-7 *. x then x
+  else isqrt a x (x *. (3.0 -. a *. x *. x) /. 2.0) in
+let rec sqrt a = a *. (isqrt a 2.0 (if a <= 1.0 then 1.0 else 1.0 /. a)) in
   (*TODO:とりあえず3桁*)
 let rec sdiv10 x y =
   if (x - 10) < 0 then y else sdiv10 (x - 10) (y + 1) in

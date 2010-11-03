@@ -136,7 +136,6 @@ let rec g env = function (* K正規化ルーチン本体 (caml2html: knormal_g) *)
   | Syntax.Var(x) -> (* 外部配列の参照 (caml2html: knormal_extarray) *)
       (match M.find x !Typing.extenv with
 	 | Type.Array(_) as t -> ExtArray x, t
-	     (*TODO:ここでタプルに対応すればlight_dirvecができる*)
 	 | Type.Tuple(_) as t -> ExtTuple x, t
 	 | _ -> failwith (Printf.sprintf "external variable %s does not have an array type" x))
   | Syntax.LetRec({ Syntax.name = (x, t); Syntax.args = yts; Syntax.body = e1 }, e2) ->
