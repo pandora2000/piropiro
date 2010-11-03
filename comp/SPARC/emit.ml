@@ -146,10 +146,6 @@ and g' e =(* 各命令のアセンブリ生成 (caml2html: emit_gprime) *)
       | NonTail(_), Nop -> []
       | NonTail(x), Floor(y) | NonTail(x), Float_of_int(y) ->
 	  [finst2 n x y]
-	    (*      | NonTail(_), Pc(y) | NonTail(_), Pf(y) ->
-		    [finst1 n y]
-		    | NonTail(x), Ri | NonTail(x), Rf ->
-		    [finst1 n x]*)
       | NonTail(_), Pc(y) | NonTail(_), Pf(y) ->
 	  [finst1 n y]
       | NonTail(x), Ri | NonTail(x), Rf ->
@@ -396,47 +392,8 @@ let f oc foc istest memext memin memout memsp memhp floffset (Prog(fl, fundefs, 
   (*型つけ*)
   if istest then ignore (memext + memin + memout + memsp + memhp + floffset);
   let lmain = Id.genid "main" in
-  let fid255 = Id.genid "fid255" in
-  let fid10_0 = Id.genid "fid10_0" in
-  let fl = fl @ [(Id.L fid255, 255.0);
-		 (Id.L fid10_0, 1000000000.0)] in
   let fli = Array.of_list fl in
     printf "fp table size is %d\n" (Array.length fli);
-    let ear = Array.make 1006 0 in      
-    let ear = 
-      Array.mapi
-	(fun i _ ->
-	   if i <= 56 then (0, 0)
-	   else if i = 57 then (1, 0)
-	   else if i = 58 then (2, 0)
-	   else if i <= 108 then (0, i + 50 + memext)
-	   else if i <= 158 then (0, -1)
-	   else if i = 159 then (0, i + 1 + memext)
-	   else if i = 160 then (0, 109 + memext)
-	   else if i <= 340 then (0, (i - 161) * 3 + 341 + memext)
-	   else if i <= 880 then (0, 0)
-	   else if i = 881 then (0, 883 + memext)
-	   else if i = 882 then (0, 886 + memext)
-	   else if i <= 945 then (0, 0)
-	   else if i <= 1005 then (0, (i - 946) * 11 + 1006 + memext)
-	   else raise Exit) ear in
-    let ear =
-      List.flatten
-	(Array.to_list
-	   (Array.mapi
-	      (fun i (x, y) ->
-		 let i = i + memext in
-		   if x = 0 then
-		     if y = 0 then [finst3 (soii Sti) zreg zreg (string_of_int i)]
-		     else 
-		       [finst3 (soii Naddi) regs.(0) zreg (string_of_int y);
-			finst3 (soii Sti) regs.(0) zreg (string_of_int i)]
-		   else if x = 1 then [finst3 (soii Fld) fregs.(0) fid255 "0";
-				       finst3 (soii Fst) fregs.(0) zreg (string_of_int i)]
-		   else if x = 2 then [finst3 (soii Fld) fregs.(0) fid10_0 "0";
-				       finst3 (soii Fst) fregs.(0) zreg (string_of_int i)]
-		   else raise Exit) ear)) in
-      
     let ret =
       List.flatten
 	[
@@ -461,7 +418,10 @@ let f oc foc istest memext memin memout memsp memhp floffset (Prog(fl, fundefs, 
 		    finst3 (soii Sti) regs.(0) zreg (string_of_int memout);
 		  ];
 		  (*外部変数領域初期化*)
-		  ear;
+		  [finst3 (soii Naddi) regs.(0) zreg (string_of_int (883 + memext));
+		   finst3 (soii Sti) regs.(0) zreg (string_of_int (881 + memext))];
+		  [finst3 (soii Naddi) regs.(0) zreg (string_of_int (886 + memext));
+		   finst3 (soii Sti) regs.(0) zreg (string_of_int (882 + memext))];
 		]));
 	   [finst1 (soii Jump) lmain];
 	   (List.flatten (List.map (fun fundef -> h fundef) fundefs));

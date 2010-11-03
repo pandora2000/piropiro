@@ -63,7 +63,6 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
 	    data := (l, d) :: !data;
 	    l in
 	(match l with Id.L x ->
-	   (*ここはハードウェアと相談*)
 	   (*メモリにあらかじめ入れておくことに*)
 	   Ans(Fload(x, 0)))
 	  (*Let((x, Type.Int), SetL(l), Ans(LdDF(x, C(0))))*)
@@ -104,35 +103,37 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
 	    | _ -> Ans(Add(zreg, x)))
        with Not_found -> raise MyNotFound3)
 	(*
-	  (*実装するには機械語を生成し、生成するときアドレスを埋め込む必要あり*)
-  | Closure.MakeCls((x, t), { Closure.entry = l; Closure.actual_fv = ys }, e2) -> (* クロージャの生成 (caml2html: virtual_makecls) *)
-      (* Closureのアドレスをセットしてから、自由変数の値をストア *)
-      let e2' = g (M.add x t env) e2 in
-      let offset, store_fv =
-	expand
+	(*実装するには機械語を生成し、生成するときアドレスを埋め込む必要あり*)
+	  | Closure.MakeCls((x, t), { Closure.entry = l; Closure.actual_fv = ys }, e2) -> (* クロージャの生成 (caml2html: virtual_makecls) *)
+	(* Closureのアドレスをセットしてから、自由変数の値をストア *)
+	  let e2' = g (M.add x t env) e2 in
+	  let offset, store_fv =
+	  expand
 	  (List.map (fun y ->
-		       try
-			 (y, M.find y env)
-		       with Not_found -> (y, Type.Unit)
-		    ) ys)
+	  try
+	  (y, M.find y env)
+	  with Not_found -> (y, Type.Unit)
+	  ) ys)
 	  (1, e2')
 	  (fun y offset store_fv -> seq(Fstore(y, x, offset), store_fv))
 	  (fun y _ offset store_fv -> seq(Store(y, x, offset), store_fv)) in
-	Let((x, t), Add(zreg, hpreg),
-	    Let((hpreg, Type.Int), Addi(hpreg, offset),
-		let z = Id.genid "l" in
-		  Let((z, Type.Int), Add(zreg, l),
-		      seq(Store(z, x, 0),
-			  store_fv))))
-  | Closure.AppCls(x, ys) ->
-      let (int, float) = separate (List.map (fun y ->
-					       try
-						 (y, M.find y env)
-					       with Not_found -> (y, Type.Unit)
-					    ) ys) in
-	Ans(CallCls(x, int, float))
+	  Let((x, t), Add(zreg, hpreg),
+	  Let((hpreg, Type.Int), Addi(hpreg, offset),
+	  let z = Id.genid "l" in
+	  Let((z, Type.Int), Add(zreg, l),
+	  seq(Store(z, x, 0),
+	  store_fv))))
+	  | Closure.AppCls(x, ys) ->
+	  let (int, float) = separate (List.map (fun y ->
+	  try
+	  (y, M.find y env)
+	  with Not_found -> (y, Type.Unit)
+	  ) ys) in
+	  Ans(CallCls(x, int, float))
 	*)
   | Closure.MakeCls _ | Closure.AppCls _ -> raise Exit3
+  | Closure.AppDir(Id.L("min_caml_xor"), [a; b]) ->
+      Ans(Xor(a, b))
   | Closure.AppDir(Id.L(x), ys) ->
       (*引数をint listとfloat listに分けてるだけ*)
       (try

@@ -11,8 +11,7 @@
 
 (*NOMINCAML open MiniMLRuntime;;*)
 (*NOMINCAML open Globals;;*)
-(*ここにあったtrue,falseは削除*)
-(*MINCAML*) let rec xor x y = if x then not y else y in
+(*ここにあったtrue,false,xorは削除*)
 
 (******************************************************************************
    ユーティリティー
