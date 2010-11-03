@@ -235,6 +235,7 @@ float freg[FREG_COUNT] =
     0, 0, 0, 0, 0, 0, 0, 0, 0
   };
 stack call_stack = { 0 };	/*call_stackのサイズを0で初期化 */
+stack cistack = { 0 };
 
 #define MEMORY_SIZE 1000000
 
@@ -643,16 +644,67 @@ void print_float()
 
 long long cnt = 0;
 
+char istnames[][100] =
+  { "nop",
+    "add",
+    "sub",
+    "mul",
+    "and",
+    "or",
+    "nor",
+    "xor",
+    "addi",
+    "subi",
+    "muli",
+    "andi",
+    "ori",
+    "nori",
+    "xori",
+    "fadd",
+    "fsub",
+    "fmul",
+    "fdiv",
+    "finv",
+    "fsqrt",
+    "flr",
+    "foi",
+    "ldi",
+    "sti",
+    "fldi",
+    "fsti",
+    "beq",
+    "bne",
+    "blt",
+    "bgt",
+    "bge",
+    "ble",
+    "beq",
+    "fbne",
+    "fbgt",
+    "fblt",
+    "fbge",
+    "fble",
+    "jump",
+    "call",
+    "return",
+  };
+
 int do_assemble2(program *program, program2 * program2)
 {
+  int i, j, k;
   int pc = 0;
   int nextpc = 0;
   instruction2 ist;
-  int iname, arg1, arg2, arg3;
+  int iname;
   int marume;
   int count = 0;
   int firstflag = 1;
   int printflag  = 0;
+  int icount[100] = { 0 };
+  int callpc = -1;
+  static int callcount[50000] = { 0 };
+  static int funcsize[50000] = { 0 };
+  char *p;
   
   while (1) {
     pc = nextpc;
@@ -665,10 +717,16 @@ int do_assemble2(program *program, program2 * program2)
     
     ist = program2->insts[pc];
     iname = ist.name[0];
-    arg1 = ist.name[1];
-    arg2 = ist.name[2];
-    arg3 = ist.name[3];
 
+    ++icount[iname];
+    if(callpc != -1)
+      {
+	++funcsize[callpc];
+      }
+    else
+      {
+	++funcsize[0];
+      }
     /*
       ++counter;
 
@@ -686,15 +744,15 @@ int do_assemble2(program *program, program2 * program2)
     DO_INST_1(1, +)
       DO_INST_1(2, -)
       DO_INST_1(3, *)
-      DO_INST_1(4, &)
-      DO_INST_1(5, |)
+      /*  DO_INST_1(4, &)
+	  DO_INST_1(5, |)*/
       /*ALU命令 */
-    else if (iname == 6) {
+      /*    else if (iname == 6) {
       regist[ist.name[1]] = ~(regist[ist.name[2]] | regist[ist.name[3]]);
-    }
+      }*/
     else if (iname == 7) {
       regist[ist.name[1]] = regist[ist.name[2]] ^ regist[ist.name[3]];
-    }
+      }
     else if (iname == 8) {
       regist[ist.name[1]] = regist[ist.name[2]] + ist.name[3];
     }
@@ -704,7 +762,7 @@ int do_assemble2(program *program, program2 * program2)
     else if (iname == 10) {
       regist[ist.name[1]] = regist[ist.name[2]] * ist.name[3];
     }
-    else if (iname == 11) {
+    /*    else if (iname == 11) {
       regist[ist.name[1]] = regist[ist.name[2]] & ist.name[3];
     }
     else if (iname == 12) {
@@ -712,10 +770,10 @@ int do_assemble2(program *program, program2 * program2)
     }
     else if (iname == 13) {
       regist[ist.name[1]] = ~(regist[ist.name[2]] | ist.name[3]);
-    }
+      }
     else if (iname == 14) {
       regist[ist.name[1]] = regist[ist.name[2]] ^ ist.name[3];
-    }
+      }*/
     /*FPU命令 */
     else if (iname == 15) {
       freg[ist.name[1]] = freg[ist.name[2]] + freg[ist.name[3]];
@@ -729,12 +787,14 @@ int do_assemble2(program *program, program2 * program2)
     else if (iname == 18) {
       freg[ist.name[1]] = freg[ist.name[2]] / freg[ist.name[3]];
     }
+    /*
     else if (iname == 19) {
       freg[ist.name[1]] = 1 / freg[ist.name[2]];
-    }
+      }
+    
     else if (iname == 20) {
       freg[ist.name[1]] = sqrt(freg[ist.name[2]]);
-    }
+      }*/
     else if (iname == 21) {
       freg[ist.name[1]] = floor(freg[ist.name[2]]);
     }
@@ -746,12 +806,13 @@ int do_assemble2(program *program, program2 * program2)
     /*MEM ACSESS命令 */
     else if (iname == 23) {
       //memory_check
+      /*
       if (check_memory(regist[ist.name[2]] + ist.name[3]) == ACSESS_BAD) {
 	printf("Error:ACSESS_BAD :\n");
 	//	 printf("%d\n", iname);
 	//printf("%lld\n", counter);
 	exit(1);
-      }
+	}*/
       regist[ist.name[1]] = memory[regist[ist.name[2]] + ist.name[3]].i;
     }
 
@@ -798,23 +859,26 @@ int do_assemble2(program *program, program2 * program2)
 
 
     /*BRANCH命令 */
+    /*
     else if (iname == 27) {
       if (regist[ist.name[1]] == regist[ist.name[2]]) {
 	nextpc = pc + ist.name[3] - 1;
       }
-    }
+      }
+    */
 
     else if (iname == 28) {
       if (regist[ist.name[1]] != regist[ist.name[2]]) {
 	nextpc = pc + ist.name[3] - 1;
       }
     }
+    
     else if (iname == 29) {
       if (regist[ist.name[1]] > regist[ist.name[2]]) {
 	nextpc = pc + ist.name[3] - 1;
       }
     }
-
+    /*
     else if (iname == 30) {
       if (regist[ist.name[1]] < regist[ist.name[2]]) {
 	nextpc = pc + ist.name[3] - 1;
@@ -831,13 +895,13 @@ int do_assemble2(program *program, program2 * program2)
       if (regist[ist.name[1]] <= regist[ist.name[2]]) {
 	nextpc = pc + ist.name[3] - 1;
       }
-
+    
     } else if (iname == 33) {
       if (freg[ist.name[1]] == freg[ist.name[2]]) {
 	nextpc = pc + ist.name[3] - 1;
       }
     }
-
+    */
     else if (iname == 34) {
       if (freg[ist.name[1]] != freg[ist.name[2]]) {
 	nextpc = pc + ist.name[3] - 1;
@@ -849,7 +913,7 @@ int do_assemble2(program *program, program2 * program2)
 	nextpc = pc + ist.name[3] - 1;
       }
     }
-
+    /*
     else if (iname == 36) {
       if (freg[ist.name[1]] < freg[ist.name[2]]) {
 	nextpc = pc + ist.name[3] - 1;
@@ -867,7 +931,7 @@ int do_assemble2(program *program, program2 * program2)
 	nextpc = pc + ist.name[3] - 1;
       }
     }
-
+    */
 
     /*JUMP命令 */
     else if (iname == 39) {
@@ -875,6 +939,9 @@ int do_assemble2(program *program, program2 * program2)
     }
     else if (iname == 40) {
       nextpc = ist.name[1] - 1;
+      push(&cistack, callpc);
+      callpc = nextpc + 1;
+      ++callcount[callpc];
       push(&call_stack, (pc + 1));
     }
     else if (iname == RDI) {
@@ -909,6 +976,7 @@ int do_assemble2(program *program, program2 * program2)
       }
     }
     else {//if (iname == 41) {
+      callpc = pop(&cistack);
       nextpc = pop(&call_stack) - 1;
     }
     /*
@@ -936,7 +1004,7 @@ int do_assemble2(program *program, program2 * program2)
       }
       }
     */
-    
+
     nextpc++;
 
 
@@ -945,6 +1013,47 @@ int do_assemble2(program *program, program2 * program2)
       break;
     }
   }
+
+  for(i = 0; i < 42; ++i)
+    {
+      printf("%s\t\t%d\n", istnames[i], icount[i]);
+    }
+
+  printf("funcweight\n");  
+  for(i = 0; i < 100000; ++i)
+    {
+      if(funcsize[i] != 0)
+	{
+	  if((p = get_label_from_index(program, i)) != NULL)
+	    {
+	      j = strlen(p);
+	      printf("%s", p);
+	      for(k = 0; k < 40 - j; ++k)
+		{
+		  printf(" ");
+		}
+	      printf("\t%d\n", funcsize[i]);
+	    }
+	}
+    }
+
+  printf("callcount\n");
+  for(i = 0; i < 100000; ++i)
+    {
+      if(callcount[i] != 0)
+	{
+	  if((p = get_label_from_index(program, i)) != NULL)
+	    {
+	      j = strlen(p);
+	      printf("%s", p);
+	      for(k = 0; k < 40 - j; ++k)
+		{
+		  printf(" ");
+		}
+	      printf("\t%d\n", callcount[i]);
+	    }
+	}
+    }
 
   return 0;
 }
