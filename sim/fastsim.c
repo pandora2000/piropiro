@@ -8,7 +8,7 @@
 #define NAME_MAX_COUNT 4
 #define NAME_SIZE 40
 
-#define INST_MAX_COUNT 20000
+#define INST_MAX_COUNT 40000
 
 #define LABEL_MAX_COUNT 10000
 

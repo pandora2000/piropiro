@@ -272,7 +272,7 @@ let print_prog oc (x, (y, z)) =
 
 let f x =
   let (p, env) = normal x in
-    print_prog stdout p;
+(*    print_prog stdout p;*)
     List.iter print_loops_of_func (fst p);
     let (a, b) = snd p in
       print_loops_of_func (a, [], [], b);

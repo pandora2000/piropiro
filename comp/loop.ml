@@ -40,7 +40,7 @@ let merge_list x y =
   fold_left (fun a b -> if mem b a then a else b :: a) x y
     
 let cap_list l m =
-  fold_left (fun a b -> if mem b l then b :: a else a) [] m
+  fold_left (fun a b -> if mem b m then b :: a else a) [] l
 
 let rem_list l m =
   fold_left (fun a b -> if mem b m then a else b :: a) [] l
@@ -48,7 +48,10 @@ let rem_list l m =
 let fpfunc s f =
   let prev = ref [] in
   let cur = ref s in
-    while !prev <> !cur do
+  let eq_as_set x y =
+    (not (exists (fun a -> not (mem a y)) x)) &&
+      (not (exists (fun a -> not (mem a x)) y)) in
+    while not (eq_as_set !prev !cur) do
       prev := !cur;
       cur := f !cur
     done; !cur
@@ -78,8 +81,8 @@ let solve_doms s nodes =
 	 map
 	   (fun (x, (y, _)) ->
 	      if x = s then (s, [s])
-	      else (x, merge_list [x] (cap_lists
-					 (map (fun x -> assoc x prev) y)))) nodes)
+	      else (x, merge_list
+		      (cap_lists (map (fun x -> assoc x prev) y)) [x])) nodes)
 
 (*(*要debug*)いる？*)
 let get_imm_doms s nodes =
@@ -110,13 +113,13 @@ let get_natural_loops s nodes =
 		 (map (fun z -> (x, z))
 		    (cap_list y (snd (assoc x nodes)))) @ a) [] doms in
   let nloop_of (n, h) =
-    let doms = solve_doms s nodes in
-      (*xからhを通らずに到達可能なノードのリスト*)
+    (*xからhを通らずに到達可能なノードのリスト*)
     let m x =
       fpfunc [x]
 	(fun prev ->
 	   fold_left
 	     (fun a b ->
+(*		if x = "L_else_8944" then iter (printf "%s\n%!") a;*)
 		merge_list (rem_list (snd (assoc b nodes)) [h]) a) prev prev) in
       (*hを通らずにnに到達可能なノードでhを上位とするノードのリスト*)
     let m =
@@ -125,19 +128,19 @@ let get_natural_loops s nodes =
 	[] (map fst nodes) in
       (h, m) in
     map nloop_of rev_branches
-      
+
 let get_loops s nodes =
   let nloops = get_natural_loops s nodes in
-    List.fold_left
+    fold_left
       (fun a b ->
 	 if mem_assoc b a then a
 	 else
 	   (b, flatten (map snd (find_all (fun (x, _) -> x = b) nloops))) :: a)
       [] (map fst nloops)
-      
+
 let loops_of_func ((sbid, _, _, _) as f) =
   get_loops sbid (make_cfg f)
-
+    
 let print_cfg g =
   iter (fun (x, (_, y)) ->
 	  printf "%s\n" x;
@@ -157,8 +160,6 @@ let print_loop (h, l) =
   iter (fun x -> if x <> h then printf "\t%s\n" x) l
     
 let print_loops ls = List.iter print_loop ls
-  
+
 let print_loops_of_func f =
- (* print_cfg_of_func f;
-  print_doms_of_func f;
-  print_loops *)ignore (loops_of_func f)
+ignore(  (loops_of_func f))
