@@ -672,7 +672,7 @@ int do_assemble2(program *program, program2 * program2)
     if (iname == 0) {
       // printf("this is nop\n");
     }
-    DO_INST_1(1, +)
+      DO_INST_1(1, +)
       DO_INST_1(2, -)
       DO_INST_1(3, *)
       DO_INST_1(4, &)
