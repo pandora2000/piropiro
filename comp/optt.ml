@@ -6,6 +6,7 @@ type t =
   | Add of id * id * id
   | Sub of id * id * id
   | Mul of id * id * id
+  | Xor of id * id * id
   | FLoad of id * float
   | FSubz of id * id
   | FAdd of id * id * id

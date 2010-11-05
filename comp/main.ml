@@ -90,6 +90,9 @@ let lexbuf outchan foutchan boutchan a = (* バッファをコンパイルしてチャンネルへ
   let pp = Opt.f f in
   let g = Virtual.f memin memout memext al pp in
   let h = RegAlloc.f g in
+  let goc = open_out "graph.dot" in
+    Graph.f goc f;
+    close_out goc;
     (*
       Closure.print_prog stdout f;
       KNormal.print_prog stdout e;

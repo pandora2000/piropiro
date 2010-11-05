@@ -1,2 +1,2 @@
-loop.cmo: optt.cmo 
-loop.cmx: optt.cmx 
+loop.cmo: optt.cmo cfg.cmo 
+loop.cmx: optt.cmx cfg.cmx 

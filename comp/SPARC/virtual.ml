@@ -70,6 +70,7 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
   | Closure.Add(x, y) -> Ans(Add(x, y))
   | Closure.Sub(x, y) -> Ans(Sub(x, y))
   | Closure.Mul(x, y) -> Ans(Mul(x, y))
+  | Closure.Xor(x, y) -> Ans(Xor(x, y))
   | Closure.FNeg(x) -> Ans(Fsub(fzreg, x))
   | Closure.Floor(x) -> Ans(Floor(x))
   | Closure.Float_of_int(x) -> Ans(Float_of_int(x))
@@ -132,8 +133,6 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
 	  Ans(CallCls(x, int, float))
 	*)
   | Closure.MakeCls _ | Closure.AppCls _ -> raise Exit3
-  | Closure.AppDir(Id.L("min_caml_xor"), [a; b]) ->
-      Ans(Xor(a, b))
   | Closure.AppDir(Id.L(x), ys) ->
       (*引数をint listとfloat listに分けてるだけ*)
       (try

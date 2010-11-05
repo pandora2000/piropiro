@@ -1,0 +1,114 @@
+digraph raytrace_main {
+  graph [ranksep = 0.35, nodesep = 0.25]
+  node [shape = box, fontname = "ARIAL", fontsize = 10, height = 0.15]
+  edge [fontsize = 8, arrowsize = 0.5]
+  "get_nvector" [peripheries = 2];
+  "utexture" [peripheries = 2];
+  "add_light" [peripheries = 2];
+  "setup_startp_constants" [peripheries = 2];
+  "calc_diffuse_using_5points" [peripheries = 2];
+  "judge_intersection" [peripheries = 2, color = "#ff0000"];
+  "shadow_check_one_or_matrix" [peripheries = 2, color = "#ff0000"];
+  "judge_intersection_fast" [peripheries = 2, color = "#ff0000"];
+  "is_outside" [peripheries = 2];
+  "solver_surface" [peripheries = 2];
+  "solver_second" [peripheries = 2];
+  "solver_rect" [peripheries = 2];
+  "solver_rect_fast" [peripheries = 2];
+  "solver_surface_fast" [peripheries = 2];
+  "solver_second_fast" [peripheries = 2];
+  "solver_surface_fast2" [peripheries = 2];
+  "solver_second_fast2" [peripheries = 2];
+
+  "rt" -> "pretrace_line";
+  "rt" -> "scan_line";
+  "pretrace_line" -> "pretrace_pixels";
+  "pretrace_pixels" -> "trace_ray" [weight = 5];
+  "pretrace_pixels" -> "pretrace_diffuse_rays";
+  "pretrace_pixels" -> "pretrace_pixels" [dir = back];
+  "trace_ray" -> "judge_intersection";
+  "trace_ray" -> "get_nvector";
+  "trace_ray" -> "utexture";
+  "trace_ray" -> "shadow_check_one_or_matrix" [weight = 2];
+  "trace_ray" -> "add_light";
+  "trace_ray" -> "setup_startp";
+  "trace_ray" -> "trace_reflections";
+  "trace_ray" -> "trace_ray" [dir = back];
+  "setup_startp" -> "setup_startp_constants";
+  "trace_reflections" -> "judge_intersection_fast" [weight = 2];
+  "trace_reflections" -> "shadow_check_one_or_matrix";
+  "trace_reflections" -> "add_light";
+  "trace_reflections" -> "trace_reflections" [dir = back];
+  "pretrace_diffuse_rays" -> "trace_diffuse_rays";
+  "pretrace_diffuse_rays" -> "pretrace_diffuse_rays" [dir = back];
+  "trace_diffuse_rays" -> "setup_startp";
+  "trace_diffuse_rays" -> "iter_trace_diffuse_rays";
+  "iter_trace_diffuse_rays" -> "trace_diffuse_ray";
+  "iter_trace_diffuse_rays" -> "iter_trace_diffuse_rays" [dir = back];
+  "trace_diffuse_ray" -> "judge_intersection_fast";
+  "trace_diffuse_ray" -> "get_nvector";
+  "trace_diffuse_ray" -> "utexture";
+  "trace_diffuse_ray" -> "shadow_check_one_or_matrix";
+  "scan_line" -> "pretrace_line";
+  "scan_line" -> "scan_pixel" [weight = 5];
+  "scan_line" -> "scan_line" [dir = back];
+  "scan_pixel" -> "do_without_neighbors";
+  "scan_pixel" -> "try_exploit_neighbors";
+  "scan_pixel" -> "scan_pixel" [dir = back];
+  "do_without_neighbors" -> "calc_diffuse_using_1point";
+  "do_without_neighbors" -> "do_without_neighbors" [dir = back];
+  "calc_diffuse_using_1point" -> "trace_diffuse_ray_80percent";
+  "trace_diffuse_ray_80percent" -> "trace_diffuse_rays";
+  "try_exploit_neighbors" -> "do_without_neighbors";
+  "try_exploit_neighbors" -> "calc_diffuse_using_5points";
+  "try_exploit_neighbors" -> "try_exploit_neighbors" [dir = back];
+  "judge_intersection" -> "trace_or_matrix" [weight = 0.8];
+  "trace_or_matrix" -> "solve_one_or_network";
+  "trace_or_matrix" -> "solver";
+  "trace_or_matrix" -> "trace_or_matrix" [dir = back];
+  "solve_one_or_network" -> "solve_each_element" [weight = 5];
+  "solve_one_or_network" -> "solve_one_or_network" [dir = back];
+  "solve_each_element" -> "solver";
+  "solve_each_element" -> "check_all_inside" [weight = 5];
+  "solve_each_element" -> "solve_each_element" [dir = back];
+  "check_all_inside" -> "is_outside";
+  "check_all_inside" -> "check_all_inside" [dir = back];
+  "solver" -> "solver_rect";
+  "solver" -> "solver_surface" [weight = 5];
+  "solver" -> "solver_second";
+//  "solver_rect" -> "solver_rect_surface";
+  "shadow_check_one_or_matrix" -> "solver_fast";
+  "shadow_check_one_or_matrix" -> "shadow_check_one_or_group";
+  "shadow_check_one_or_matrix" -> "shadow_check_one_or_matrix" [dir = back];
+  "shadow_check_one_or_group" -> "shadow_check_and_group";
+  "shadow_check_one_or_group" -> "shadow_check_one_or_group" [dir = back];
+  "shadow_check_and_group" -> "solver_fast" [weight = 5];
+  "shadow_check_and_group" -> "check_all_inside";
+  "shadow_check_and_group" -> "shadow_check_and_group" [dir = back];
+  "solver_fast" -> "solver_rect_fast";
+  "solver_fast" -> "solver_surface_fast";
+  "solver_fast" -> "solver_second_fast";
+  "judge_intersection_fast" -> "trace_or_matrix_fast";
+  "trace_or_matrix_fast" -> "solve_one_or_network_fast";
+  "trace_or_matrix_fast" -> "solver_fast2";
+  "trace_or_matrix_fast" -> "trace_or_matrix_fast" [dir = back];
+  "solve_one_or_network_fast" -> "solve_each_element_fast";
+  "solve_one_or_network_fast" -> "solve_one_or_network_fast" [dir = back];
+  "solve_each_element_fast" -> "solver_fast2";
+  "solve_each_element_fast" -> "check_all_inside";
+  "solve_each_element_fast" -> "solve_each_element_fast" [dir = back];
+  "solver_fast2" -> "solver_rect_fast";
+  "solver_fast2" -> "solver_surface_fast2";
+  "solver_fast2" -> "solver_second_fast2";
+  {rank = same; "rt"; "scan_line"; "scan_pixel"}
+  {rank = same; "try_exploit_neighbors"; "do_without_neighbors"}
+//  {rank = same; "add_light"; "trace_ray"; "trace_diffuse_rays"}
+  {rank = same; "trace_ray"; "trace_diffuse_rays"}
+//  {rank = same; "trace_reflections"; "judge_intersection"}
+//  {rank = same; "trace_reflections"; "add_light"}
+  {rank = same; "judge_intersection_fast"; "judge_intersection"}
+  {rank = same; "solve_each_element"; "check_all_inside"; "solve_each_element_fast"}
+  {rank = same; "solver_rect"; "solver_fast"; "solver_fast2"; "is_outside"}
+  {rank = same; "solver"; "solver_rect"; "solver_second_fast"; "solver_surface_fast2"}
+  {rank = same; "solver_surface"; "solver_surface_fast"; "solver_second_fast2"}
+}

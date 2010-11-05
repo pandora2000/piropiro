@@ -10,6 +10,7 @@ let genid x = Id.genid x
 let ptyp_of_type = function Type.Float -> F | _ -> I
 
 exception IllegalPattern
+  (*NextedLetはコードによっては来る可能性がある*)
 exception NestedLet
 exception UnsupportedComparison
 exception NoExpression
@@ -38,6 +39,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
     | Closure.Add (x, y) -> [Add (n, x, y)]
     | Closure.Sub (x, y) -> [Sub (n, x, y)]
     | Closure.Mul (x, y) -> [Mul (n, x, y)]
+    | Closure.Xor (x, y) -> [Xor (n, x, y)]
     | Closure.FNeg x -> [FSubz (n, x)]
     | Closure.FAdd (x, y) -> [FAdd (n, x, y)]
     | Closure.FSub (x, y) -> [FSub (n, x, y)]
@@ -131,6 +133,7 @@ let rec p_each_rconv bid blks tenv =
       | Add (x, y, z) -> (x, Type.Int, Closure.Add (y, z))
       | Sub (x, y, z) -> (x, Type.Int, Closure.Sub (y, z))
       | Mul (x, y, z) -> (x, Type.Int, Closure.Mul (y, z))
+      | Xor (x, y, z) -> (x, Type.Int, Closure.Xor (y, z))
       | FLoad (x, y) -> (x, Type.Float, Closure.Float y)
       | FSubz (x, y) -> (x, Type.Float, Closure.FNeg y)
       | FAdd (x, y, z) -> (x, Type.Float, Closure.FAdd (y, z))
@@ -199,7 +202,8 @@ let rconv (l, t) tenv =
 
 let rec exp_make_total_env = function
   | Closure.Unit | Closure.Int _ | Closure.Float _ | Closure.Neg _
-  | Closure.Add _ | Closure.Sub _ | Closure.Mul _ | Closure.FNeg _
+  | Closure.Add _ | Closure.Sub _ | Closure.Mul _ | Closure.Xor _
+  | Closure.FNeg _
   | Closure.FAdd _ | Closure.FSub _ | Closure.FMul _ | Closure.FDiv _
   | Closure.Floor _ | Closure.Float_of_int _ | Closure.Var _
   | Closure.MakeCls _ | Closure.AppCls _ | Closure.AppDir _
@@ -232,7 +236,8 @@ let reverse (a, tenv) =
 
 let sotn = function
   | Addzi _ -> "Addzi" | Subz _ -> "Subz"
-  | Add _ -> "Add" | Sub _ -> "Sub" | Mul _ -> "Mul" | FLoad _ -> "FLoad"
+  | Add _ -> "Add" | Sub _ -> "Sub" | Mul _ -> "Mul" | Xor _ -> "Xor"
+  | FLoad _ -> "FLoad"
   | FSubz _ -> "FSubz" | FAdd _ -> "FAdd" | FSub _ -> "FSub" | FMul _ -> "FMul"
   | FDiv _ -> "FDiv" | Flr _ -> "Flr" | Foi _ -> "Foi" | Call _ -> "Call"
   | IfEq _ -> "IfEq" | IfLE _ -> "IfLE" | Var _ -> "Var" | Tuple _ -> "Tuple"
@@ -315,6 +320,7 @@ let sotai = function
 let f x =
 (*  let fl = ref [] in*)
   let (p, env) = normal x in
+    ignore (Alloc.f p);
 (*    print_prog stdout p;*)
 (*    List.iter print_loops_of_func (fst p);*)
 (*    let (a, b) = snd p in*)

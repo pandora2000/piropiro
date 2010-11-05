@@ -3,7 +3,7 @@ open Printf
 
 
 type inst = Ret | Ldi | Fld | Sti | Fst | Call | Jump | Bne | Bgt | Blt | Fbne | Fbgt |
-    Nadd | Nfadd | Nnop | Naddi | Nmuli | Npc
+    Nadd | Nfadd | Nnop | Naddi | Nmuli | Npc | Nsubi
 
 let ltostr (Id.L x) = x
 let soii = function
@@ -11,6 +11,7 @@ let soii = function
   | Nnop -> "nop"
   | Naddi -> "addi"
   | Nmuli -> "muli"
+  | Nsubi -> "subi"
   | Ret -> "return"
   | Ldi -> "ldi"
   | Fld -> "fldi"
@@ -184,7 +185,7 @@ and g' e =(* 各命令のアセンブリ生成 (caml2html: emit_gprime) *)
 	    tmp @
 	      [finst3 (soii Naddi) spreg spreg (string_of_int ss);
 	       finst1 (soii Call) x;
-	       finst3 "subi" spreg spreg (string_of_int ss)]
+	       finst3 (soii Nsubi) spreg spreg (string_of_int ss)]
 	    @
 	      (if List.mem a allregs && a <> regs.(0) then
 		 [finst3 (soii Nadd) a zreg regs.(0)]
