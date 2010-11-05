@@ -27,10 +27,10 @@ let make ((sbid, rids, aids, blks) : func) =
 		    | Call (_, y, _, _) when y = sbid && bs = [] -> [sbid]
 		    | _ -> []) @ bs) :: a) [] blks in
     (sbid, map (fun (a, b) -> (a, (pred a alist, b))) alist)
-(*
+
 let order (s, nodes) =
   let l = ref [] in
   let s = ref [s] in
     while s <> [] do
       rem
-*)
+
