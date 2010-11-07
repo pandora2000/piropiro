@@ -5,8 +5,6 @@ open Loop
 let merge_alist x y =
   List.fold_left (fun a b -> if List.mem_assoc (fst b) a then a else b :: a) x y
 
-let genid x = Id.genid x
-
 let ptyp_of_type = function Type.Float -> F | _ -> I
 
 exception IllegalPattern
@@ -101,10 +99,10 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
       | Closure.AppDir (Id.L x, y) -> [cbid, (cblk @ [Call (rid, x, y, None)], [])]
       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
       | _ -> [cbid, (cblk @ (imm_conv rid rtyp e), nextid nbid)]
-	  
+
 let each_conv rid rtyp x env z =
   each_conv [] x None rid rtyp env z
-    
+
 let conv (Closure.Prog (l, t)) =
   let mbid = "min_caml_start" in
   let mrid = genid "mret" in
@@ -127,7 +125,7 @@ let rec p_each_rconv bid blks tenv =
     | _ -> raise FatalError in
   let imm_rconv e =
     match e with
-      | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | LetTuple _ | Call _ -> raise FatalError
+      | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | LetTuple _ | Call _ | Ret -> raise FatalError
       | Addzi (x, y) -> (x, Type.Int, Closure.Int y)
       | Subz (x, y) -> (x, Type.Int, Closure.Neg y)
       | Add (x, y, z) -> (x, Type.Int, Closure.Add (y, z))
@@ -233,134 +231,11 @@ let normal x =
 
 let reverse (a, tenv) =
   rconv a tenv
-
-let sotn = function
-  | Addzi _ -> "Addzi" | Subz _ -> "Subz"
-  | Add _ -> "Add" | Sub _ -> "Sub" | Mul _ -> "Mul" | Xor _ -> "Xor"
-  | FLoad _ -> "FLoad"
-  | FSubz _ -> "FSubz" | FAdd _ -> "FAdd" | FSub _ -> "FSub" | FMul _ -> "FMul"
-  | FDiv _ -> "FDiv" | Flr _ -> "Flr" | Foi _ -> "Foi" | Call _ -> "Call"
-  | IfEq _ -> "IfEq" | IfLE _ -> "IfLE" | Var _ -> "Var" | Tuple _ -> "Tuple"
-  | IfFEq _ -> "IfFEq" | IfFLE _ -> "IfFLE" | FGet _ -> "FGet" | FPut _ -> "FPut"
-  | Get _ -> "Get" | Put _ -> "Put" | ExtArray _ -> "ExtArray"
-  | ExtTuple _ -> "ExtTuple" | LetTuple _ -> "LetTuple"
-
-let print_t oc e =
-  match e with
-    | Addzi (x, y) -> fprintf oc "\t\t%s %s %d\n" (sotn e) x y
-    | FLoad (x, y) -> fprintf oc "\t\t%s %s %f\n" (sotn e) x y
-    | Subz (x, y) | FSubz (x, y) | Flr (x, y) | Foi (x, y)
-    | ExtArray (x, y) | ExtTuple (x, y) ->
-	fprintf oc "\t\t%s %s %s\n" (sotn e) x y
-    | Add (x, y, z) | Sub (x, y, z) | Mul (x, y, z)
-    | FAdd (x, y, z) | FSub (x, y, z) | FMul (x, y, z) | FDiv (x, y, z)
-    | Get (x, y, z) | Put (x, y, z) | FGet (x, y, z) | FPut (x, y, z) ->
-	fprintf oc "\t\t%s %s %s %s\n" (sotn e) x y z
-    | IfEq (r, x, y, _, _, _) | IfLE (r, x, y, _, _, _)
-    | IfFEq (r, x, y, _, _, _) | IfFLE (r, x, y, _, _, _) ->
-	fprintf oc "\t\t%s %s %s %s\n" (sotn e) r x y
-    | Call (x, y, z, _) ->
-	fprintf oc "\t\t%s (%s) <- %s (%s)\n" (sotn e) x y (String.concat ", " z)
-    | _ -> fprintf oc "\t\t%s\n" (sotn e)
-
-let print_block oc (x, (y, z)) =
-  fprintf oc "\t%s -> (%s)\n" x (String.concat ", " z);
-  List.iter (print_t oc) y
-
-let print_func oc (n, x, y, z) =
-  fprintf oc "%s: (%s) <- (%s)\n" n (String.concat ", " x) (String.concat ", " y);
-  List.iter (print_block oc) z
-
-let print_prog oc (x, (y, z)) =
-  List.iter (print_func oc) x;
-  print_func oc (y, [], [], z)
-(*    
-type a = { nm : string; ac : int; a1 : string;
-	   mutable a2 : string; mutable a3 : string; mutable index : int }
-      
-let finst0 n =
-  { nm = n; ac = 0; a1 = ""; a2 = ""; a3 = ""; index = 0 } 
-let finst1 n a =
-  { nm = n; ac = 1; a1 = a; a2 = ""; a3 = ""; index = 0 } 
-let finst2 n a b =
-  { nm = n; ac = 2; a1 = a; a2 = b; a3 = ""; index = 0 } 
-let finst3 n a b c =
-  { nm = n; ac = 3; a1 = a; a2 = b; a3 = c; index = 0 } 
-let flabel n =
-  { nm = n; ac = - 1; a1 = ""; a2 = ""; a3 = ""; index = 0 } 
-
-let prep_op x =
-  if is_reg x then String.sub x 1 (String.length x - 1) else x
     
-let string_of_a x =
-  if x.ac = - 1 then
-    sprintf "%s : " x.nm
-  else if x.ac = 0 then
-    sprintf "\t%s" x.nm
-  else if x.ac = 1 then
-    sprintf "\t%s\t%s" x.nm (prep_op x.a1)
-  else if x.ac = 2 then
-    sprintf "\t%s\t%s %s" x.nm (prep_op x.a1) (prep_op x.a2)
-  else 
-    sprintf "\t%s\t%s %s %s" x.nm (prep_op x.a1) (prep_op x.a2) (prep_op x.a3)
-
-let print_a0 oc n a = output_string oc (string_of_a (finst0 n))
-let print_a1 oc n a b = output_string oc (string_of_a (finst1 n a))
-let print_a2 oc n a b c = output_string oc (string_of_a (finst2 n a b))
-let print_a3 oc n = output_string oc (string_of_a (finst3 n a b c))
-let print_al oc n = output_string oc (string_of_a (flabel n))
-
-exception CannotConvertToString
-
-let sotai = function
-  | Add _ -> "add" | Sub _ -> "sub" | Mul _ -> "mul"
-  | FAdd _ -> "fadd" | FSub _ -> "fsub" | FMul _ -> "fmul" | FDiv _ -> "fdiv"
-  | _ -> raise CannotConvertToString
-*)
 let f x =
-(*  let fl = ref [] in*)
   let (p, env) = normal x in
-    ignore (Alloc.f p);
 (*    print_prog stdout p;*)
-(*    List.iter print_loops_of_func (fst p);*)
-(*    let (a, b) = snd p in*)
-    (*      print_loops_of_func (a, [], [], b);*)
-    (*
-  let (l, (eid, eblks)) = p in
-    List.iter
-      (fun (bid, rids, aids, blks) ->
-	 List.iter
-	   (fun (id, (tl, bl)) ->
-	      List.iter
-		(fun e -> match e with
-		   | Addzi (x, y) -> print_a3 "addi" x zreg (string_of_int y)
-		   | Subz (x, y) -> print_a3 "sub" x zreg y
-		   | Add (x, y, z) | Sub (x, y, z) | Mul (x, y, z)
-		   | FAdd (x, y, z) | FSub (x, y, z) | FMul (x, y, z)
-		   | FDiv (x, y, z) ->
-		       print_a3 (sotai e) x y z
-		   | Flr (x, y) | Foi (x, y) | 
-		       
-  | FLoad of id * float
-  | FSubz of id * id
-  | Flr of id * id
-  | Foi of id * id
-  | Call of id * bid * (id list) * (bid option)
-  | IfEq of id * id * id * bid * bid * (bid option)
-  | IfLE of id * id * id * bid * bid * (bid option)
-  | IfFEq of id * id * id * bid * bid * (bid option)
-  | IfFLE of id * id * id * bid * bid * (bid option)
-  | Var of id * id
-  | Tuple of id * (id list)
-  | Get of id * id * id
-  | Put of id * id * id
-  | FGet of id * id * id
-  | FPut of id * id * id
-  | ExtArray of id * id
-  | ExtTuple of id * id
-  | LetTuple of (id list) * id
-
-		) l*)
+    Output.f (Alloc.f p env) env;
       reverse (p, env)
 
     

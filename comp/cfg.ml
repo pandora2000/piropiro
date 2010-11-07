@@ -4,8 +4,10 @@ open List
 
 exception FatalError
 exception Break1 of int
-
+  
 let rec rem y x = match x with [] -> [] | h :: t -> if h = y then t else h :: (rem y t)
+  
+let cup x y = fold_left (fun a b -> if mem b a then a else b :: a) x y
 
 let find_index f x =
   try
@@ -58,3 +60,111 @@ let rev_order (s, nodes) =
     done; !s
 
 let order x = rev (rev_order x)
+
+let max x y = if x < y then y else x
+
+(*基本ブロックに分けない制御フローグラフ*)
+let make_block_no_block sbid (bid, (ts, ns)) =
+  let tbl = Array.make (length ts + 1) ("", None, []) in
+  let nid = ref (genid "nid") in
+  let t = ref bid in
+  let i = ref 0 in
+  let cblk = ref ts in
+  let next () = match !cblk with [] -> raise FatalError | h :: t -> cblk := t; h in
+    if !cblk = [] then
+      (if ns = [] then tbl.(0) <- (!t, Some Ret, [])
+       else tbl.(0) <- (!t, None, ns);
+       incr i)
+    else 
+      while !cblk <> [] do
+	let c = next () in
+	  if !cblk = [] then
+	    (match c with
+	       | Call (_, y, _, _) when ns = [] && y = sbid -> tbl.(!i) <- (!t, Some c, [sbid])
+	       | Call _ when ns = [] -> tbl.(!i) <- (!t, Some c, [])
+	       | Ret -> tbl.(!i) <- (!t, Some c, [])
+	       | _ when ns = [] -> tbl.(!i) <- (!t, Some c, [!nid]); cblk := [Ret]
+	       | _ -> tbl.(!i) <- (!t, Some c, ns))
+	  else tbl.(!i) <- (!t, Some c, [!nid]);
+	  incr i;
+	  t := !nid;
+	  nid := genid "nid"
+      done;
+    Array.to_list (Array.sub tbl 0 !i)
+
+let make_no_block (bid, _, _, blks) =
+  let env = ref [] in
+  let i = ref 0 in
+  let p = flatten (map (fun x ->
+		          env := (!i, bid) :: !env;
+			  map (fun (x, y, z) ->
+				 incr i;
+				 (x, !i - 1, y, z)) (make_block_no_block bid x)
+		       ) blks) in
+  let len = !i + 1 in
+  let (_, s, _, _) = find (fun (x, _, _, _) -> x = bid) p in
+  let p = map (fun (x, i, y, z) ->
+		 (i,
+		  (y, map
+		     (fun v ->
+			let (_, n, _, _) = find (fun (w, _, _, _) -> w = v) p in n) z))) p in
+  let p =
+    fold_left (fun a (i, (e, ss)) ->
+		 match e with
+		   | None -> map (fun ((i2, (e2, ss2)) as t) ->
+				    if mem i ss2 then (i2, (e2, cup ss (rem i ss2)))
+				    else t) a
+		   | _ -> a) p p in
+  let p = fold_left (fun a (i, (e, ss)) ->
+		       match e with None -> a | Some x -> (i, (x, ss)) :: a) [] p in
+  let p = map (fun (i, (e, sucs)) ->
+		 (i, (e, fst (split (find_all (fun (_, (_, ss)) -> mem i ss) p)), sucs))) p in
+  let q = Array.make len (Var ("", ""), [], []) in
+    for i = 0 to len - 1 do
+      try
+	q.(i) <- assoc i p
+      with Not_found -> ()
+    done; ((s, q), !env)
+
+let rev_order_no_block ((sid, ar), _) =
+  let ary = Array.copy ar in
+  let l = ref [] in
+  let s = ref [sid] in
+    while !s <> [] do
+      match !s with [] -> raise FatalError | h :: t ->
+	s := t;
+	l := h :: !l;
+	let (_, _, sucs) = ary.(h) in
+	  iter (fun m ->
+		  (ary.(h) <- let (x, y, _) = ary.(h) in (x, y, rem m sucs));
+		  let (x, y, z) = let (x, y, z) = ary.(m) in (x, rem h y, z) in
+		    (ary.(m) <- (x, y, z));
+		    if y = [] then s := m :: !s) sucs
+    done;
+    !l
+
+(*
+  let rev_array a =
+  for i = 0 to (Array.length a - 1) / 2 do
+  let j = Array.length a - 1 - i in
+  let t = a.(i) in
+  a.(i) <- a.(j);
+  a.(j) <- t
+  done; a
+*)
+
+let order_no_block x =
+  rev (rev_order_no_block x)
+
+let print_cfg_no_block oc (_, ary) =
+  for i = 0 to Array.length ary - 1 do
+    let (e, p, n) = ary.(i) in
+      match e with
+	| None -> fprintf oc "\t%d\n" i
+	| Some x ->
+	    fprintf oc "\t%d\n" i;
+	    print_t oc x;
+	    fprintf oc "\t(%s) -> (%s)\n" (String.concat ", " (map string_of_int p))
+	      (String.concat ", " (map string_of_int n))
+  done
+    
