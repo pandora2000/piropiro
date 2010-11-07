@@ -235,7 +235,7 @@ let reverse (a, tenv) =
 let f x =
   let (p, env) = normal x in
 (*    print_prog stdout p;*)
-    Output.f (Alloc.f p env) env;
+(*    Output.f (Alloc.f p env) env;*)
       reverse (p, env)
 
     
