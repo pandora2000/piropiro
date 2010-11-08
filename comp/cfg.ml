@@ -4,6 +4,7 @@ open List
 
 exception FatalError
 exception Break1 of int
+exception MyNotFound
   
 let rec rem y x = match x with [] -> [] | h :: t -> if h = y then t else h :: (rem y t)
   
@@ -64,7 +65,7 @@ let order x = rev (rev_order x)
 let max x y = if x < y then y else x
 
 (*基本ブロックに分けない制御フローグラフ*)
-let make_block_no_block sbid (bid, (ts, ns)) =
+let make_block_no_block sbid rids (bid, (ts, ns)) =
   let tbl = Array.make (length ts + 1) ("", None, []) in
   let nid = ref (genid "nid") in
   let t = ref bid in
@@ -72,7 +73,7 @@ let make_block_no_block sbid (bid, (ts, ns)) =
   let cblk = ref ts in
   let next () = match !cblk with [] -> raise FatalError | h :: t -> cblk := t; h in
     if !cblk = [] then
-      (if ns = [] then tbl.(0) <- (!t, Some Ret, [])
+      (if ns = [] then tbl.(0) <- (!t, Some (Ret rids), [])
        else tbl.(0) <- (!t, None, ns);
        incr i)
     else 
@@ -82,8 +83,8 @@ let make_block_no_block sbid (bid, (ts, ns)) =
 	    (match c with
 	       | Call (_, y, _, _) when ns = [] && y = sbid -> tbl.(!i) <- (!t, Some c, [sbid])
 	       | Call _ when ns = [] -> tbl.(!i) <- (!t, Some c, [])
-	       | Ret -> tbl.(!i) <- (!t, Some c, [])
-	       | _ when ns = [] -> tbl.(!i) <- (!t, Some c, [!nid]); cblk := [Ret]
+	       | Ret _ -> tbl.(!i) <- (!t, Some c, [])
+	       | _ when ns = [] -> tbl.(!i) <- (!t, Some c, [!nid]); cblk := [Ret rids]
 	       | _ -> tbl.(!i) <- (!t, Some c, ns))
 	  else tbl.(!i) <- (!t, Some c, [!nid]);
 	  incr i;
@@ -92,16 +93,20 @@ let make_block_no_block sbid (bid, (ts, ns)) =
       done;
     Array.to_list (Array.sub tbl 0 !i)
 
-let make_no_block (bid, _, _, blks) =
+let make_no_block (bid, rids, aids, blks) =
   let env = ref [] in
   let i = ref 0 in
-  let p = flatten (map (fun x ->
-		          env := (!i, bid) :: !env;
+  let p = flatten (map (fun ((id, _) as x) ->
+		          env := (!i, id) :: !env;
+			  printf "bid: %s %d\n%!" id !i;
 			  map (fun (x, y, z) ->
-				 incr i;
-				 (x, !i - 1, y, z)) (make_block_no_block bid x)
+				 match y with
+				   | Some _ -> 
+				       incr i;
+				       (x, !i - 1, y, z)
+				   | None -> (x, !i, y, z)) (make_block_no_block bid rids x)
 		       ) blks) in
-  let len = !i + 1 in
+  let len = !i in
   let (_, s, _, _) = find (fun (x, _, _, _) -> x = bid) p in
   let p = map (fun (x, i, y, z) ->
 		 (i,
@@ -123,10 +128,10 @@ let make_no_block (bid, _, _, blks) =
     for i = 0 to len - 1 do
       try
 	q.(i) <- assoc i p
-      with Not_found -> ()
-    done; ((s, q), !env)
+      with Not_found -> raise MyNotFound
+    done; ((s, rids, aids, q), !env)
 
-let rev_order_no_block ((sid, ar), _) =
+let rev_order_no_block ((sid, _, _, ar), _) =
   let ary = Array.copy ar in
   let l = ref [] in
   let s = ref [sid] in

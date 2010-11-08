@@ -6,7 +6,7 @@ let istest = ref false
 let rec iter n e = (* 最適化処理をくりかえす (caml2html: main_iter) *)
   Format.eprintf "iteration %d@." n;
   if n = 0 then e else
-    let e' = Elim.f (ConstFold.f (Inline.f (Assoc.f (Beta.f e)))) in
+    let e' = (*Elim.f (ConstFold.f*) (Inline.f (Assoc.f (Beta.f e))) in
       if e = e' then e else
 	iter (n - 1) e'
 
@@ -87,12 +87,14 @@ let lexbuf outchan foutchan boutchan a = (* バッファをコンパイルしてチャンネルへ
   let d = Alpha.f c in
   let e = iter !limit d in
   let f = Closure.f e in
-  let pp = Opt.f f in
+  let outchan2 = open_out "b.s" in
+  let pp = Opt.f outchan2 f in
   let g = Virtual.f memin memout memext al pp in
   let h = RegAlloc.f g in
   let goc = open_out "graph.dot" in
     Graph.f goc f;
     close_out goc;
+    close_out outchan2;
     (*
       Closure.print_prog stdout f;
       KNormal.print_prog stdout e;

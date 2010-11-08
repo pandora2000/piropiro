@@ -15,17 +15,17 @@ exception NoExpression
 exception FatalError
 
 let rec each_conv cblk cbid nbid rid rtyp env e =
-  let sel_if r x y z w v env e =
+  let sel_if r x y z w v u env e =
     match e with
       | Closure.IfEq _ ->
 	  (match M.find x env with
-	     | Type.Float -> IfFEq (r, x, y, z, w, v)
-	     | Type.Int | Type.Bool -> IfEq (r, x, y, z, w, v)
+	     | Type.Float -> IfFEq (r, x, y, z, w, v, u)
+	     | Type.Int | Type.Bool -> IfEq (r, x, y, z, w, v, u)
 	     | _ -> raise UnsupportedComparison)
       | Closure.IfLE _ ->
 	  (match M.find x env with
-	     | Type.Float -> IfFLE (r, x, y, z, w, v)
-	     | Type.Int | Type.Bool -> IfLE (r, x, y, z, w, v)
+	     | Type.Float -> IfFLE (r, x, y, z, w, v, u)
+	     | Type.Int | Type.Bool -> IfLE (r, x, y, z, w, v, u)
 	     | _ -> raise UnsupportedComparison)
       | _ -> raise FatalError in
   let nextid = function Some x -> [x] | None -> [] in
@@ -75,7 +75,8 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 		   let contblks = each_conv [] contid nbid rid rtyp nenv e2 in
 		   let thenblks = each_conv [] thenid (Some contid) n t env z in
 		   let elseblks = each_conv [] elseid (Some contid) n t env w in
-		     (cbid, (cblk @ [sel_if n x y thenid elseid (Some contid) env e1],
+		     (cbid, (cblk @ [sel_if n x y thenid elseid
+				       (Some contid) (Some contid) env e1],
 			     [thenid; elseid]))
 		     :: (thenblks @ elseblks @ contblks)
 	       | Closure.AppDir (Id.L x, y) ->
@@ -94,7 +95,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 	  let elseid = genid "else" in
 	  let thenblks = each_conv [] thenid nbid rid rtyp env z in
 	  let elseblks = each_conv [] elseid nbid rid rtyp env w in
-	    (cbid, (cblk @ [sel_if rid x y thenid elseid None env e], [thenid; elseid]))
+	    (cbid, (cblk @ [sel_if rid x y thenid elseid None nbid env e], [thenid; elseid]))
 	    :: (thenblks @ elseblks)
       | Closure.AppDir (Id.L x, y) -> [cbid, (cblk @ [Call (rid, x, y, None)], [])]
       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
@@ -111,12 +112,13 @@ let conv (Closure.Prog (l, t)) =
 		     Closure.body = w } ->
 		 let rid = genid "ret" in
 		 let rtyp = match y with Type.Fun (_, w) -> w | _ -> raise FatalError in
-		   ((rid, rtyp), (x, [rid],
-				  List.map fst z,
-				  each_conv rid rtyp x
-				    (M.add x y (M.add_list z M.empty))
-				    w))) l) in
-    ((mrid, Type.Unit) :: p, (q, (mbid, each_conv mrid Type.Unit mbid M.empty t)))
+		   ((rid, rtyp) :: z, (x, [rid],
+				       List.map fst z,
+				       each_conv rid rtyp x
+					 (M.add x y (M.add_list z M.empty))
+					 w))) l) in
+    ((mrid, Type.Unit) :: (List.flatten p),
+     (q, (mbid, each_conv mrid Type.Unit mbid M.empty t)))
 
 let rec p_each_rconv bid blks tenv =
   let sel_if x y z w = function
@@ -125,7 +127,7 @@ let rec p_each_rconv bid blks tenv =
     | _ -> raise FatalError in
   let imm_rconv e =
     match e with
-      | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | LetTuple _ | Call _ | Ret -> raise FatalError
+      | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | LetTuple _ | Call _ | Ret _ -> raise FatalError
       | Addzi (x, y) -> (x, Type.Int, Closure.Int y)
       | Subz (x, y) -> (x, Type.Int, Closure.Neg y)
       | Add (x, y, z) -> (x, Type.Int, Closure.Add (y, z))
@@ -155,8 +157,8 @@ let rec p_each_rconv bid blks tenv =
 	     Some 
 	       (match e with
 		  | LetTuple _ -> raise FatalError
-		  | IfEq (r, x, y, z, w, v) | IfLE (r, x, y, z, w, v)
-		  | IfFEq (r, x, y, z, w, v) | IfFLE (r, x, y, z, w, v) ->
+		  | IfEq (r, x, y, z, w, v, _) | IfLE (r, x, y, z, w, v, _)
+		  | IfFEq (r, x, y, z, w, v, _) | IfFLE (r, x, y, z, w, v, _) ->
 		      let thenexp = p_each_rconv z blks tenv in
 		      let elseexp = p_each_rconv w blks tenv in
 		      let expif = sel_if x y thenexp elseexp e in
@@ -232,10 +234,10 @@ let normal x =
 let reverse (a, tenv) =
   rconv a tenv
     
-let f x =
+let f oc x =
   let (p, env) = normal x in
-(*    print_prog stdout p;*)
-(*    Output.f (Alloc.f p env) env;*)
-      reverse (p, env)
+    print_prog stdout p;
+    Output.f oc (Alloc.f p env) env;
+    reverse (p, env)
 
-    
+      

@@ -992,6 +992,7 @@ int do_assemble2(program *program, program2 * program2)
       printflag = 1;
     }
     */
+    print_instruction(program->insts[pc]);
     /*
     if(printflag == 1){ 
       count++;
@@ -1013,6 +1014,7 @@ int do_assemble2(program *program, program2 * program2)
       break;
     }
   }
+      print_register();
 
   for(i = 0; i < 42; ++i)
     {

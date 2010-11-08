@@ -13,11 +13,11 @@ let use_and_def = function
   | FAdd (z, x, y) | FSub (z, x, y) | FMul (z, x, y) | FDiv (z, x, y)
   | Get (z, x, y) | FGet (z, x, y) -> ([x; y], [z])
   | Call (y, _, x, _) | Tuple (y, x) -> (x, [y])
-  | IfEq (_, x, y, _, _, _) | IfLE (_, x, y, _, _, _) | IfFEq (_, x, y, _, _, _)
-  | IfFLE (_, x, y, _, _, _) -> ([x; y], [])
+  | IfEq (_, x, y, _, _, _, _) | IfLE (_, x, y, _, _, _, _) | IfFEq (_, x, y, _, _, _, _)
+  | IfFLE (_, x, y, _, _, _, _) -> ([x; y], [])
   | LetTuple (y, x) -> ([x], y)
   | Put (x, y, z) | FPut (x, y, z) -> ([x; y; z], [])
-  | Ret -> ([], [])
+  | Ret x -> (x, [])
 
 let use x = fst (use_and_def x)
 let def x = snd (use_and_def x)
@@ -26,7 +26,7 @@ let analyze f =
   let eq_as_set x y =
     (not (exists (fun a -> not (mem a y)) x)) &&
       (not (exists (fun a -> not (mem a x)) y)) in
-  let ((_, g), _) as cfg = Cfg.make_no_block f in
+  let ((_, _, _, g), _) as cfg = Cfg.make_no_block f in
   let ord = Array.of_list (Cfg.rev_order_no_block cfg) in
   let next_in x cout =
     let (y, _, _) = g.(x) in
@@ -58,9 +58,8 @@ let analyze f =
       cout := !nout;
       nout := !t
     done;
-    (cfg, !cin, !cout)
-    
-(*    printf "in\n";
+(*    
+    printf "in\n";
     Array.iteri (fun i x ->
 		   let (e, _, _) = g.(i) in
 		     printf "%d\t%s\n%s" i (string_of_t e)
@@ -69,6 +68,7 @@ let analyze f =
     Array.iteri (fun i x ->
 		   let (e, _, _) = g.(i) in
 		     printf "%d\t%s\n%s" i (string_of_t e)
-		       (String.concat "" (map (sprintf "\t%s\n") x))) !cout*)
+		       (String.concat "" (map (sprintf "\t%s\n") x))) !cout;*)
+    (cfg, !cin, !cout)
     
 	     
