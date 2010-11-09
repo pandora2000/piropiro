@@ -544,7 +544,8 @@ program2 *parse_all2(program * program)
     arg2 = ist.name[2];
     arg3 = ist.name[3];
     //printf("%s\t%s %s %s\n", ist.name[0], ist.name[1], ist.name[2], ist.name[3]);
-    //print_instruction(ist);
+    print_label_from_index(program, i);
+    print_instruction(ist);
     if (strcmp(iname, "nop") == 0) {
       answer->insts[i].name[0] = 0;
     }
@@ -594,7 +595,7 @@ program2 *parse_all2(program * program)
       PARSE_INST_12("rdi", RDI)
       PARSE_INST_13("rdf", RDF)
       PARSE_INST_12("ptc", PTC)
-      PARSE_INST_13("ptf", PTF)      
+      PARSE_INST_13("ptf", PTF)
     else {
       printf("Error : this is iligal inst!: %s\n", iname);
       exit(1);

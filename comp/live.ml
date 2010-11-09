@@ -58,17 +58,17 @@ let analyze f =
       cout := !nout;
       nout := !t
     done;
-(*    
-    printf "in\n";
-    Array.iteri (fun i x ->
-		   let (e, _, _) = g.(i) in
-		     printf "%d\t%s\n%s" i (string_of_t e)
-		       (String.concat "" (map (sprintf "\t%s\n") x))) !cin;
-    printf "out\n";
-    Array.iteri (fun i x ->
-		   let (e, _, _) = g.(i) in
-		     printf "%d\t%s\n%s" i (string_of_t e)
-		       (String.concat "" (map (sprintf "\t%s\n") x))) !cout;*)
+    (*    
+	  printf "in\n";
+	  Array.iteri (fun i x ->
+	  let (e, _, _) = g.(i) in
+	  printf "%d\t%s\n%s" i (string_of_t e)
+	  (String.concat "" (map (sprintf "\t%s\n") x))) !cin;
+	  printf "out\n";
+	  Array.iteri (fun i x ->
+	  let (e, _, _) = g.(i) in
+	  printf "%d\t%s\n%s" i (string_of_t e)
+	  (String.concat "" (map (sprintf "\t%s\n") x))) !cout;*)
     (cfg, !cin, !cout)
-    
-	     
+      
+      

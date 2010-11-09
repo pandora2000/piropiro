@@ -40,6 +40,8 @@ type ptyp = I | F
 
 let genid x = Id.genid x
 
+let noreg = "xxx"
+
 let reg_offset = 4
 let freg_offset = 2
 let regs =  Array.init (64 - reg_offset) (fun i -> Printf.sprintf "%%r%d" (i + reg_offset))

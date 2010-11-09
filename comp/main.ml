@@ -6,7 +6,7 @@ let istest = ref false
 let rec iter n e = (* 最適化処理をくりかえす (caml2html: main_iter) *)
   Format.eprintf "iteration %d@." n;
   if n = 0 then e else
-    let e' = (*Elim.f (ConstFold.f*) (Inline.f (Assoc.f (Beta.f e))) in
+    let e' = (*Elim.f (ConstFold.f (Inline.f*) (Assoc.f (Beta.f e)) in
       if e = e' then e else
 	iter (n - 1) e'
 
@@ -18,7 +18,7 @@ let prep s =
 
       
 let memhp = 170000
-let memsp = 100
+let memsp = 4096
 let memext = 4096
 let memin = 6144
 let memout = 8192(*memoutの値はmemout+1で初期化*)
@@ -61,23 +61,6 @@ let extlist =
   ]
 
 let lexbuf outchan foutchan boutchan a = (* バッファをコンパイルしてチャンネルへ出力する (caml2html: main_lexbuf) *)
-  (*  Id.counter := 0;
-      Typing.extenv := M.empty;
-      let p = Emit.f
-      (RegAlloc.f
-      (Virtual.f
-      (Closure.f
-      (iter !limit
-      (Alpha.f
-      (KNormal.f
-      (Typing.f
-      (Parser.exp Lexer.token l)))))))) in
-      output_string stdout (prep (Emit.string_of_alist p));
-      print_newline ();
-      output_string stdout (Emit.string_of_flist p);
-      print_newline ();
-      output_string stdout (Emit.string_of_binary p)
-  *)			    
   Id.counter := 0;
   Typing.extenv := M.empty;
   let al = (List.map (fun (x, y) -> ("min_caml_" ^ x, y)) extlist) in
@@ -88,20 +71,20 @@ let lexbuf outchan foutchan boutchan a = (* バッファをコンパイルしてチャンネルへ
   let e = iter !limit d in
   let f = Closure.f e in
   let outchan2 = open_out "b.s" in
-  let pp = Opt.f outchan2 f in
+  let pp = Opt.f outchan foutchan f in
   let g = Virtual.f memin memout memext al pp in
   let h = RegAlloc.f g in
   let goc = open_out "graph.dot" in
     Graph.f goc f;
     close_out goc;
-    close_out outchan2;
     (*
       Closure.print_prog stdout f;
       KNormal.print_prog stdout e;
       Asm.print_prog stdout g;
       Asm.print_prog stdout h;
     *)
-    Emit.f outchan foutchan !istest memext memin memout memsp memhp floffset h;
+(*    Emit.f outchan foutchan !istest memext memin memout memsp memhp floffset h;*)
+    close_out outchan2;
     (*
       let dvir = open_out "dvir" in
       let dbcls = open_out "dbcls" in

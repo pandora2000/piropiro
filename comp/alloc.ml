@@ -18,38 +18,39 @@ let replace ((s, rids, aids, g), ienv) gr fgr env fenv tenv =
 	if
 	  (try M.find x tenv = Type.Float with Not_found -> printf "%s\n%!" x;raise MyNotFound) then fregs.(assoc x fenv) else regs.(assoc x env)
 	    (*TODO:*)
-      with Not_found -> (*printf "%s\n%!" x; *)"%r100" in
-    let p e = match e with
-      | Addzi (x, y) -> Addzi (q x, y)
-      | Subz (x, y) -> Subz (q x, q y)
-      | Add (x, y, z) -> Add (q x, q y, q z)
-      | Sub (x, y, z) -> Sub (q x, q y, q z)
-      | Mul (x, y, z) -> Mul (q x, q y, q z)
-      | Xor (x, y, z) -> Xor (q x, q y, q z)
-      | FLoad (x, y) -> FLoad (q x, y)
-      | FSubz (x, y) -> FSubz (q x, q y)
-      | FAdd (x, y, z) -> FAdd (q x, q y, q z)
-      | FSub (x, y, z) -> FSub (q x, q y, q z)
-      | FMul (x, y, z) -> FMul (q x, q y, q z)
-      | FDiv (x, y, z) -> FDiv (q x, q y, q z)
-      | Flr (x, y) -> Flr (q x, q y)
-      | Foi (x, y) -> Foi (q x, q y)
-      | Call (x, y, z, w) -> Call (q x, y, map q z, w)
-      | IfEq (x, y, z, u, v, w, t) -> IfEq (x, q y, q z, u, v, w, t)
-      | IfLE (x, y, z, u, v, w, t) -> IfLE (x, q y, q z, u, v, w, t)
-      | IfFEq (x, y, z, u, v, w, t) -> IfFEq (x, q y, q z, u, v, w, t)
-      | IfFLE (x, y, z, u, v, w, t) -> IfFLE (x, q y, q z, u, v, w, t)
-      | Var (x, y) -> Var (q x, q y)
-      | Tuple (x, y) -> Tuple (q x, map q y)
-      | Get (x, y, z) -> Get (q x, q y, q z)
-      | Put (x, y, z) -> Put (q x, q y, q z)
-      | FGet (x, y, z) -> FGet (q x, q y, q z)
-      | FPut (x, y, z) -> FPut (q x, q y, q z)
-      | ExtArray (x, y) -> ExtArray (q x, y)
-      | ExtTuple (x, y) -> ExtTuple (q x, y)
-      | LetTuple (x, y) -> LetTuple (map q x, q y)
-      | Ret x -> Ret (map q x) in
-      Array.iteri (fun i (x, y, z) -> printf "%s\n%!" (string_of_t x);g.(i) <- (p x, y, z)) g;
+      with Not_found -> (*printf "%s\n%!" x; *)"xxx" in
+    let p e =
+      match e with
+	| Addzi (x, y) -> Addzi (q x, y)
+	| Subz (x, y) -> Subz (q x, q y)
+	| Add (x, y, z) -> Add (q x, q y, q z)
+	| Sub (x, y, z) -> Sub (q x, q y, q z)
+	| Mul (x, y, z) -> Mul (q x, q y, q z)
+	| Xor (x, y, z) -> Xor (q x, q y, q z)
+	| FLoad (x, y) -> FLoad (q x, y)
+	| FSubz (x, y) -> FSubz (q x, q y)
+	| FAdd (x, y, z) -> FAdd (q x, q y, q z)
+	| FSub (x, y, z) -> FSub (q x, q y, q z)
+	| FMul (x, y, z) -> FMul (q x, q y, q z)
+	| FDiv (x, y, z) -> FDiv (q x, q y, q z)
+	| Flr (x, y) -> Flr (q x, q y)
+	| Foi (x, y) -> Foi (q x, q y)
+	| Call (x, y, z, w) -> Call (q x, y, map q z, w)
+	| IfEq (x, y, z, u, v, w, t) -> IfEq (x, q y, q z, u, v, w, t)
+	| IfLE (x, y, z, u, v, w, t) -> IfLE (x, q y, q z, u, v, w, t)
+	| IfFEq (x, y, z, u, v, w, t) -> IfFEq (x, q y, q z, u, v, w, t)
+	| IfFLE (x, y, z, u, v, w, t) -> IfFLE (x, q y, q z, u, v, w, t)
+	| Var (x, y) -> Var (q x, q y)
+	| Tuple (x, y) -> Tuple (q x, map q y)
+	| Get (x, y, z) -> Get (q x, q y, q z)
+	| Put (x, y, z) -> Put (q x, q y, q z)
+	| FGet (x, y, z) -> FGet (q x, q y, q z)
+	| FPut (x, y, z) -> FPut (q x, q y, q z)
+	| ExtArray (x, y) -> ExtArray (q x, y)
+	| ExtTuple (x, y) -> ExtTuple (q x, y)
+	| LetTuple (x, y) -> LetTuple (map q x, q y)
+	| Ret x -> Ret (map q x) in
+      Array.iteri (fun i (x, y, z) -> printf "%s\n%!" (string_of_t x); g.(i) <- (p x, y, z)) g;
       (((s, map q rids, map q aids, g), ienv), (gr, fgr))
 
 let rec alloc_func ((bid, rids, aids, blks) as f) tenv =
@@ -126,4 +127,5 @@ let rec alloc_func ((bid, rids, aids, blks) as f) tenv =
 
 let rec f (fs, (x, y)) tenv =
   (*  print_prog stdout (fs, (x, y));*)
-  (map (fun x -> alloc_func x tenv) fs, alloc_func (x, [], [], y) tenv)
+  let p =map (fun x -> alloc_func x tenv) fs in
+  (p, alloc_func (x, [], [], y) tenv)

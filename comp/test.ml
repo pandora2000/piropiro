@@ -1,6 +1,9 @@
-let rec add x y =
-  if y = 0 then x else add (x + 1) (y - 1) in
-let rec mul10 x =
-  x + x + x + x + add x x + x + x + x + x in
-  mul10 4
+let rec ponyo x =
+  let puro =
+    if 1 = 1 then ()
+    else if 2 = 2 then
+      if 3 = 3 then () else ()
+    else if 4 = 4 then () else () in
+    read_int puro in
+  ponyo 30
     

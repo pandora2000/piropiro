@@ -29,7 +29,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 	     | _ -> raise UnsupportedComparison)
       | _ -> raise FatalError in
   let nextid = function Some x -> [x] | None -> [] in
-  let imm_conv n t = function
+  let imm_conv n t env = function
     | Closure.Unit -> []
     | Closure.Int x -> [Addzi (n, x)]
     | Closure.Float x -> [FLoad (n, x)]
@@ -56,7 +56,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 	   | Type.Float -> [FGet (n, x, y)]
 	   | _ -> [Get (n, x, y)])
     | Closure.Put (x, y, z) ->
-	(match t with
+	(match M.find z env with
 	   | Type.Float -> [FPut (x, y, z)]
 	   | _ -> [Put (x, y, z)])
     | Closure.ExtArray (Id.L x) -> [ExtArray (n, x)]
@@ -86,7 +86,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 		     :: contblks
 	       | Closure.Let _ | Closure.LetTuple _ -> raise NestedLet
 	       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
-	       | _ -> each_conv (cblk @ (imm_conv n t e1)) cbid nbid rid rtyp nenv e2)
+	       | _ -> each_conv (cblk @ (imm_conv n t env e1)) cbid nbid rid rtyp nenv e2)
       | Closure.LetTuple (x, z, w) ->
 	  each_conv (cblk @ [LetTuple (List.map fst x, z)]) cbid nbid rid rtyp
 	    (M.add_list x env) w
@@ -99,7 +99,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 	    :: (thenblks @ elseblks)
       | Closure.AppDir (Id.L x, y) -> [cbid, (cblk @ [Call (rid, x, y, None)], [])]
       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
-      | _ -> [cbid, (cblk @ (imm_conv rid rtyp e), nextid nbid)]
+      | _ -> [cbid, (cblk @ (imm_conv rid rtyp env e), nextid nbid)]
 
 let each_conv rid rtyp x env z =
   each_conv [] x None rid rtyp env z
@@ -147,8 +147,7 @@ let rec p_each_rconv bid blks tenv =
       | Get (x, y, z) | FGet (x, y, z) -> (x, M.find x tenv, Closure.Get (y, z))
       | Put (x, y, z) | FPut (x, y, z) -> (genid "put", Type.Unit, Closure.Put (x, y, z))
       | ExtArray (x, y) -> (x, M.find x tenv, Closure.ExtArray (Id.L y))
-      | ExtTuple (x, y) -> (x, M.find x tenv, Closure.ExtTuple y)
-  in
+      | ExtTuple (x, y) -> (x, M.find x tenv, Closure.ExtTuple y) in
   let (cblk, _) = List.assoc bid blks in
   let r =
     List.fold_right
@@ -233,11 +232,11 @@ let normal x =
 
 let reverse (a, tenv) =
   rconv a tenv
-    
-let f oc x =
+
+let f oc foc x =
   let (p, env) = normal x in
-    print_prog stdout p;
-    Output.f oc (Alloc.f p env) env;
+    (*    print_prog stdout p;*)
+    Output.f oc foc (Alloc.f p env) env;
     reverse (p, env)
 
       
