@@ -30,6 +30,10 @@ and exp = (* 一つ一つの命令に対応する式 (caml2html: sparcasm_exp) *)
   | Store of Id.t * Id.t * int
   | Fload of Id.t * int
   | Fstore of Id.t * Id.t * int
+  | Ldr of Id.t * Id.t
+  | Str of Id.t * Id.t * Id.t
+  | Fldr of Id.t * Id.t
+  | Fstr of Id.t * Id.t * Id.t
   | Ri | Rf | Pc of Id.t | Pf of Id.t
       (* virtual instructions *)
   | IfEq of Id.t * Id.t * t * t

@@ -51,6 +51,7 @@ exception MyNotFound8
 let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *)
   | Closure.Unit -> Ans(Nop)
       (*TODO:即値のサイズ計算*)
+  | Closure.Addzi(i) -> Ans(Addi(zreg, i))
   | Closure.Int(i) -> Ans(Addi(zreg, i))
   | Closure.Float(d) ->
       let l =
@@ -68,6 +69,7 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
 	  (*Let((x, Type.Int), SetL(l), Ans(LdDF(x, C(0))))*)
   | Closure.Neg(x) -> Ans(Sub(zreg, x))
   | Closure.Add(x, y) -> Ans(Add(x, y))
+  | Closure.Addi(x, y) -> Ans(Addi(x, y))
   | Closure.Sub(x, y) -> Ans(Sub(x, y))
   | Closure.Mul(x, y) -> Ans(Mul(x, y))
   | Closure.Xor(x, y) -> Ans(Xor(x, y))
@@ -78,6 +80,30 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
   | Closure.FSub(x, y) -> Ans(Fsub(x, y))
   | Closure.FMul(x, y) -> Ans(Fmul(x, y))
   | Closure.FDiv(x, y) -> Ans(Fdiv(x, y))
+  | Closure.IfFLEz(x, e1, e2) ->
+      (match M.find x env with
+	 | Type.Float -> Ans(IfFLE(x, fzreg, g al env e1, g al env e2))
+	 | _ -> failwith "equality supported only for bool, int, and float")
+  | Closure.IfILEz(x, e1, e2) ->
+      (match M.find x env with
+	 | Type.Bool | Type.Int -> Ans(IfLE(x, zreg, g al env e1, g al env e2))
+	 | _ -> failwith "equality supported only for bool, int, and float")
+  | Closure.IfFGEz(x, e1, e2) ->
+      (match M.find x env with
+	 | Type.Float -> Ans(IfFLE(fzreg, x, g al env e1, g al env e2))
+	 | _ -> failwith "equality supported only for bool, int, and float")
+  | Closure.IfIGEz(x, e1, e2) ->
+      (match M.find x env with
+	 | Type.Bool | Type.Int -> Ans(IfLE(zreg, x, g al env e1, g al env e2))
+	 | _ -> failwith "equality supported only for bool, int, and float")
+  | Closure.IfFEqz(x, e1, e2) ->
+      (match M.find x env with
+	 | Type.Float -> Ans(IfFEq(x, fzreg, g al env e1, g al env e2))
+	 | _ -> failwith "equality supported only for bool, int, and float")
+  | Closure.IfIEqz(x, e1, e2) ->
+      (match M.find x env with
+	 | Type.Bool | Type.Int -> Ans(IfEq(x, zreg, g al env e1, g al env e2))
+	 | _ -> failwith "equality supported only for bool, int, and float")
   | Closure.IfEq(x, y, e1, e2) ->
       (try
 	 (match M.find x env with
@@ -103,35 +129,6 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
 	    | Type.Float -> Ans(Fadd(fzreg, x))
 	    | _ -> Ans(Add(zreg, x)))
        with Not_found -> raise MyNotFound3)
-	(*
-	(*実装するには機械語を生成し、生成するときアドレスを埋め込む必要あり*)
-	  | Closure.MakeCls((x, t), { Closure.entry = l; Closure.actual_fv = ys }, e2) -> (* クロージャの生成 (caml2html: virtual_makecls) *)
-	(* Closureのアドレスをセットしてから、自由変数の値をストア *)
-	  let e2' = g (M.add x t env) e2 in
-	  let offset, store_fv =
-	  expand
-	  (List.map (fun y ->
-	  try
-	  (y, M.find y env)
-	  with Not_found -> (y, Type.Unit)
-	  ) ys)
-	  (1, e2')
-	  (fun y offset store_fv -> seq(Fstore(y, x, offset), store_fv))
-	  (fun y _ offset store_fv -> seq(Store(y, x, offset), store_fv)) in
-	  Let((x, t), Add(zreg, hpreg),
-	  Let((hpreg, Type.Int), Addi(hpreg, offset),
-	  let z = Id.genid "l" in
-	  Let((z, Type.Int), Add(zreg, l),
-	  seq(Store(z, x, 0),
-	  store_fv))))
-	  | Closure.AppCls(x, ys) ->
-	  let (int, float) = separate (List.map (fun y ->
-	  try
-	  (y, M.find y env)
-	  with Not_found -> (y, Type.Unit)
-	  ) ys) in
-	  Ans(CallCls(x, int, float))
-	*)
   | Closure.MakeCls _ | Closure.AppCls _ -> raise Exit3
   | Closure.AppDir(Id.L(x), ys) ->
       (*引数をint listとfloat listに分けてるだけ*)
@@ -144,9 +141,6 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
 					       ) ys) in
 	   Ans(CallDir(Id.L(x), int, float))
        with Not_found -> printf "%s\n" (String.concat ", " ys); raise MyNotFound4)
-	(*ここまで*)
-	(*tupleの方針:K正規化後の段階でタプルを全部平坦にして、その後関数適用における
-	  タプルも全部展開する*)
 	
   | Closure.Tuple(xs) -> (* 組の生成 (caml2html: virtual_tuple) *)
       (try
@@ -174,29 +168,41 @@ let rec g al env = function (* 式の仮想マシンコード生成 (caml2html: virtual_g) *
 	     if not (S.mem x s) then load else (* [XX] a little ad hoc optimization *)
 	       Let((x, t), Load(y, offset), load)) in
 	load
+  | Closure.Geti(x, y) -> (* 配列の読み出し (caml2html: virtual_get) *)
+      (match M.find x env with
+	 | Type.Array(Type.Unit) -> Ans(Nop)
+	 | Type.Array(Type.Float) -> Ans(Fload(x, y))
+	 | Type.Array(_) -> Ans(Load(x, y))
+	 | _ -> assert false)
   | Closure.Get(x, y) -> (* 配列の読み出し (caml2html: virtual_get) *)
       (try
 	 let offset = Id.genid "get" in
 	   (match M.find x env with
 	      | Type.Array(Type.Unit) -> Ans(Nop)
-	      | Type.Array(Type.Float) ->
+	      | Type.Array(Type.Float) -> (*Ans(Fldr(x, y))*)
 		  (*TODO:WATCH:たとえばディスプレースメントをレジスタで出来ればこの辺が速くなる*)
 		  Let((offset, Type.Int), Add(x, y),
 		      Ans(Fload(offset, 0)))
-	      | Type.Array(_) ->
+	      | Type.Array(_) -> (*Ans(Ldr(x, y))*)
 		  Let((offset, Type.Int), Add(x, y),
 		      Ans(Load(offset, 0)))
 	      | _ -> assert false)
        with Not_found -> raise MyNotFound6)
+  | Closure.Puti(x, y, z) ->
+      (match M.find x env with
+	 | Type.Array(Type.Unit) -> Ans(Nop)
+	 | Type.Array(Type.Float) -> Ans(Fstore(z, x, y))
+	 | Type.Array(_) -> Ans(Store(z, x, y))
+	 | _ -> assert false)
   | Closure.Put(x, y, z) ->
       (try
 	 let offset = Id.genid "put" in
 	   (match M.find x env with
 	      | Type.Array(Type.Unit) -> Ans(Nop)
-	      | Type.Array(Type.Float) ->
+	      | Type.Array(Type.Float) -> (*Ans(Fstr(z, x, y))*)
 		  Let((offset, Type.Int), Add(x, y),
 		      Ans(Fstore(z, offset, 0)))
-	      | Type.Array(_) ->
+	      | Type.Array(_) -> (*Ans(Str(z, x, y))*)
 		  Let((offset, Type.Int), Add(x, y),
 		      Ans(Store(z, offset, 0)))
 	      | _ -> assert false)

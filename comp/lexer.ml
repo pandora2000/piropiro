@@ -1176,12 +1176,12 @@ and __ocaml_lex_token_rec lexbuf __ocaml_lex_state =
 
   | 4 ->
 # 24 "lexer.mll"
-    ( BOOL(true) )
+    ( INT(1) )
 # 1181 "lexer.ml"
 
   | 5 ->
 # 26 "lexer.mll"
-    ( BOOL(false) )
+    ( INT(0) )
 # 1186 "lexer.ml"
 
   | 6 ->

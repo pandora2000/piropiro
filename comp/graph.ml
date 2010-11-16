@@ -1,7 +1,7 @@
 open Printf
 open Closure
 open Str
-
+(*
 let merge_list x y =
   List.fold_left (fun a b -> if List.mem b a then a else b :: a) x y
 
@@ -32,3 +32,4 @@ let f oc (Prog (l, m)) =
 		      fprintf oc "\t\"%s\" -> \"%s\";\n" x z) (callees_of y)) l;
   fprintf oc "}\n"
 
+*)

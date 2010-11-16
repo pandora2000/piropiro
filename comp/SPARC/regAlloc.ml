@@ -116,17 +116,7 @@ and g'_and_restore dest cont regenv exp = (* »ÈÍÑ¤µ¤ì¤ëÊÑ¿ô¤ò¥¹¥¿¥Ã¥¯¤«¤é¥ì¥¸¥¹¥
 and g' dest cont regenv = function (* ³ÆÌ¿Îá¤Î¥ì¥¸¥¹¥¿³ä¤êÅö¤Æ (caml2html: regalloc_gprime) *)
   | Nop | Restore _ | Ri | Rf as exp ->
       (Ans(exp), regenv)
-  | Addi(p, _) | Subi(p, _) | Muli(p, _)
-  | Xori(p, _) | Nori(p, _) | Ori(p, _) | Andi(p, _) as exp when p = zreg ->
-      (Ans(exp), regenv)
       (*Add r0 rx = Addi rx 0¤ÏÆ±¤¸¤À¤¬¸å¼Ô¤Ï¤Ê¤¤¤è¤¦¤Ë¤·¤Æ¤¤¤ë¤Ï¤º*)
-  | Add(p, x) when p = zreg -> (Ans(Add(zreg, find x Type.Int regenv)), regenv)
-  | Sub(p, x) when p = zreg -> (Ans(Sub(zreg, find x Type.Int regenv)), regenv)
-  | Mul(p, x) when p = zreg -> (Ans(Mul(zreg, find x Type.Int regenv)), regenv)
-  | And(p, x) when p = zreg -> (Ans(And(zreg, find x Type.Int regenv)), regenv)
-  | Or(p, x) when p = zreg -> (Ans(Or(zreg, find x Type.Int regenv)), regenv)
-  | Xor(p, x) when p = zreg -> (Ans(Xor(zreg, find x Type.Int regenv)), regenv)
-  | Nor(p, x) when p = zreg -> (Ans(Nor(zreg, find x Type.Int regenv)), regenv)
   | Add(x, y') -> (Ans(Add(find x Type.Int regenv, find y' Type.Int regenv)), regenv)
   | Sub(x, y') -> (Ans(Sub(find x Type.Int regenv, find y' Type.Int regenv)), regenv)
   | Mul(x, y') -> (Ans(Mul(find x Type.Int regenv, find y' Type.Int regenv)), regenv)
@@ -143,6 +133,9 @@ and g' dest cont regenv = function (* ³ÆÌ¿Îá¤Î¥ì¥¸¥¹¥¿³ä¤êÅö¤Æ (caml2html: regal
   | Nori(x, y) -> (Ans(Nori(find x Type.Int regenv, y)), regenv)
   | Load(x, y) -> (Ans(Load(find x Type.Int regenv, y)), regenv)
   | Store(x, y, z) -> (Ans(Store(find x Type.Int regenv, find y Type.Int regenv, z)), regenv)
+  | Ldr(x, y) -> (Ans(Ldr(find x Type.Int regenv, find y Type.Int regenv)), regenv)
+  | Str(x, y, z) -> (Ans(Str(find x Type.Int regenv,
+			       find y Type.Int regenv, find z Type.Int regenv)), regenv)
   | Fadd(fp, x) when fp = fzreg -> (Ans(Fadd(fzreg, find x Type.Float regenv)), regenv)
   | Fsub(fp, x) when fp = fzreg -> (Ans(Fsub(fzreg, find x Type.Float regenv)), regenv)
   | Fmul(fp, x) when fp = fzreg -> (Ans(Fmul(fzreg, find x Type.Float regenv)), regenv)
@@ -162,8 +155,12 @@ and g' dest cont regenv = function (* ³ÆÌ¿Îá¤Î¥ì¥¸¥¹¥¿³ä¤êÅö¤Æ (caml2html: regal
   | Fload(x, y') when (String.sub x 0 4) = "P_fd" ->
       (Ans(Fload(x, y')), regenv)
   | Fload(x, y') -> (Ans(Fload(find x Type.Int regenv, y')), regenv)
+  | Fldr(x, y') -> (Ans(Fldr(find x Type.Int regenv, find y' Type.Int regenv)), regenv)
   | Fstore(x, y, z') ->
       (Ans(Fstore(find x Type.Float regenv, find y Type.Int regenv, z')), regenv)
+  | Fstr(x, y, z') ->
+      (Ans(Fstr(find x Type.Float regenv,
+		  find y Type.Int regenv, find z' Type.Int regenv)), regenv)
   | IfEq(x, y, e1, e2) as exp -> g'_if dest cont regenv exp
       (fun e1' e2' -> IfEq(find x Type.Int regenv, find y Type.Int regenv, e1', e2')) e1 e2
   | IfLE(x, y, e1, e2) as exp -> g'_if dest cont regenv exp

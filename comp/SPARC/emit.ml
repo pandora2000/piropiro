@@ -29,6 +29,7 @@ let soii = function
 let string_of_inst = function
     (*  | Pc _ -> "ptc" | Pf _ -> "ptf" | Ri -> "rdi" | Rf -> "rdf"*)
   | Ri -> "rdi" | Rf -> "rdf" | Pc _ -> "ptc" | Pf _ -> "ptf"
+  | Ldr _ -> "ldr" | Fldr _ -> "fldr" | Str _ -> "str" | Fstr _ -> "fstr"
   | Floor _ -> "flr" | Float_of_int _ -> "foi"
   | Nop -> (soii Nnop) | Add _ -> (soii Nadd) | Sub _ -> "sub" | Mul _ -> "mul"
   | And _ -> "and" | Or _ -> "or" | Nor _ -> "nor" | Xor _ -> "xor"
@@ -126,8 +127,12 @@ and g' e =(* 各命令のアセンブリ生成 (caml2html: emit_gprime) *)
       | NonTail(x), Nori(y, z') | NonTail(x), Load(y, z') | NonTail(x), Fload(y, z')
       | NonTail(x), Andi(y, z') ->
 	  [finst3 n x y (string_of_int z')]
+      | NonTail(x), Ldr(y, z') | NonTail(x), Fldr(y, z') ->
+	  [finst3 n x y z']
       | NonTail(_), Store(x, y, z') | NonTail(_), Fstore(x, y, z') ->
 	  [finst3 n x y (string_of_int z')]
+      | NonTail(_), Str(x, y, z') | NonTail(_), Fstr(x, y, z') ->
+	  [finst3 n x y z']
 	    (* 退避の仮想命令の実装 (caml2html: emit_save) *)
       | NonTail(_), Save(x, y) when List.mem x allregs && not (S.mem y !stackset) ->
 	  save y;
@@ -143,15 +148,17 @@ and g' e =(* 各命令のアセンブリ生成 (caml2html: emit_gprime) *)
 	  assert (List.mem x allfregs);
 	  [finst3 (soii Fld) x spreg (string_of_int (offset y))]
 	    (* 末尾だったら計算結果を第一レジスタにセットしてret (caml2html: emit_tailret) *)
-      | Tail, (Nop | Store _ | Fstore _ | Save _ | Pc _ | Pf _ as exp) ->
+      | Tail, (Nop | Store _ | Fstore _ | Save _ | Pc _ | Pf _
+	| Str _ | Fstr _ as exp) ->
 	  (g' (NonTail(Id.gentmp Type.Unit), exp)) @ [finst0 (soii Ret)]
       | Tail, (Floor _ | Float_of_int _ | Rf as exp) ->
 	  (g' (NonTail(fregs.(0)), exp)) @ [finst0 (soii Ret)]
-      | Tail, (Add _ | Sub _ | Mul _ | And _ | Load _ 
+      | Tail, (Add _ | Sub _ | Mul _ | And _ | Load _ | Ldr _
 	| Or _ | Xor _ | Nor _ | Ori _ | Nori _ | Xori _
 	| Andi _ | Addi _ | Subi _ | Muli _ | Ri as exp) ->
 	  (g' (NonTail(regs.(0)), exp)) @ [finst0 (soii Ret)]
-      | Tail, (Fadd _ | Fmul _ | Fdiv _ | Finv _ | Fsub _ | Fsqrt _ | Fload _  as exp) ->
+      | Tail, (Fadd _ | Fmul _ | Fdiv _ | Finv _ | Fsub _ | Fsqrt _ | Fload _
+	| Fldr _ as exp) ->
 	  (g' (NonTail(fregs.(0)), exp)) @ [finst0 (soii Ret)]
       | Tail, (Restore(x) as exp) ->
 	  (match locate x with

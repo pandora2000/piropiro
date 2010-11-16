@@ -220,20 +220,14 @@ program *parse_all(char buf[][100], int buf_size)
   return answer;
 }
 
-#define REG_COUNT 32
-#define FREG_COUNT 32
+#define REG_COUNT 64
+#define FREG_COUNT 64
 
 
 /*CPU の設定*/
-int regist[REG_COUNT] =
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0
-  };
+int regist[REG_COUNT] = { 0 };
 
-float freg[FREG_COUNT] =
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0
-  };
+float freg[FREG_COUNT] = { 0 };
 stack call_stack = { 0 };	/*call_stackのサイズを0で初期化 */
 stack cistack = { 0 };
 
@@ -524,6 +518,11 @@ int null_cal(char *null)
 #define RDI 120
 #define RDF 130
 
+#define STR 42
+#define LDR 43
+#define FSTR 44
+#define FLDR 45
+
 
 program2 *parse_all2(program * program)
 {
@@ -544,8 +543,8 @@ program2 *parse_all2(program * program)
     arg2 = ist.name[2];
     arg3 = ist.name[3];
     //printf("%s\t%s %s %s\n", ist.name[0], ist.name[1], ist.name[2], ist.name[3]);
-    print_label_from_index(program, i);
-    print_instruction(ist);
+    //print_label_from_index(program, i);
+    //print_instruction(ist);
     if (strcmp(iname, "nop") == 0) {
       answer->insts[i].name[0] = 0;
     }
@@ -590,8 +589,12 @@ program2 *parse_all2(program * program)
       PARSE_INST_7("jump", 39)
       PARSE_INST_7("call", 40)
       PARSE_INST_8("return", 41)
-      PARSE_INST_8("bp", 42)
 
+      PARSE_INST_1("str", STR)
+      PARSE_INST_1("ldr", LDR)
+      PARSE_INST_11("fstr", FSTR)
+      PARSE_INST_11("fldr", FLDR)
+      
       PARSE_INST_12("rdi", RDI)
       PARSE_INST_13("rdf", RDF)
       PARSE_INST_12("ptc", PTC)
@@ -675,8 +678,8 @@ char istnames[][100] =
     "fsti",
     "beq",
     "bne",
-    "blt",
     "bgt",
+    "blt",
     "bge",
     "ble",
     "beq",
@@ -688,6 +691,10 @@ char istnames[][100] =
     "jump",
     "call",
     "return",
+    "str",
+    "ldr",
+    "fstr",
+    "fldr",
   };
 
 int do_assemble2(program *program, program2 * program2)
@@ -857,6 +864,22 @@ int do_assemble2(program *program, program2 * program2)
       memory[regist[ist.name[2]] + ist.name[3]].d =
 	freg[ist.name[1]];
     }
+    else if (iname == LDR)
+      {
+	regist[ist.name[1]] = memory[regist[ist.name[2]] + regist[ist.name[3]]].i;
+      }
+    else if (iname == STR)
+      {
+	memory[regist[ist.name[2]] + regist[ist.name[3]]].i = regist[ist.name[1]];
+      }
+    else if (iname == FLDR)
+      {
+	freg[ist.name[1]] = memory[regist[ist.name[2]] + regist[ist.name[3]]].d;
+      }
+    else if (iname == FSTR)
+      {
+	memory[regist[ist.name[2]] + regist[ist.name[3]]].d = freg[ist.name[1]];
+      }
 
 
     /*BRANCH命令 */
@@ -963,7 +986,7 @@ int do_assemble2(program *program, program2 * program2)
         }
         firstflag = 0;
       }else{
-        fprintf(out_fp,"%c",regist[ist.name[1]]);
+        fprintf(out_fp, "%c",regist[ist.name[1]]);
       }
     }
     else if (iname == PTF) {
@@ -993,7 +1016,8 @@ int do_assemble2(program *program, program2 * program2)
       printflag = 1;
     }
     */
-    print_instruction(program->insts[pc]);
+    //    print_instruction(program->insts[pc]);
+    //print_register();
     /*
     if(printflag == 1){ 
       count++;
@@ -1015,9 +1039,10 @@ int do_assemble2(program *program, program2 * program2)
       break;
     }
   }
-      print_register();
+  
+  print_register();
 
-  for(i = 0; i < 42; ++i)
+  for(i = 0; i < 46; ++i)
     {
       printf("%s\t\t%d\n", istnames[i], icount[i]);
     }

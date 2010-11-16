@@ -5,7 +5,8 @@ let threshold = ref 0 (* Mainで-inlineオプションによりセットされる *)
 
   
 let rec size = function
-  | IfEq(_, _, e1, e2) | IfLE(_, _, e1, e2)
+  | IfFLEz(_, e1, e2) | IfILEz(_, e1, e2) | IfFGEz(_, e1, e2) | IfIGEz(_, e1, e2)
+  | IfEq(_, _, e1, e2) | IfLE(_, _, e1, e2) | IfFEqz(_, e1, e2) | IfIEqz(_, e1, e2)
   | Let(_, e1, e2) | LetRec({ body = e1 }, e2) -> 1 + size e1 + size e2
   | LetTuple(_, _, e) -> 1 + size e
   | _ -> 1
@@ -21,10 +22,14 @@ let rec h f e =
   (*fを呼ぶ関数のリスト*)
   let rec callers_of f er = function
     | App (x, _) when x = f -> [er]
-    | Unit | Int _ | Float _ | Neg _ | Add _ | Sub _ | App _
-    | Mul _ | Div _ | FNeg _ | FAdd _ | FSub _ | FMul _
+    | Unit | Int _ | Float _ | Neg _ | Add _ | Addi _ | Sub _ | App _
+    | Mul _ | Div _ | FNeg _ | FAdd _ | FSub _ | FMul _ | Addzi _
     | FDiv _ | Floor _ | Float_of_int _ | Var _ | Tuple _
+    | Geti _ | Puti _
     | Get _ | Put _ | ExtArray _ | ExtTuple _ | ExtFunApp _ -> []
+    | IfFLEz (_, y, z) | IfILEz (_, y, z)
+    | IfFGEz (_, y, z) | IfIGEz (_, y, z)
+    | IfFEqz (_, y, z) | IfIEqz (_, y, z)
     | IfEq (_, _, y, z) | IfLE (_, _, y, z)
     | Let (_, y, z) -> merge_list (callers_of f er y) (callers_of f er z)
     | LetRec ({ name = (x, _); body = y }, z) ->
@@ -36,6 +41,12 @@ let rec h f e =
       | _ -> false
 
 let rec g we env = function (* インライン展開ルーチン本体 (caml2html: inline_g) *)
+  | IfFLEz(x, e1, e2) -> IfFLEz(x, g we env e1, g we env e2)
+  | IfILEz(x, e1, e2) -> IfILEz(x, g we env e1, g we env e2)
+  | IfFGEz(x, e1, e2) -> IfFGEz(x, g we env e1, g we env e2)
+  | IfIGEz(x, e1, e2) -> IfIGEz(x, g we env e1, g we env e2)
+  | IfFEqz(x, e1, e2) -> IfFEqz(x, g we env e1, g we env e2)
+  | IfIEqz(x, e1, e2) -> IfIEqz(x, g we env e1, g we env e2)
   | IfEq(x, y, e1, e2) -> IfEq(x, y, g we env e1, g we env e2)
   | IfLE(x, y, e1, e2) -> IfLE(x, y, g we env e1, g we env e2)
   | Let(xt, e1, e2) -> Let(xt, g we env e1, g we env e2)

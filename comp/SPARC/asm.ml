@@ -35,6 +35,10 @@ and exp = (* 一つ一つの命令に対応する式 (caml2html: sparcasm_exp) *)
   | Store of Id.t * Id.t * int
   | Fload of Id.t * int
   | Fstore of Id.t * Id.t * int
+  | Ldr of Id.t * Id.t
+  | Str of Id.t * Id.t * Id.t
+  | Fldr of Id.t * Id.t
+  | Fstr of Id.t * Id.t * Id.t
   | Ri | Rf | Pc of Id.t | Pf of Id.t
       (* virtual instructions *)
   | IfEq of Id.t * Id.t * t * t
@@ -59,6 +63,7 @@ let ii_tostr = function
       
 let string_of_vinst = function
   | Floor _ -> "Floor" | Float_of_int _ -> "Foi"
+  | Str _ -> "Str" | Fstr _ -> "Fstr" | Ldr _ -> "Ldr" | Fldr _ -> "Fldr"
   | Ri -> "Ri" | Rf -> "Rf" | Pc _ -> "Pc" | Pf _ -> "Pf"
   | Nop -> "Nop" | Add _ -> "Add" | Sub _ -> "Sub" | Mul _ -> "Mul"
   | And _ -> "And" | Or _ -> "Or" | Nor _ -> "Nor" | Xor _ -> "Xor"
@@ -98,6 +103,7 @@ let rec soe level e =
 	    (String.concat ", " y) (String.concat ", " z)
       | Save (x, y) -> sprintf "%s%s(%s, %s)\n" i (son e) x y
       | Restore x -> sprintf "%s%s(%s)\n" i (son e) x
+      | _ -> "aa\n"
 and sop level e =
   let i = String.make level ' ' in
   let nl = level + 1 in
@@ -150,14 +156,15 @@ let rec remove_and_uniq xs = function
 let rec fv_exp = function
   | Nop | Restore _ | Ri | Rf -> []
   | Save(x, _) | Floor(x) | Float_of_int(x) | Pc x | Pf x -> [x]
-  | Add(y, z) | Sub(y, z) | Mul(y, z) | And(y, z) 
-  | Or(y, z) | Nor(y, z) | Xor(y, z) | Fadd(y, z) 
+  | Add(y, z) | Sub(y, z) | Mul(y, z) | And(y, z)
+  | Or(y, z) | Nor(y, z) | Xor(y, z) | Fadd(y, z)
   | Fsub(y, z) | Fmul(y, z) | Finv(y, z) | Fsqrt(y, z)
-  | Fdiv(y, z) | Store(y, z, _) | Fstore(y, z, _) ->
+  | Fdiv(y, z) | Store(y, z, _) | Fstore(y, z, _) | Ldr(y, z) | Fldr(y, z) ->
       [y; z]
   | Addi(y, _) | Subi(y, _) | Muli(y, _) | Andi(y, _)
   | Ori(y, _) | Nori(y, _) | Xori(y, _) | Load(y, _) | Fload(y, _) ->
       [y]
+  | Str(x, y, z) | Fstr(x, y, z) -> [x; y; z]
   | IfEq(x, y, e1, e2) | IfLE(x, y, e1, e2) ->
       x :: y :: remove_and_uniq S.empty (fv e1 @ fv e2) (* uniq here just for efficiency *)
   | IfFEq(x, y, e1, e2) | IfFLE(x, y, e1, e2) ->

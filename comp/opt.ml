@@ -1,7 +1,7 @@
 open Printf
 open Optt
 open Loop
-
+(*
 let merge_alist x y =
   List.fold_left (fun a b -> if List.mem_assoc (fst b) a then a else b :: a) x y
 
@@ -242,3 +242,4 @@ let f oc foc x =
 
       
 
+*)

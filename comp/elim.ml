@@ -1,12 +1,22 @@
 open KNormal
 
 let rec effect = function (* 副作用の有無 (caml2html: elim_effect) *)
-  | Let(_, e1, e2) | IfEq(_, _, e1, e2) | IfLE(_, _, e1, e2) -> effect e1 || effect e2
+  | IfFEqz(_, e1, e2) | IfIEqz(_, e1, e2)
+  | IfFLEz(_, e1, e2) | IfILEz(_, e1, e2)
+  | IfFGEz(_, e1, e2) | IfIGEz(_, e1, e2)
+  | Let(_, e1, e2) | IfEq(_, _, e1, e2) | IfLE(_, _, e1, e2) ->
+      effect e1 || effect e2
   | LetRec(_, e) | LetTuple(_, _, e) -> effect e
-  | App _ | Put _ | ExtFunApp _ -> true
+  | App _ | Put _ | Puti _ | ExtFunApp _ -> true
   | _ -> false
 
 let rec f = function (* 不要定義削除ルーチン本体 (caml2html: elim_f) *)
+  | IfFEqz(x, e1, e2) -> IfFEqz(x, f e1, f e2)
+  | IfIEqz(x, e1, e2) -> IfIEqz(x, f e1, f e2)
+  | IfFLEz(x, e1, e2) -> IfFLEz(x, f e1, f e2)
+  | IfILEz(x, e1, e2) -> IfILEz(x, f e1, f e2)
+  | IfFGEz(x, e1, e2) -> IfFGEz(x, f e1, f e2)
+  | IfIGEz(x, e1, e2) -> IfIGEz(x, f e1, f e2)
   | IfEq(x, y, e1, e2) -> IfEq(x, y, f e1, f e2)
   | IfLE(x, y, e1, e2) -> IfLE(x, y, f e1, f e2)
   | Let((x, t), e1, e2) -> (* letの場合 (caml2html: elim_let) *)
