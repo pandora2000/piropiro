@@ -1,0 +1,4 @@
+let rec a x =
+  let p = 1.0 in
+    print_float p in
+  a 30

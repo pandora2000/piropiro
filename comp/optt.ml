@@ -3,6 +3,7 @@ open Printf
 type id = string
 type bid = string
 type t =
+  | Nop
   | Addzi of id * int
   | Subz of id * id
   | Add of id * id * id
@@ -105,7 +106,7 @@ let int_of_freg x = int_of_string (String.sub x 2 (String.length x - 2)) - freg_
 let int_of_wereg x = if is_freg x then int_of_freg x else int_of_reg x
 
 let sotn = function
-  | Addzi _ -> "Addzi" | Subz _ -> "Subz"
+  | Nop -> "Nop" | Addzi _ -> "Addzi" | Subz _ -> "Subz"
   | Add _ -> "Add" | Sub _ -> "Sub" | Mul _ -> "Mul" | Xor _ -> "Xor" | FLoad _ -> "FLoad"
   | FSubz _ -> "FSubz" | FAdd _ -> "FAdd" | FSub _ -> "FSub" | FMul _ -> "FMul"
   | FDiv _ -> "FDiv" | Flr _ -> "Flr" | Foi _ -> "Foi" | Call _ -> "Call"
@@ -116,6 +117,7 @@ let sotn = function
 
 let string_of_t e =
   match e with
+    | Nop -> sprintf "%s" (sotn e)
     | Addzi (x, y) -> sprintf "%s %s %d" (sotn e) x y
     | FLoad (x, y) -> sprintf "%s %s %f" (sotn e) x y
     | Subz (x, y) | FSubz (x, y) | Flr (x, y) | Foi (x, y) | Var (x, y)
@@ -135,7 +137,7 @@ let string_of_t e =
     | Tuple (x, y) ->
 	sprintf "%s %s (%s)" (sotn e) x (String.concat ", " y)
     | Ret x -> sprintf "%s (%s)" (sotn e) (String.concat ", " x)
-  
+	
 let print_t oc e = fprintf oc "\t\t%s\n" (string_of_t e)
 
 let print_block oc (x, (y, z)) =
@@ -149,3 +151,4 @@ let print_func oc (n, x, y, z) =
 let print_prog oc (x, (y, z)) =
   List.iter (print_func oc) x;
   print_func oc (y, [], [], z)
+    

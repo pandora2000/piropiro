@@ -82,7 +82,7 @@ let rec shuffle sw xys =
 
 type a = { nm : string; ac : int; a1 : string;
 	   mutable a2 : string; mutable a3 : string; mutable index : int }
-      
+    
 (*相対jumpの距離について*)
 (*TODO:a1,a3が数字の時値が範囲内にあるか確かめる*)
 let finst0 n =
@@ -272,10 +272,10 @@ let string_of_flist (_, x) =
        (List.map (fun y -> Int32.format "%08X" (Int32.bits_of_float y)) x))
 
 
-      
+    
 
-      
-      
+    
+    
 let f oc foc istest memext memin memout memsp memhp floffset (Prog(fl, fundefs, e)) =
   (*型つけ*)
   if istest then ignore (memext + memin + memout + memsp + memhp + floffset);
@@ -311,24 +311,24 @@ let f oc foc istest memext memin memout memsp memhp floffset (Prog(fl, fundefs, 
 		  [finst3 (soii Naddi) regs.(0) zreg (string_of_int (886 + memext));
 		   finst3 (soii Sti) regs.(0) zreg (string_of_int (882 + memext))];
 		]));
-	   [finst1 (soii Jump) lmain];
-	   (List.flatten (List.map (fun fundef -> h fundef) fundefs));
-	   [flabel lmain];
-	   (stackset := S.empty;
-	    stackmap := [];
-	    g (NonTail(regs.(0)), e))
-	  ] in
-	let ret =
-	  List.map (fun x ->
-		      if x.nm = (soii Fld) && not (is_reg x.a2) then
-			try
-			  for i = 0 to Array.length fli - 1 do
-			    if (match fli.(i) with (Id.L y, _) -> y) = x.a2 then
-			      (x.a2 <- zreg; x.a3 <- string_of_int (i + floffset); raise Exit)
-			  done; x
-			with Exit -> x
-		      else x) ret in
-	let ret = (ret, snd (List.split fl)) in
-	  output_string oc (string_of_alist ret);
-	  output_string foc (string_of_flist ret);
-	  output_string foc "FFFFFFFF\n"
+	  [finst1 (soii Jump) lmain];
+	  (List.flatten (List.map (fun fundef -> h fundef) fundefs));
+	  [flabel lmain];
+	  (stackset := S.empty;
+	   stackmap := [];
+	   g (NonTail(regs.(0)), e))
+	] in
+    let ret =
+      List.map (fun x ->
+		  if x.nm = (soii Fld) && not (is_reg x.a2) then
+		    try
+		      for i = 0 to Array.length fli - 1 do
+			if (match fli.(i) with (Id.L y, _) -> y) = x.a2 then
+			  (x.a2 <- zreg; x.a3 <- string_of_int (i + floffset); raise Exit)
+		      done; x
+		    with Exit -> x
+		  else x) ret in
+    let ret = (ret, snd (List.split fl)) in
+      output_string oc (string_of_alist ret);
+      output_string foc (string_of_flist ret);
+      output_string foc "FFFFFFFF\n"

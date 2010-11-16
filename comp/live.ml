@@ -6,6 +6,7 @@ open List
 exception FatalError
 
 let use_and_def = function
+  | Nop -> ([], [])
   | Addzi (x, _) | FLoad (x, _) -> ([], [x])
   | Subz (y, x) | FSubz (y, x) | Flr (y, x) | Foi (y, x) | Var (y, x) -> ([x], [y])
   | ExtArray (y, _) | ExtTuple (y, _) -> ([], [y])

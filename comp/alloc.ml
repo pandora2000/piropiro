@@ -18,9 +18,10 @@ let replace ((s, rids, aids, g), ienv) gr fgr env fenv tenv =
 	if
 	  (try M.find x tenv = Type.Float with Not_found -> printf "%s\n%!" x;raise MyNotFound) then fregs.(assoc x fenv) else regs.(assoc x env)
 	    (*TODO:*)
-      with Not_found -> (*printf "%s\n%!" x; *)"xxx" in
+      with Not_found -> (*printf "%s\n%!" x; *)"%r63" in
     let p e =
       match e with
+	| Nop -> Nop
 	| Addzi (x, y) -> Addzi (q x, y)
 	| Subz (x, y) -> Subz (q x, q y)
 	| Add (x, y, z) -> Add (q x, q y, q z)

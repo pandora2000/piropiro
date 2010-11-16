@@ -97,7 +97,7 @@ let rec each_conv cblk cbid nbid rid rtyp env e =
 	  let elseblks = each_conv [] elseid nbid rid rtyp env w in
 	    (cbid, (cblk @ [sel_if rid x y thenid elseid None nbid env e], [thenid; elseid]))
 	    :: (thenblks @ elseblks)
-      | Closure.AppDir (Id.L x, y) -> [cbid, (cblk @ [Call (rid, x, y, None)], [])]
+      | Closure.AppDir (Id.L x, y) -> [cbid, (cblk @ [Call (rid, x, y, None)], nextid nbid)]
       | Closure.MakeCls _ | Closure.AppCls _ -> raise IllegalPattern
       | _ -> [cbid, (cblk @ (imm_conv rid rtyp env e), nextid nbid)]
 
@@ -128,6 +128,7 @@ let rec p_each_rconv bid blks tenv =
   let imm_rconv e =
     match e with
       | IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | LetTuple _ | Call _ | Ret _ -> raise FatalError
+      | Nop -> raise FatalError
       | Addzi (x, y) -> (x, Type.Int, Closure.Int y)
       | Subz (x, y) -> (x, Type.Int, Closure.Neg y)
       | Add (x, y, z) -> (x, Type.Int, Closure.Add (y, z))
@@ -235,8 +236,9 @@ let reverse (a, tenv) =
 
 let f oc foc x =
   let (p, env) = normal x in
-    (*    print_prog stdout p;*)
+        print_prog stdout p;
     Output.f oc foc (Alloc.f p env) env;
     reverse (p, env)
 
       
+

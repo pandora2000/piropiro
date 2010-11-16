@@ -705,7 +705,7 @@ in
 
 let rec read_parameter _ =
   (
-   read_screen_settings();
+    read_screen_settings();
    read_light();
    read_all_object ();
    read_and_network 0;
@@ -2302,7 +2302,7 @@ let rec rt size_x size_y =
   image_center.(0) <- size_x / 2;
     image_center.(1) <- size_y / 2;
   
- scan_pitch.(0) <- 128.0 /. float_of_int size_x;
+    scan_pitch.(0) <- 128.0 /. float_of_int size_x;
  let prev = create_pixelline () in
  let cur  = create_pixelline () in
  let next = create_pixelline () in

@@ -84,6 +84,7 @@ let each_output ((((sbid, rids, aids, g), ienv), (cg, fcg)), lout, flout) tenv =
     let (e, _, (sucs : int list)) = g.(s) in
     let imm_out e =
       match e with
+	| Nop -> ()
 	| Addzi (x, y) -> if x <> noreg then printi3 "addi" x zreg (string_of_int y)
 	| Subz (x, y) -> if x <> noreg then  printi3 "sub" x zreg y
 	| Add (x, y, z) -> if x <> noreg then printi3 "add" x y z
@@ -164,7 +165,7 @@ let each_output ((((sbid, rids, aids, g), ienv), (cg, fcg)), lout, flout) tenv =
 	      if len > 0 then printi3 "addi" spreg spreg (string_of_int len)
 	| ExtArray (x, y) | ExtTuple (x, y) ->
 	    if x <> noreg then
-	      printi3 "ldi" x zreg (string_of_int (assoc y extlist + memext))
+	      printi3 "addi" x zreg (string_of_int (assoc y extlist + memext))
 	| IfEq _ | IfLE _ | IfFEq _ | IfFLE _ | Ret _ -> raise FatalError in
     let if_inst e =
       match e with
@@ -173,7 +174,7 @@ let each_output ((((sbid, rids, aids, g), ienv), (cg, fcg)), lout, flout) tenv =
       match e with
 	| Ret _ -> printi0 "return"
 	| IfEq (_, y, z, _, v, _, w) | IfLE (_, y, z, _, v, _, w)
-	| IfFEq (_, y, z, _, v, _, w) | IfFLE (_, y, z, _, v, _, w)a ->
+	| IfFEq (_, y, z, _, v, _, w) | IfFLE (_, y, z, _, v, _, w) ->
 	    (match sucs with
 	       | [th; el] ->
 		   (match w with
@@ -192,7 +193,7 @@ let each_output ((((sbid, rids, aids, g), ienv), (cg, fcg)), lout, flout) tenv =
 			  printi3 (if_inst e) y z v;
 			  loop c th g;
 			  printl v;
-			  loop c el g);
+			  loop c el g)
 	       | _ -> printf "aa%!"; raise FatalError)
 	| Call (_, y, z, _) when sucs = [] || sucs = [sbid] ->
 	    set_args z;
@@ -240,9 +241,9 @@ let f outchan foutchan (l, e) tenv =
     printi3 "add" hpreg regs.(0) hpreg;
     printi3 "sub" regs.(0) hpreg regs.(0);
     printi3 "add" regs.(2) zreg regs.(1);
-    printi3 "add" regs.(1) hpreg regs.(0);
+    printi3 "sub" regs.(1) hpreg regs.(0);
     printi1 "call" "min_caml_init_array";
-    printi3 "sub" regs.(0) zreg regs.(3);
+    printi3 "add" regs.(0) zreg regs.(3);
     (let el = genid "else" in
        printl "min_caml_init_array";
        printi3 "bne" zreg regs.(1) el;
@@ -256,9 +257,9 @@ let f outchan foutchan (l, e) tenv =
     printi3 "add" regs.(3) zreg hpreg;
     printi3 "add" hpreg regs.(0) hpreg;
     printi3 "sub" regs.(0) hpreg regs.(0);
-    printi3 "add" regs.(1) hpreg regs.(0);
+    printi3 "sub" regs.(1) hpreg regs.(0);
     printi1 "call" "min_caml_init_float_array";
-    printi3 "sub" regs.(0) zreg regs.(3);
+    printi3 "add" regs.(0) zreg regs.(3);
     (let el = genid "else" in
        printl "min_caml_init_float_array";
        printi3 "bne" zreg regs.(1) el;

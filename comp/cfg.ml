@@ -74,7 +74,7 @@ let make_block_no_block sbid rids (bid, (ts, ns)) =
   let next () = match !cblk with [] -> raise FatalError | h :: t -> cblk := t; h in
     if !cblk = [] then
       (if ns = [] then tbl.(0) <- (!t, Some (Ret rids), [])
-       else tbl.(0) <- (!t, None, ns);
+       else tbl.(0) <- (!t, Some Nop, ns);
        incr i)
     else 
       while !cblk <> [] do
@@ -113,13 +113,13 @@ let make_no_block (bid, rids, aids, blks) =
 		  (y, map
 		     (fun v ->
 			let (_, n, _, _) = find (fun (w, _, _, _) -> w = v) p in n) z))) p in
-  let p =
+(*  let p =
     fold_left (fun a (i, (e, ss)) ->
 		 match e with
 		   | None -> map (fun ((i2, (e2, ss2)) as t) ->
 				    if mem i ss2 then (i2, (e2, cup ss (rem i ss2)))
 				    else t) a
-		   | _ -> a) p p in
+		   | _ -> a) p p in*)
   let p = fold_left (fun a (i, (e, ss)) ->
 		       match e with None -> a | Some x -> (i, (x, ss)) :: a) [] p in
   let p = map (fun (i, (e, sucs)) ->
