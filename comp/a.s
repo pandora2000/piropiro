@@ -12,7 +12,6 @@
 	sti	r4 r0 33650
 	jump	L_mend_14957
 min_caml_create_array : 
-	bp	2 0
 	add	r7 r0 r3
 	add	r3 r4 r3
 	sub	r4 r3 r4
@@ -22,17 +21,14 @@ min_caml_create_array :
 	add	r4 r0 r7
 	return
 min_caml_init_array : 
-	bp	3 0
 	bne	r0 r5 L_else_14958
 	return
 L_else_14958 : 
-	deb	r6 r4 0
 	sti	r6 r4 0
 	addi	r5 r5 -1
 	addi	r4 r4 1
 	jump	min_caml_init_array
 min_caml_create_float_array : 
-	bp	1 1
 	add	r7 r0 r3
 	add	r3 r4 r3
 	sub	r4 r3 r4
@@ -41,33 +37,26 @@ min_caml_create_float_array :
 	add	r4 r0 r7
 	return
 min_caml_init_float_array : 
-	bp	2 1
 	bne	r0 r5 L_else_14959
 	return
 L_else_14959 : 
-	debf	f2 r4 0
 	fsti	f2 r4 0
 	addi	r5 r5 -1
 	addi	r4 r4 1
 	jump	min_caml_init_float_array
 min_caml_read_int : 
-	bp	0 0
 	rdi	r4
 	return
 min_caml_read_float : 
-	bp	0 0
 	rdf	f2
 	return
 min_caml_print_char : 
-	bp	1 0
 	ptc	r4
 	return
 min_caml_print_float : 
-	bp	0 1
 	ptf	f2
 	return
 L_psin_1882 : 
-	bp	0 1
 	fadd	f9 f0 f2
 	fmul	f2 f9 f9
 	fmul	f8 f9 f2
@@ -96,7 +85,6 @@ L_psin_1882 :
 	fadd	f2 f2 f9
 	return
 L_pcos_1884 : 
-	bp	0 1
 	fmul	f8 f2 f2
 	fmul	f7 f8 f8
 	fmul	f6 f7 f8
@@ -124,7 +112,6 @@ L_pcos_1884 :
 	fadd	f2 f3 f2
 	return
 L_sin_1886 : 
-	bp	0 1
 	fadd	f6 f0 f2
 	fldi	f3 r0 13
 	fldi	f4 r0 14
@@ -169,7 +156,6 @@ L_else_13196 :
 	fsub	f2 f6 f3
 	jump	L_sin_1886
 L_cos_1888 : 
-	bp	0 1
 	fadd	f6 f0 f2
 	fldi	f3 r0 13
 	fldi	f5 r0 14
@@ -216,7 +202,6 @@ L_else_13211 :
 	fsub	f2 f6 f3
 	jump	L_cos_1888
 L_atan_1890 : 
-	bp	0 1
 	fadd	f14 f0 f2
 	fmul	f3 f14 f14
 	fldi	f2 r0 12
@@ -254,7 +239,6 @@ L_atan_1890 :
 	fadd	f2 f3 f2
 	return
 L_isqrt_1892 : 
-	bp	0 3
 	fadd	f6 f0 f4
 	fadd	f5 f0 f2
 	fadd	f4 f0 f3
@@ -303,7 +287,6 @@ L_else_13230 :
 	fadd	f2 f0 f6
 	return
 L_sdiv10_1898 : 
-	bp	2 0
 	add	r7 r0 r5
 	add	r5 r0 r4
 	addi	r4 r5 -10
@@ -366,7 +349,6 @@ L_else_13238 :
 	add	r4 r0 r7
 	return
 L_vecunit_sgn_1931 : 
-	bp	2 0
 	add	r1 r0 r4
 	add	r4 r0 r5
 	add	r5 r0 r1
@@ -433,7 +415,6 @@ L_cont_13260 :
 	add	r4 r0 r6
 	return
 L_read_object_2041 : 
-	bp	1 0
 	add	r17 r0 r4
 	addi	r4 r0 60
 	bgt	r4 r17 L_else_13267
@@ -2293,7 +2274,6 @@ L_else_13279 :
 	addi	r4 r13 1
 	jump	L_read_object_2041
 L_read_net_item_2045 : 
-	bp	1 0
 	add	r12 r0 r4
 	sti	r12 r2 0
 	addi	r2 r2 1
@@ -2447,7 +2427,6 @@ L_cont_13419 :
 	add	r4 r0 r4
 	return
 L_read_or_network_2047 : 
-	bp	1 0
 	add	r11 r0 r4
 	addi	r10 r0 0
 	sti	r11 r2 0
@@ -2714,7 +2693,6 @@ L_cont_13437 :
 	add	r4 r0 r4
 	return
 L_read_and_network_2049 : 
-	bp	1 0
 	add	r11 r0 r4
 	addi	r8 r0 0
 	sti	r12 r2 0
@@ -2960,7 +2938,6 @@ L_else_13459 :
 	addi	r4 r9 1
 	jump	L_read_and_network_2049
 L_solver_rect_surface_2053 : 
-	bp	5 3
 	add	r10 r0 r8
 	add	r9 r0 r7
 	add	r7 r0 r6
@@ -3053,7 +3030,6 @@ L_else_13474 :
 	addi	r4 r0 0
 	return
 L_solver_surface_2068 : 
-	bp	2 3
 	fadd	f7 f0 f4
 	fadd	f6 f0 f3
 	fadd	f5 f0 f2
@@ -3094,7 +3070,6 @@ L_else_13502 :
 	addi	r4 r0 1
 	return
 L_quadratic_2074 : 
-	bp	1 3
 	add	r5 r0 r4
 	fadd	f7 f0 f4
 	fadd	f6 f0 f3
@@ -3135,7 +3110,6 @@ L_else_13505 :
 	fadd	f2 f4 f2
 	return
 L_solver_second_2087 : 
-	bp	2 3
 	add	r6 r0 r4
 	fadd	f12 f0 f4
 	fadd	f11 f0 f3
@@ -3292,7 +3266,6 @@ L_else_13511 :
 	addi	r4 r0 0
 	return
 L_solver_rect_fast_2097 : 
-	bp	3 3
 	add	r7 r0 r5
 	add	r8 r0 r4
 	fadd	f6 f0 f4
@@ -3487,7 +3460,6 @@ L_else_13540 :
 	addi	r4 r0 1
 	return
 L_solver_second_fast_2110 : 
-	bp	2 3
 	add	r6 r0 r5
 	add	r7 r0 r4
 	fadd	f6 f0 f4
@@ -3616,7 +3588,6 @@ L_else_13601 :
 	addi	r4 r0 0
 	return
 L_solver_second_fast2_2127 : 
-	bp	3 3
 	add	r7 r0 r4
 	fadd	f5 f0 f4
 	fadd	f6 f0 f3
@@ -3720,7 +3691,6 @@ L_else_13624 :
 	addi	r4 r0 0
 	return
 L_setup_rect_table_2137 : 
-	bp	2 0
 	add	r6 r0 r5
 	add	r7 r0 r4
 	addi	r4 r0 6
@@ -3841,7 +3811,6 @@ L_cont_13655 :
 	add	r4 r0 r8
 	return
 L_setup_surface_table_2140 : 
-	bp	2 0
 	add	r6 r0 r4
 	addi	r4 r0 4
 	fldi	f2 r0 30
@@ -3900,7 +3869,6 @@ L_cont_13680 :
 	add	r4 r0 r7
 	return
 L_setup_second_table_2143 : 
-	bp	2 0
 	add	r6 r0 r4
 	addi	r4 r0 5
 	fldi	f2 r0 30
@@ -4009,7 +3977,6 @@ L_cont_13690 :
 	add	r4 r0 r7
 	return
 L_iter_setup_dirvec_constants_2146 : 
-	bp	2 0
 	add	r10 r0 r5
 	add	r12 r0 r4
 	bgt	r0 r10 L_else_13695
@@ -4402,7 +4369,6 @@ L_else_13695 :
 	add	r4 r0 r11
 	return
 L_setup_startp_constants_2151 : 
-	bp	2 0
 	add	r6 r0 r5
 	add	r8 r0 r4
 	bgt	r0 r6 L_else_13761
@@ -4483,7 +4449,6 @@ L_cont_13762 :
 L_else_13761 : 
 	return
 L_is_outside_2171 : 
-	bp	1 3
 	add	r7 r0 r4
 	fadd	f5 f0 f3
 	fadd	f3 f0 f2
@@ -4612,7 +4577,6 @@ L_cont_13805 :
 	sub	r4 r6 r4
 	return
 L_check_all_inside_2176 : 
-	bp	2 3
 	add	r8 r0 r5
 	add	r9 r0 r4
 	fadd	f7 f0 f4
@@ -4804,7 +4768,6 @@ L_else_13815 :
 	addi	r4 r0 0
 	return
 L_shadow_check_and_group_2182 : 
-	bp	2 0
 	add	r10 r0 r5
 	add	r11 r0 r4
 	add	r1 r10 r11
@@ -4994,7 +4957,6 @@ L_else_13872 :
 	addi	r4 r0 1
 	return
 L_shadow_check_one_or_group_2185 : 
-	bp	2 0
 	add	r7 r0 r5
 	add	r6 r0 r4
 	add	r1 r7 r6
@@ -5101,7 +5063,6 @@ L_else_13888 :
 	addi	r4 r0 1
 	return
 L_shadow_check_one_or_matrix_2188 : 
-	bp	2 0
 	add	r9 r0 r5
 	add	r11 r0 r4
 	add	r1 r9 r11
@@ -5422,7 +5383,6 @@ L_else_13913 :
 	addi	r4 r0 1
 	return
 L_solve_each_element_2191 : 
-	bp	3 0
 	add	r12 r0 r6
 	add	r9 r0 r5
 	add	r10 r0 r4
@@ -5731,7 +5691,6 @@ L_cont_13969 :
 	add	r5 r0 r9
 	jump	L_solve_each_element_2191
 L_solve_one_or_network_2195 : 
-	bp	3 0
 	add	r9 r0 r6
 	add	r7 r0 r4
 	add	r6 r0 r5
@@ -5839,7 +5798,6 @@ L_else_14000 :
 	add	r6 r0 r9
 	jump	L_solve_one_or_network_2195
 L_trace_or_matrix_2199 : 
-	bp	3 0
 	add	r11 r0 r6
 	add	r9 r0 r5
 	add	r10 r0 r4
@@ -6208,7 +6166,6 @@ L_cont_14004 :
 	add	r5 r0 r9
 	jump	L_trace_or_matrix_2199
 L_solve_each_element_fast_2205 : 
-	bp	3 0
 	add	r11 r0 r6
 	add	r14 r0 r5
 	add	r13 r0 r4
@@ -6433,7 +6390,6 @@ L_cont_14050 :
 	add	r5 r0 r14
 	jump	L_solve_each_element_fast_2205
 L_solve_one_or_network_fast_2209 : 
-	bp	3 0
 	add	r9 r0 r6
 	add	r7 r0 r4
 	add	r6 r0 r5
@@ -6541,7 +6497,6 @@ L_else_14080 :
 	add	r6 r0 r9
 	jump	L_solve_one_or_network_fast_2209
 L_trace_or_matrix_fast_2213 : 
-	bp	3 0
 	add	r10 r0 r6
 	add	r9 r0 r5
 	add	r13 r0 r4
@@ -7214,7 +7169,6 @@ L_cont_14089 :
 	add	r5 r0 r9
 	jump	L_trace_or_matrix_fast_2213
 L_get_nvector_second_2223 : 
-	bp	1 0
 	add	r6 r0 r4
 	addi	r4 r0 32786
 	fldi	f2 r4 0
@@ -7294,7 +7248,6 @@ L_cont_14178 :
 	add	r4 r0 r1
 	jump	L_vecunit_sgn_1931
 L_utexture_2228 : 
-	bp	2 0
 	add	r9 r0 r5
 	add	r7 r0 r4
 	ldi	r6 r7 0
@@ -7666,7 +7619,6 @@ L_else_14205 :
 	add	r4 r0 r8
 	return
 L_add_light_2231 : 
-	bp	0 3
 	fadd	f5 f0 f4
 	fadd	f6 f0 f3
 	fadd	f4 f0 f2
@@ -7728,7 +7680,6 @@ L_else_14256 :
 	add	r4 r0 r6
 	return
 L_trace_reflections_2235 : 
-	bp	2 2
 	add	r8 r0 r5
 	add	r7 r0 r4
 	fadd	f7 f0 f3
@@ -7873,7 +7824,6 @@ L_cont_14266 :
 L_else_14259 : 
 	return
 L_trace_ray_2240 : 
-	bp	3 2
 	add	r13 r0 r6
 	add	r11 r0 r5
 	add	r12 r0 r4
@@ -8419,7 +8369,6 @@ L_else_14277 :
 	add	r4 r0 r9
 	return
 L_trace_diffuse_ray_2246 : 
-	bp	1 1
 	add	r6 r0 r4
 	fadd	f5 f0 f2
 	addi	r4 r0 32826
@@ -8623,7 +8572,6 @@ L_else_14343 :
 	add	r4 r0 r10
 	return
 L_iter_trace_diffuse_rays_2249 : 
-	bp	4 0
 	add	r9 r0 r4
 	add	r1 r0 r5
 	add	r5 r0 r7
@@ -8759,7 +8707,6 @@ L_else_14367 :
 	add	r4 r0 r8
 	return
 L_trace_diffuse_rays_2254 : 
-	bp	3 0
 	add	r8 r0 r6
 	add	r7 r0 r5
 	add	r6 r0 r4
@@ -8843,7 +8790,6 @@ L_cont_14386 :
 	add	r6 r0 r8
 	jump	L_iter_trace_diffuse_rays_2249
 L_calc_diffuse_using_1point_2262 : 
-	bp	2 0
 	add	r11 r0 r5
 	add	r9 r0 r4
 	ldi	r4 r9 5
@@ -9008,7 +8954,6 @@ L_cont_14402 :
 	add	r4 r0 r10
 	return
 L_calc_diffuse_using_5points_2265 : 
-	bp	5 0
 	add	r12 r0 r8
 	add	r13 r0 r6
 	add	r10 r0 r4
@@ -9128,7 +9073,6 @@ L_calc_diffuse_using_5points_2265 :
 	add	r4 r0 r11
 	return
 L_do_without_neighbors_2271 : 
-	bp	2 0
 	add	r13 r0 r5
 	add	r11 r0 r4
 	addi	r4 r0 4
@@ -9510,7 +9454,6 @@ L_else_14408 :
 	add	r4 r0 r12
 	return
 L_try_exploit_neighbors_2287 : 
-	bp	6 0
 	add	r12 r0 r9
 	add	r15 r0 r8
 	add	r10 r0 r7
@@ -9833,7 +9776,6 @@ L_else_14438 :
 	add	r4 r0 r13
 	return
 L_pretrace_diffuse_rays_2300 : 
-	bp	2 0
 	add	r10 r0 r5
 	add	r8 r0 r4
 	addi	r4 r0 4
@@ -9925,7 +9867,6 @@ L_else_14482 :
 	add	r4 r0 r5
 	return
 L_pretrace_pixels_2303 : 
-	bp	3 3
 	add	r8 r0 r6
 	add	r7 r0 r5
 	add	r9 r0 r4
@@ -10071,7 +10012,6 @@ L_cont_14491 :
 L_else_14490 : 
 	return
 L_pretrace_line_2310 : 
-	bp	3 0
 	add	r7 r0 r6
 	add	r6 r0 r4
 	addi	r4 r0 32806
@@ -10110,7 +10050,6 @@ L_pretrace_line_2310 :
 	fadd	f2 f0 f5
 	jump	L_pretrace_pixels_2303
 L_scan_pixel_2314 : 
-	bp	5 0
 	add	r9 r0 r8
 	add	r11 r0 r7
 	add	r10 r0 r5
@@ -10524,7 +10463,6 @@ L_cont_14509 :
 	add	r8 r0 r9
 	jump	L_scan_pixel_2314
 L_scan_line_2320 : 
-	bp	5 0
 	add	r12 r0 r8
 	add	r10 r0 r7
 	add	r9 r0 r6
@@ -10790,7 +10728,6 @@ L_cont_14562 :
 	add	r6 r0 r11
 	jump	L_scan_line_2320
 L_create_float5x3array_2326 : 
-	bp	0 0
 	addi	r4 r0 3
 	fldi	f2 r0 30
 	call	min_caml_create_float_array
@@ -10835,7 +10772,6 @@ L_create_float5x3array_2326 :
 	add	r4 r0 r5
 	return
 L_create_pixel_2328 : 
-	bp	0 0
 	addi	r4 r0 3
 	fldi	f2 r0 30
 	call	min_caml_create_float_array
@@ -10944,7 +10880,6 @@ L_create_pixel_2328 :
 	addi	r3 r3 8
 	return
 L_init_line_elements_2330 : 
-	bp	2 0
 	add	r6 r0 r4
 	bgt	r0 r5 L_else_14579
 	sti	r5 r2 0
@@ -11009,7 +10944,6 @@ L_else_14579 :
 	add	r4 r0 r6
 	return
 L_calc_dirvec_2340 : 
-	bp	3 4
 	add	r7 r0 r6
 	add	r8 r0 r4
 	fadd	f9 f0 f5
@@ -11342,7 +11276,6 @@ L_cont_14607 :
 	fadd	f2 f0 f7
 	jump	L_calc_dirvec_2340
 L_calc_dirvecs_2348 : 
-	bp	3 1
 	add	r8 r0 r5
 	fadd	f5 f0 f2
 	bgt	r0 r4 L_else_14612
@@ -11414,7 +11347,6 @@ L_else_14612 :
 	add	r4 r0 r5
 	return
 L_calc_dirvec_rows_2353 : 
-	bp	3 0
 	add	r9 r0 r6
 	add	r6 r0 r5
 	add	r5 r0 r4
@@ -11488,7 +11420,6 @@ L_else_14618 :
 	add	r4 r0 r7
 	return
 L_create_dirvec_elements_2359 : 
-	bp	2 0
 	add	r6 r0 r5
 	add	r7 r0 r4
 	bgt	r0 r6 L_else_14629
@@ -11638,7 +11569,6 @@ L_else_14629 :
 	add	r4 r0 r8
 	return
 L_create_dirvecs_2362 : 
-	bp	1 0
 	add	r8 r0 r4
 	bgt	r0 r8 L_else_14638
 	addi	r6 r0 32820
@@ -11943,7 +11873,6 @@ L_else_14638 :
 	add	r4 r0 r9
 	return
 L_init_dirvec_constants_2364 : 
-	bp	2 0
 	add	r6 r0 r5
 	add	r13 r0 r4
 	bgt	r0 r6 L_else_14643
@@ -12178,7 +12107,6 @@ L_else_14643 :
 	add	r4 r0 r12
 	return
 L_init_vecset_constants_2367 : 
-	bp	1 0
 	add	r12 r0 r4
 	bgt	r0 r12 L_else_14668
 	addi	r4 r0 32820
@@ -12521,7 +12449,6 @@ L_else_14668 :
 	add	r4 r0 r13
 	return
 min_caml_start : 
-	bp	0 0
 	addi	r6 r0 128
 	addi	r5 r0 128
 	addi	r4 r0 32802
