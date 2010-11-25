@@ -64,9 +64,9 @@
 	sti	r0 r0 4150
 	sti	r0 r0 4151
 	sti	r0 r0 4152
-	fldi	f2 L_fid255_8691 0
+	fldi	f2 r0 57
 	fsti	f2 r0 4153
-	fldi	f2 L_fid10_0_8692 0
+	fldi	f2 r0 58
 	fsti	f2 r0 4154
 	addi	r4 r0 4205
 	sti	r4 r0 4155

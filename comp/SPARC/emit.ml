@@ -289,7 +289,7 @@ let f oc foc istest memext memin memout memsp memhp floffset (Prog(fl, fundefs, 
   let lmain = Id.genid "main" in
   let fid255 = Id.genid "fid255" in
   let fid10_0 = Id.genid "fid10_0" in
-  let fli = Array.of_list fl in
+  let fli = Array.of_list (fl @ [Id.L fid255, 255.0; Id.L fid10_0, 1000000000.0]) in
     printf "fp table size is %d\n" (Array.length fli);
     let ear = Array.make 1006 0 in      
     let ear = 
