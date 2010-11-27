@@ -257,8 +257,7 @@ begin
     clk, ist_set, ready, unit_REG, op_REG(0), data_recv, rd_finish,
     rd_port, data_rd);
 
-  iof1: iof port map (
-    clk, op_REG(0), unit_REG, data1, unit_iof, data_iof);
+  iof1: iof port map (clk, op_REG(0), unit_REG, data1, unit_iof, data_iof);
   
   sram_sim1: sram_sim port map (clk, mem_rw_set, addr, data3, data_ld);
 

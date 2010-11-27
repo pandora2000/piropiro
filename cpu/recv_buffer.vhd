@@ -7,7 +7,6 @@ entity recv_buffer is
     clk       : in std_logic;
     ist_set   : in std_logic;
     ready     : in std_logic;
-    missprd   : in std_logic;
     unit      : in std_logic_vector(2 downto 0);
     r_or_f    : in std_logic;
     data_in   : in std_logic_vector(31 downto 0);
@@ -24,7 +23,6 @@ architecture behavior of recv_buffer is
   signal head       : std_logic_vector(8 downto 0) := (others => '0');
   signal tail       : std_logic_vector(8 downto 0) := (others => '0');
   signal valid, go  : std_logic := '0';
-  signal missprd0   : std_logic;
   signal rd_finish0 : std_logic;
   signal r_or_f0    : std_logic;
   
@@ -40,24 +38,21 @@ begin
       if rd_finish0 = '1' then
         tail <= tail + 1;
       end if;
-      if unit = "101" and missprd0 = '0' and rd_finish0 = '0' then
+      if unit = "101" and rd_finish0 = '0' then
         go <= '1';
         r_or_f0 <= r_or_f;
       elsif head /= tail then
         go <= '0';
       end if;
-      missprd0 <= missprd;
     end if;
   end process;
 
   data_out <= ram(conv_integer(tail));
 
-  rd_finish0 <= '1' when head /= tail and 
-                         ((unit = "101" and missprd0 = '0') or go = '1') else
+  rd_finish0 <= '1' when head /= tail and (unit = "101" or go = '1') else
                 '0';
 
-  rd_port <= '0' & rd_finish0 when (r_or_f = '0' and 
-                                    unit = "101" and missprd0 = '0') or 
+  rd_port <= '0' & rd_finish0 when (r_or_f = '0' and unit = "101") or 
                                    (r_or_f0 = '0' and go = '1') else
              rd_finish0 & '0'; 
 

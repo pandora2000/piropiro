@@ -7,9 +7,8 @@ entity iof is
     clk      : in std_logic;
     r_or_f   : in std_logic;
     unit     : in std_logic_vector(2 downto 0);
-    missprd  : in std_logic;
     data     : in std_logic_vector(31 downto 0);
-    unitmiss : out std_logic_vector(3 downto 0);
+    unit_out : out std_logic_vector(2 downto 0);
     result   : out std_logic_vector(7 downto 0));
 end iof;
 
@@ -24,8 +23,7 @@ architecture behavior of iof is
   signal ou0, ou1, ou2     : std_logic_vector(1 downto 0);
   signal data1, data2      : std_logic_vector(7 downto 0);
   signal r_or_f1, r_or_f2  : std_logic;
-  signal missprd0          : std_logic;
-  signal unitmiss0         : std_logic_vector(3 downto 0);
+  signal unit0             : std_logic_vector(2 downto 0);
   signal result0           : std_logic_vector(8 downto 0);
   
   component bshifter_l_iof
@@ -54,8 +52,7 @@ begin
       int_ss1 <= int_ss0;
       r_or_f1 <= r_or_f;
       data1 <= data(7 downto 0);
-      unitmiss0 <= unit & missprd0;
-      missprd0 <= missprd;
+      unit0 <= unit;
     end if;
   end process;
 
@@ -71,7 +68,7 @@ begin
       int_s2 <= int_s1;
       r_or_f2 <= r_or_f1;
       data2 <= data1;
-      unitmiss <= unitmiss0;
+      unit_out <= unit0;
     end if;
   end process;
 

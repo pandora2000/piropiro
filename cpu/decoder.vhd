@@ -11,7 +11,7 @@ entity decoder is
     dst                : out std_logic_vector(4 downto 0);
     imm                : out std_logic_vector(15 downto 0);
     rf                 : out std_logic_vector(7 downto 0);
-    reg_w              : out std_logic_vector(15 downto 0);
+    reg_w              : out std_logic_vector(11 downto 0);
     mem_rw, reg_or_imm : out std_logic;
     isbrc, isret       : out std_logic;
     isjump, iscall     : out std_logic);
@@ -72,13 +72,13 @@ begin
                               ist(31 downto 28) = "1001" else  --fbrc
                     "00";
 
-  reg_w <= x"0000" when ist(31 downto 26) = "000000" or   -- nop命令
-                        ist(31 downto 27) = "00010" else  -- output
-           x"0010" when ist(31 downto 30) = "00" else     -- ALU
-           x"2000" when ist(31 downto 27) = "01100" else  -- load命令
-           x"8000" when ist(31 downto 27) = "01110" else  -- fload命令
-           x"4000" when ist(31 downto 29) = "010" else    -- FFPU命令
-           x"0000";
+  reg_w <= x"000" when ist(31 downto 26) = "000000" or   -- nop命令
+                       ist(31 downto 27) = "00010" else  -- output
+           x"001" when ist(31 downto 30) = "00" else     -- ALU
+           x"200" when ist(31 downto 27) = "01100" else  -- load命令
+           x"800" when ist(31 downto 27) = "01110" else  -- fload命令
+           x"400" when ist(31 downto 29) = "010" else    -- FFPU命令
+           x"000";
 
   reg_or_imm <= ist(29) when ist(31 downto 30) = "00" else
                 ist(26) when ist(31 downto 29) = "011" else

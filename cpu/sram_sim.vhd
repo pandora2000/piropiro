@@ -13,7 +13,8 @@ end sram_sim;
 architecture behavior of sram_sim is
 
   type ram_t is array (0 to 31) of std_logic_vector (31 downto 0);
-  signal ram : ram_t;
+  signal ram : ram_t := (0 => x"3F800000",
+                         others => x"00000000");
   
   signal xw0, xw1               : std_logic := '1';
   signal addr_tmp, addr0, addr1 : std_logic_vector(4 downto 0);

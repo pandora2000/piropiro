@@ -5,7 +5,7 @@ use ieee.std_logic_unsigned.all;
 entity send_buffer is
   port (
     clk      : in std_logic;
-    unitmiss : in std_logic_vector(3 downto 0);
+    unit     : in std_logic_vector(2 downto 0);
     send_cmt : in std_logic;
     data_in  : in std_logic_vector(7 downto 0);
     busy     : out std_logic;
@@ -26,7 +26,7 @@ begin
   write_read: process (clk)
   begin 
     if rising_edge(clk) then
-      if unitmiss = "1000" then
+      if unit = "100" then
         ram(conv_integer(head)) <= data_in;
         head <= head + 1;
       end if;

@@ -33,16 +33,16 @@ end ID_stage;
 architecture behavior of ID_stage is
 
   -- destinationを格納するシフトレジスタ
-  signal ffpu_reg : std_logic_vector(19 downto 0) := (others => '0');
+  signal ffpu_reg : std_logic_vector(14 downto 0) := (others => '0');
   signal sfpu_reg : std_logic_vector(4 downto 0) := (others => '0');
-  signal alu_reg  : std_logic_vector(9 downto 0) := (others => '0');
-  signal ld_reg   : std_logic_vector(27 downto 0) := (others => '0');
+  signal alu_reg  : std_logic_vector(4 downto 0) := (others => '0');
+  signal ld_reg   : std_logic_vector(20 downto 0) := (others => '0');
   signal rd_reg   : std_logic_vector(6 downto 0) := (others => '0');
   
   -- レジスタ書き込みポート、メモリ読み書き、分岐命令を保持するシフトレジスタ
-  signal reg_w_reg   : std_logic_vector(15 downto 0) := (others => '0');
-  signal mem_rw_reg  : std_logic_vector(1 downto 0) := (others => '1');
-  signal brc_reg     : std_logic_vector(1 downto 0) := (others => '0');
+  signal reg_w_reg   : std_logic_vector(11 downto 0) := (others => '0');
+  signal mem_rw_reg  : std_logic := '1';
+  signal brc_reg     : std_logic := '0';
 
   signal raw       : std_logic;
   signal waw       : std_logic;
@@ -62,7 +62,7 @@ architecture behavior of ID_stage is
       dst                : out std_logic_vector(4 downto 0);
       imm                : out std_logic_vector(15 downto 0);
       rf                 : out std_logic_vector(7 downto 0);
-      reg_w              : out std_logic_vector(15 downto 0);
+      reg_w              : out std_logic_vector(11 downto 0);
       mem_rw, reg_or_imm : out std_logic;
       isbrc, isret       : out std_logic;
       isjump, iscall     : out std_logic);
@@ -74,7 +74,7 @@ architecture behavior of ID_stage is
   signal op               : std_logic_vector(2 downto 0);
   signal imm              : std_logic_vector(15 downto 0);
   signal reg_or_imm       : std_logic;
-  signal reg_w            : std_logic_vector(15 downto 0);
+  signal reg_w            : std_logic_vector(11 downto 0);
   signal mem_rw           : std_logic;
   signal isbrc            : std_logic;
   signal isret            : std_logic;
@@ -140,17 +140,13 @@ begin
 
   -- istと先行のWAW
   waw <= '1' when (rf(7 downto 6) /= 0 and
-                   (rf(7 downto 6) & dst = ld_reg(27 downto 21) or
-                    rf(7 downto 6) & dst = ld_reg(20 downto 14) or
+                   (rf(7 downto 6) & dst = ld_reg(20 downto 14) or
                     rf(7 downto 6) & dst = ld_reg(13 downto 7) or
                     rf(7 downto 6) & dst = ld_reg(6 downto 0) or 
                     rf(7 downto 6) & dst = rd_reg)) or
-                    (rf(7 downto 6) = "01" and 
-                     (dst = alu_reg(9 downto 5) or
-                      dst = alu_reg(4 downto 0))) or
+                    (rf(7 downto 6) = "01" and dst = alu_reg) or
                     (rf(7 downto 6) = "10" and
                      (dst = sfpu_reg or
-                      dst = ffpu_reg(19 downto 15) or
                       dst = ffpu_reg(14 downto 10) or
                       dst = ffpu_reg(9 downto 5) or
                       dst = ffpu_reg(4 downto 0))) else
@@ -158,47 +154,35 @@ begin
 
   -- istと先行のRAW
   raw <= '1' when (src1 /= 0 and
-                   (rf(5 downto 4) & src1 = ld_reg(27 downto 21) or
-                    rf(5 downto 4) & src1 = ld_reg(20 downto 14) or
+                   (rf(5 downto 4) & src1 = ld_reg(20 downto 14) or
                     rf(5 downto 4) & src1 = ld_reg(13 downto 7) or
                     rf(5 downto 4) & src1 = ld_reg(6 downto 0) or 
                     rf(5 downto 4) & src1 = rd_reg or
-                    (rf(5 downto 4) = "01" and
-                     (src1 = alu_reg(9 downto 5) or
-                      src1 = alu_reg(4 downto 0))) or
+                    (rf(5 downto 4) = "01" and src1 = alu_reg) or
                     (rf(5 downto 4) = "10" and
                       (src1 = sfpu_reg or
-                       src1 = ffpu_reg(19 downto 15) or
                        src1 = ffpu_reg(14 downto 10) or
                        src1 = ffpu_reg(9 downto 5) or
                        src1 = ffpu_reg(4 downto 0))))) or
                     (src2 /= 0 and 
-                     (rf(3 downto 2) & src2 = ld_reg(27 downto 21) or
-                      rf(3 downto 2) & src2 = ld_reg(20 downto 14) or
+                     (rf(3 downto 2) & src2 = ld_reg(20 downto 14) or
                       rf(3 downto 2) & src2 = ld_reg(13 downto 7) or
                       rf(3 downto 2) & src2 = ld_reg(6 downto 0) or 
                       rf(3 downto 2) & src2 = rd_reg or
-                      (rf(3 downto 2) = "01" and 
-                       (src2 = alu_reg(9 downto 5) or
-                        src2 = alu_reg(4 downto 0))) or
+                      (rf(3 downto 2) = "01" and src2 = alu_reg) or
                       (rf(3 downto 2) = "10" and 
                        (src2 = sfpu_reg or
-                        src2 = ffpu_reg(19 downto 15) or
                         src2 = ffpu_reg(14 downto 10) or
                         src2 = ffpu_reg(9 downto 5) or
                         src2 = ffpu_reg(4 downto 0))))) or
                      (src3 /= 0 and 
-                      (rf(1 downto 0) & src3 = ld_reg(27 downto 21) or
-                       rf(1 downto 0) & src3 = ld_reg(20 downto 14) or
+                      (rf(1 downto 0) & src3 = ld_reg(20 downto 14) or
                        rf(1 downto 0) & src3 = ld_reg(13 downto 7) or
                        rf(1 downto 0) & src3 = ld_reg(6 downto 0) or 
                        rf(1 downto 0) & src3 = rd_reg or
-                       (rf(1 downto 0) = "01" and 
-                        (src3 = alu_reg(9 downto 5) or
-                         src3 = alu_reg(4 downto 0))) or
+                       (rf(1 downto 0) = "01" and src3 = alu_reg) or
                        (rf(1 downto 0) = "10" and 
                         (src3 = sfpu_reg or
-                         src3 = ffpu_reg(19 downto 15) or
                          src3 = ffpu_reg(14 downto 10) or
                          src3 = ffpu_reg(9 downto 5) or
                          src3 = ffpu_reg(4 downto 0))))) else
@@ -207,39 +191,50 @@ begin
   shift_reg_w_reg: process (clk)
   begin 
     if rising_edge(clk) then 
-      if missprd = '1' then                 -- missprd
-        reg_w_reg <= x"00" & reg_w_reg(11 downto 4);
+      if missprd = '1' then            -- missprd
+        reg_w_reg <= x"00" & reg_w_reg(7 downto 4);
       elsif nop = '1' then             -- stall
-        reg_w_reg <= x"0" & reg_w_reg(15 downto 4);
+        reg_w_reg <= x"0" & reg_w_reg(11 downto 4);
       else 
-        reg_w_reg <= reg_w or (x"0" & reg_w_reg(15 downto 4));
+        reg_w_reg <= reg_w or (x"0" & reg_w_reg(11 downto 4));
       end if;
     end if;
   end process;
 
+  set_reg_w_set: process (clk)
+  begin 
+    if rising_edge(clk) then 
+      if missprd = '1' then  -- ALU命令はreg_w_regでクリアできない
+        reg_w_set <= reg_w_reg(3 downto 0) and "1110";
+      else
+        reg_w_set <= reg_w_reg(3 downto 0); 
+      end if;
+    end if;
+  end process;
+        
   shift_dst_reg: process (clk)
   begin 
     if rising_edge(clk) then
       if missprd = '1' then
-        alu_reg <= "0000000000";
+        alu_reg <= "00000";
       elsif unit = "001" and nop = '0' then
-        alu_reg <= dst & alu_reg(9 downto 5);
+        alu_reg <= dst;
       else
-        alu_reg <= "00000" & alu_reg(9 downto 5);
+        alu_reg <= "00000";
       end if;
       if missprd = '1' then
-        ffpu_reg <= "0000000000" & ffpu_reg(14 downto 5);
+        ffpu_reg <= "0000000000" & ffpu_reg(9 downto 5);
       elsif unit = "010" and nop = '0' then
-        ffpu_reg <= dst & ffpu_reg(19 downto 5);
+        ffpu_reg <= dst & ffpu_reg(14 downto 5);
       else
-        ffpu_reg <= "00000" & ffpu_reg(19 downto 5);
+        ffpu_reg <= "00000" & ffpu_reg(14 downto 5);
       end if;
       if missprd = '1' then
-        ld_reg <= "00000000000000" & ld_reg(20 downto 7);
+        ld_reg <= "00000000000000" & ld_reg(13 downto 7);
       elsif unit = "110" and nop = '0' then
-        ld_reg <= rf(7 downto 6) & dst & ld_reg(27 downto 7);
+        ld_reg <= rf(7 downto 6) & dst & ld_reg(20 downto 7);
       else
-        ld_reg <= "0000000" & ld_reg(27 downto 7);
+        ld_reg <= "0000000" & ld_reg(20 downto 7);
       end if;
       if sfpu_finish = '1' or (sfpu_go = '1' and missprd = '1') then
         sfpu_reg <= "00000";
@@ -254,15 +249,37 @@ begin
     end if;
   end process;
 
+  set_dst_reg: process (clk)
+  begin 
+    if rising_edge(clk) then
+      dst_alu <= alu_reg;
+      dst_ffpu <= ffpu_reg(4 downto 0);
+      dst_ld <= ld_reg(4 downto 0);
+      dst_sfpu <= sfpu_reg;
+      dst_rd <= rd_reg(4 downto 0);
+    end if;
+  end process;
+
   shift_mem_rw_reg: process (clk)
   begin 
     if rising_edge(clk) then 
       if missprd = '1' then
-        mem_rw_reg <= "11";
+        mem_rw_reg <= '1';
       elsif unit = "110" and nop = '0' then
-        mem_rw_reg <= mem_rw & mem_rw_reg(1);
+        mem_rw_reg <= mem_rw;
       else
-        mem_rw_reg <= '1' & mem_rw_reg(1);
+        mem_rw_reg <= '1';
+      end if;
+    end if;
+  end process;
+
+  set_mem_rw_set: process (clk)
+  begin 
+    if rising_edge(clk) then 
+      if missprd = '1' then
+        mem_rw_set <= '1';
+      else
+        mem_rw_set <= mem_rw_reg;
       end if;
     end if;
   end process;
@@ -271,11 +288,22 @@ begin
   begin 
     if rising_edge(clk) then
       if missprd = '1' then
-        brc_reg <= "00";
+        brc_reg <= '0';
       elsif isbrc = '1' and nop = '0' then
-        brc_reg <= '1' & brc_reg(1);
+        brc_reg <= '1';
       else
-        brc_reg <= '0' & brc_reg(1);  
+        brc_reg <= '0';  
+      end if;
+    end if;
+  end process;
+
+  set_isbrc_out: process (clk)
+  begin 
+    if rising_edge(clk) then 
+      if missprd = '1' then
+        isbrc_out <= '0';
+      else
+        isbrc_out <= brc_reg;
       end if;
     end if;
   end process;
@@ -323,16 +351,6 @@ begin
       end if;
     end if;
   end process;
-  
-  reg_w_set <= reg_w_reg(3 downto 0);        -- register write enable
-  mem_rw_set <= mem_rw_reg(0);               -- memory write enable
-  isbrc_out <= brc_reg(0);
-
-  dst_alu <= alu_reg(4 downto 0);   -- alu port
-  dst_ld <= ld_reg(4 downto 0);     -- load port
-  dst_ffpu <= ffpu_reg(4 downto 0); -- ffpu port
-  dst_sfpu <= sfpu_reg;
-  dst_rd <= rd_reg(4 downto 0);
 
   to_REG: process (clk)
   begin 
