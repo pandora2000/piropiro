@@ -17,6 +17,8 @@
 #define  ACSESS_GOOD 0
 #define  ACSESS_BAD -1
 
+
+
 typedef struct {
   char name[NAME_MAX_COUNT][NAME_SIZE];
 } instruction;
@@ -233,6 +235,11 @@ stack cistack = { 0 };
 
 #define MEMORY_SIZE 1000000
 
+#define POW_2_15 32768
+#define POW_2_25 33554432
+
+
+
 union umemory {
   int i;
   float d;
@@ -251,8 +258,42 @@ int check_memory(int num)
   return ACSESS_BAD;
 }
 
+/*即値が16bit以内(-32768~32767)以内に入っているかどうか確かめる。
+間違っていたら、error表示をしてexitする。*/
+void check_sokuti(int num){
+  if( - POW_2_15 <= num && num < POW_2_15){
+    return;
+  }
+  printf("error:sokkuti over 16bit:%d\n",num);
+  exit(1);
+  return;
+}
+
+/*ジャンプ即値が26bit以内に入っているかどうか確かめる。
+間違っていたら、error表示をしてexitする。*/
+void check_jump(int num){
+  if( - POW_2_25 <= num && num < POW_2_25){
+    return;
+  }
+  printf("error:jump sokkuti over 26bit:%d\n",num);
+  exit(1);
+  return;
+}
+
+int atoi_and_check(char *str){
+  int temp = atoi(str);
+  check_sokuti(temp);
+  return temp;
+}
+
+int atoi_and_check_jump(char *str){
+  int temp = atoi(str);
+  check_jump(temp);
+  return temp;
+}
+
 /*print系*/
-print_memory()
+void print_memory()
 {
   int i;
 
@@ -310,7 +351,7 @@ int new_label_trans(char *label, program * program)
       || label[0] == '2' || label[0] == '3' || label[0] == '4'
       || label[0] == '5' || label[0] == '6' || label[0] == '7'
       || label[0] == '8' || label[0] == '9') {
-    return atoi(label);
+    return atoi_and_check(label);
   }
   /*label */
   /*特殊ラベル*/
@@ -338,7 +379,7 @@ int label_trans(char *label, program * program)
       || label[0] == '2' || label[0] == '3' || label[0] == '4'
       || label[0] == '5' || label[0] == '6' || label[0] == '7'
       || label[0] == '8' || label[0] == '9') {
-    return atoi(label);
+    return atoi_and_check_jump(label);
   }
   /*label */
   for (i = 0; i < program->label_count; i++) {
@@ -362,7 +403,7 @@ int label_trans_soutai(char *label, program * program, int nowpc)
       || label[0] == '2' || label[0] == '3' || label[0] == '4'
       || label[0] == '5' || label[0] == '6' || label[0] == '7'
       || label[0] == '8' || label[0] == '9') {
-    return atoi(label);
+    return atoi_and_check(label);
   }
   /*label */
   for (i = 0; i < program->label_count; i++) {
@@ -469,8 +510,8 @@ int null_cal(char *null)
 
 
 #define PARSE_INST_1(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_regi,int_of_regi,int_of_regi)
-#define PARSE_INST_2(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_regi,int_of_regi,atoi)
-#define PARSE_INST_9(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_fregi,int_of_regi,atoi)
+#define PARSE_INST_2(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_regi,int_of_regi,atoi_and_check)
+#define PARSE_INST_9(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_fregi,int_of_regi,atoi_and_check)
 #define PARSE_INST_3(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_fregi,int_of_fregi,int_of_fregi)
 #define PARSE_INST_4(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_fregi,int_of_fregi,null_cal)
 
@@ -494,7 +535,7 @@ int null_cal(char *null)
 #define PARSE_INST_7(INST,INST_NUM)					\
   else if(strcmp(iname,INST) == 0){					\
     answer -> insts[i].name[0] = INST_NUM;				\
-    answer -> insts[i].name[1] = new_label_trans(ist.name[1],program);	\
+    answer -> insts[i].name[1] = label_trans(ist.name[1],program);	\
   }
 
 #define PARSE_INST_8(INST,INST_NUM)             \
@@ -610,7 +651,7 @@ program2 *parse_all2(program * program)
 
 #define DO_INST_1(INST_NUM,OP)						\
   else if(iname == INST_NUM){						\
-    regist[ist.name[1]] = regist[ist.name[2]] OP regist[ist.name[3]];	\
+     regist[ist.name[1]]  = regist[ist.name[2]] OP regist[ist.name[3]];	\
   }
 
 long long counter = 0;
@@ -708,11 +749,15 @@ int do_assemble2(program *program, program2 * program2)
   int count = 0;
   int firstflag = 1;
   int printflag  = 0;
+<<<<<<< HEAD:sim/fastsim.c
+  int temp;
+=======
   int icount[100] = { 0 };
   int callpc = -1;
   static int callcount[50000] = { 0 };
   static int funcsize[50000] = { 0 };
   char *p;
+>>>>>>> 318a64eed5438dcc53e3df089b90003bcb7bf750:sim/fastsim.c
   
   while (1) {
     pc = nextpc;

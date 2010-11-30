@@ -30,15 +30,17 @@ architecture behavior of fdiv is
   signal zero           : std_logic;
   
 begin 
- 
+ --分岐の為？？
   missprd_test: process (clk)
   begin 
     if rising_edge(clk) then 
       missprd0 <= missprd;
     end if;
   end process;
-  
-  nd <= (not dr) + 1;
+
+  --goldシュミット法
+  --五回反復箇所
+  nd <= (not dr) + 1; 
   mul1 <= dr * nd;
   mul2 <= zr * nd;                         
 
@@ -48,13 +50,13 @@ begin
     if rising_edge(clk) then
       if count1 = 0 then
         if unit = "011" and missprd0 = '0' then 
-          dr <= "01" & data2(22 downto 0) & "00000";
+          dr <= "01" & data2(22 downto 0) & "00000";  --dataの取得 3にするかも、１にするかも
           zr <= "01" & data1(22 downto 0) & "00000";
-          data1s <= data1(31 downto 23);
+          data1s <= data1(31 downto 23);  -- 指数部の保存
           data2s <= data2(31 downto 23);
-          count1 <= "101";
+          count1 <= "101";              --カウンタ
           if data1(30 downto 0) = 0 then
-            zero <= '1';
+            zero <= '1';                --ゼロは特殊扱い
           else
             zero <= '0';
           end if;
@@ -71,6 +73,7 @@ begin
     end if;
   end process;
 
+  --丸めなど
   man_s <= ('0' & q(25 downto 2)) + q(1) when q(25) = '1' else 
            ('0' & q(24 downto 1)) + q(0);
 

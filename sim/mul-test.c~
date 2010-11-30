@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <math.h>
+
+
+unsigned int trans_char_to_unsigned(char *str){
+  unsigned int answer = 0;
+  int i;
+  for(i = 0;i<32;i++){
+    if(str[i] == '1'){
+      answer = answer + pow(2,(31-i));
+    }
+  }
+  return answer;
+}
+
+
+void trans_unsigned_to_char(unsigned int num,char *str){
+  int i;
+  for(i=0;i<32;i++){
+    if(num % 2 == 1){
+      str[31-i] = '1';
+    }
+    else{
+      str[31-i] = '0';
+    }
+    num = num /2;
+  }
+  str[32] = '\0';
+  return;
+}
+
+int main(){
+  FILE *input_fp;
+  FILE *output_fp;
+  char buf1_c[33];
+  char buf2_c[33];
+  char answer_c[33];
+  char my_answer_c[33];
+  unsigned int buf1,buf2;
+  
+  input_fp = fopen("fmul-result.txt","r");
+  output_fp = fopen("fmul-result2.txt","w");
+
+
+
+
+  if(fscanf(input_fp,"%s",buf1_c) == EOF){
+    printf("file end\n");
+    exit(1);
+  }
+  fscanf(input_fp,"%s",buf2_c);
+  fscanf(input_fp,"%s",answer_c);
+  
+  buf1 = trans_char_to_unsigned(buf1_c);
+  buf2 = trans_char_to_unsigned(buf2_c);
+
+  trans_unsigned_to_char(buf1,buf1_c);  
+  trans_unsigned_to_char(buf2,buf2_c);  
+
+  my_answer = buf1 * buf2;
+  trans_unsigned_to_char(my_answer->result,my_answer_c);
+  
+  fprintf(output_fp,"%s\n",buf1_c);
+  fprintf(output_fp,"%s\n",buf2_c);
+  
+
+  while(1){
+    if(fscanf(input_fp,"%s",buf1_c) == EOF){
+      printf("file end\n");
+      break;
+    }
+    fscanf(input_fp,"%s",buf2_c);
+    fscanf(input_fp,"%s",answer_c);
+
+    buf1 = trans_char_to_unsigned(buf1_c);
+    buf2 = trans_char_to_unsigned(buf2_c);
+
+    my_answer = buf1 * buf2;
+    trans_unsigned_to_char(my_answer->result,my_answer_c);
+    
+    fprintf(output_fp,"%s\n",my_answer_c);
+    fprintf(output_fp,"%s\n",buf1_c);
+    fprintf(output_fp,"%s\n",buf2_c);
+  }
+
+  fclose(input_fp);
+  fclose(output_fp);
+
+  return 1;
+
+
+}

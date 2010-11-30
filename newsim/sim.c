@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include "fdiv.h"
+#include "fmul.h"
 
 #define NAME_MAX_COUNT 4
 #define NAME_SIZE 40
@@ -234,7 +235,10 @@ union umemory {
 
 union umemory memory[MEMORY_SIZE];
 
-
+union ubuff {
+  unsigned int i;
+  float f;
+};
 
 /*メモリーの範囲内をアクセスしているか調べる*/
 int check_memory(int num)
@@ -521,6 +525,7 @@ program2 *parse_all2(program * program)
   instruction ist;
   char *arg1, *arg2, *arg3;
 
+
   answer = malloc(sizeof(program2));
   answer->inst_count = program->inst_count;
 
@@ -642,6 +647,7 @@ int do_assemble2(program *program, program2 * program2)
   int count = 0;
   int firstflag = 1;
   int printflag  = 0;
+  union ubuff op1,op2,op3;
   
   while (1) {
     pc = nextpc;
@@ -660,7 +666,6 @@ int do_assemble2(program *program, program2 * program2)
 
     /*
       ++counter;
-
       if(counter > 575600 && counter < 575719)
       {
       print_label_from_index(program, pc);
@@ -713,13 +718,18 @@ int do_assemble2(program *program, program2 * program2)
       freg[ist.name[1]] = freg[ist.name[2]] - freg[ist.name[3]];
     }
     else if (iname == 17) {
-      freg[ist.name[1]] = freg[ist.name[2]] * freg[ist.name[3]];
+      op1.f = freg[ist.name[2]];
+      op2.f = freg[ist.name[3]];
+      fmul(op1.i,op2.i);
+      op3.i = fmul(op1.i,op2.i);
+      freg[ist.name[1]] = op3.f;
+      //freg[ist.name[1]] = freg[ist.name[2]] * freg[ist.name[3]];
     }
     else if (iname == 18) {
       freg[ist.name[1]] = fdiv(freg[ist.name[2]],freg[ist.name[3]]);
     }
     else if (iname == 19) {
-      freg[ist.name[1]] = 1 / freg[ist.name[2]];
+      freg[ist.name[1]] = fdiv(1,freg[ist.name[2]]);
     }
     else if (iname == 20) {
       freg[ist.name[1]] = sqrt(freg[ist.name[2]]);

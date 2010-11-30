@@ -1,0 +1,28 @@
+#include "fmul.h"
+
+
+
+fmul_result * fmul(unsigned int clk,unsigned int data1,unsigned int data2){
+static unsigned int sign0,sign1,over,sign2,exp,exp1_1,exp1_2,exp2_2,mul0,mul1,sticky,diff,round1,round2,man_s1,man_s2,zero0,zero1,zero2;
+
+  sign0 = (data1 >> 31) ^ (data2 >> 31);
+
+  mul0 = (((data1 << 9) >> 9) & 0x00800000) * (((data2 << 9) >> 9) & 0x00800000);
+
+  if(data0 == 0 || data1 == 0){
+    rero0 = 0x00000001;
+  }else{
+    rero0 = 0x00000000;
+  }
+
+  if(clk == 0x00000001){
+    sign1 = sign0;
+    mul1 = mul0;
+    exp1_1 = data1 >> 23;
+    exp2_1 = data2 >> 23;
+    zero1 = zero0;
+
+
+
+
+}

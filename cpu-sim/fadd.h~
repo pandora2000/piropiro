@@ -1,0 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+unsigned int  fmul(unsigned int op,unsigned int f_in1,unsigned int f_in2);
