@@ -1,2 +1,2 @@
-opt.cmo: type.cmo id.cmo closure.cmi 
-opt.cmx: type.cmx id.cmx closure.cmx 
+opt.cmo: optt.cmo loop.cmo 
+opt.cmx: optt.cmx loop.cmx 

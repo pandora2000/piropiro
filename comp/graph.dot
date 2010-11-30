@@ -1,0 +1,5 @@
+digraph raytrace_main {
+	graph [ranksep = 0.35, nodesep = 0.25]
+	node [shape = box, fontname = "ARIAL", fontsize = 10, height = 0.15]
+	edge [fontsize = 8, arrowsize = 0.5]
+}

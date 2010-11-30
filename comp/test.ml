@@ -1,3 +1,9 @@
-let rec fact x = if x = 1 then 1 else (x + (fact (x - 1))) in
-  (print_int 3;
-   print_int 4;)
+let rec ponyo x =
+  let puro =
+    if 1 = 1 then ()
+    else if 2 = 2 then
+      if 3 = 3 then () else ()
+    else if 4 = 4 then () else () in
+    read_int puro in
+  ponyo 30
+    

@@ -3,10 +3,11 @@
 module M =
   Map.Make
     (struct
-      type t = Id.t
+      type t = string
       let compare = compare
     end)
 include M
 
 let add_list xys env = List.fold_left (fun env (x, y) -> add x y env) env xys
 let add_list2 xs ys env = List.fold_left2 (fun env x y -> add x y env) env xs ys
+let union env1 env2 = fold (fun x y env -> add x y env) env1 env2

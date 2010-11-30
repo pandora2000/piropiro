@@ -61,23 +61,6 @@ let extlist =
   ]
 
 let lexbuf outchan foutchan boutchan a = (* バッファをコンパイルしてチャンネルへ出力する (caml2html: main_lexbuf) *)
-  (*  Id.counter := 0;
-      Typing.extenv := M.empty;
-      let p = Emit.f
-      (RegAlloc.f
-      (Virtual.f
-      (Closure.f
-      (iter !limit
-      (Alpha.f
-      (KNormal.f
-      (Typing.f
-      (Parser.exp Lexer.token l)))))))) in
-      output_string stdout (prep (Emit.string_of_alist p));
-      print_newline ();
-      output_string stdout (Emit.string_of_flist p);
-      print_newline ();
-      output_string stdout (Emit.string_of_binary p)
-  *)			    
   Id.counter := 0;
   Typing.extenv := M.empty;
   let al = (List.map (fun (x, y) -> ("min_caml_" ^ x, y)) extlist) in
@@ -87,47 +70,63 @@ let lexbuf outchan foutchan boutchan a = (* バッファをコンパイルしてチャンネルへ
   let d = Alpha.f c in
   let e = iter !limit d in
   let f = Closure.f e in
+(*  let outchan2 = open_out "b.s" in*)
+(*  let pp = Opt.f outchan foutchan f in*)
   let g = Virtual.f memin memout memext al f in
   let h = RegAlloc.f g in
+(*  let goc = open_out "graph.dot" in
+    Graph.f goc f;
+    close_out goc;*)
     (*
       Closure.print_prog stdout f;
       KNormal.print_prog stdout e;
       Asm.print_prog stdout g;
       Asm.print_prog stdout h;
     *)
-  let i = Emit.f outchan foutchan !istest memext memin memout memsp memhp floffset h in
+    Emit.f outchan foutchan !istest memext memin memout memsp memhp floffset h;
+(*    close_out outchan2;*)
+    (*
+      let dvir = open_out "dvir" in
+      let dbcls = open_out "dbcls" in
+      let dacls = open_out "dacls" in
+      ignore (Opt.f dvir f);
+      Closure.print_prog dbcls f;
+      Closure.print_prog dacls pp;
+      close_out dvir;
+      close_out dbcls;
+      close_out dacls;
+    *)
     
-    
-(*    
-    output_string outchan (prep (Emit.string_of_alist i));
+    (*    
+	  output_string outchan (prep (Emit.string_of_alist i));
 
-    output_string foutchan (Emit.string_of_flist i);
-*)
-(*
-  output_string boutchan (Emit.string_of_binary i);
-*)
+	  output_string foutchan (Emit.string_of_flist i);
+    *)
+    (*
+      output_string boutchan (Emit.string_of_binary i);
+    *)
     
-(*    
-      output_string stdout j;
-*)
-      (*
+    (*    
+	  output_string stdout j;
+    *)
+    (*
       print_newline ();
-	output_string stdout (sprintf "%d\n"
-      *)
+      output_string stdout (sprintf "%d\n"
+    *)
     ()
-    (*
-let string s = lexbuf stdout (Lexing.from_string s) (* 文字列をコンパイルして標準出力に表示する (caml2html: main_string) *)
-    *)
-    (*
-let file f = (* ファイルをコンパイルしてファイルに出力する (caml2html: main_file) *)
-  let inchan = open_in f in
-  let outchan = stdout in
-    try
-      lexbuf outchan (Lexing.from_channel inchan);
-      close_in inchan;
-      close_out outchan;
-    with e -> (close_in inchan; close_out outchan; raise e)
-    *)
+      (*
+	let string s = lexbuf stdout (Lexing.from_string s) (* 文字列をコンパイルして標準出力に表示する (caml2html: main_string) *)
+      *)
+      (*
+	let file f = (* ファイルをコンパイルしてファイルに出力する (caml2html: main_file) *)
+	let inchan = open_in f in
+	let outchan = stdout in
+	try
+	lexbuf outchan (Lexing.from_channel inchan);
+	close_in inchan;
+	close_out outchan;
+	with e -> (close_in inchan; close_out outchan; raise e)
+      *)
 
 
       
@@ -154,4 +153,4 @@ let () = (* ここからコンパイラの実行が開始される (caml2html: main_entry) *)
       lexbuf ofile fofile bofile q;
       close_out ofile;
       close_out fofile
-      
+	

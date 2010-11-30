@@ -11,7 +11,7 @@ let rec target' src (dest, t) = function
   | Fadd(fzreg, x) when x = src && is_reg dest ->
       assert (t = Type.Float);
       false, [dest]
-  | IfEq(_, _, e1, e2) | IfLE(_, _, e1, e2) | IfGE(_, _, e1, e2)
+  | IfEq(_, _, e1, e2) | IfLE(_, _, e1, e2)
   | IfFEq(_, _, e1, e2) | IfFLE(_, _, e1, e2) ->
       let c1, rs1 = target src (dest, t) e1 in
       let c2, rs2 = target src (dest, t) e2 in
@@ -116,17 +116,7 @@ and g'_and_restore dest cont regenv exp = (* »ÈÍÑ¤µ¤ì¤ëÊÑ¿ô¤ò¥¹¥¿¥Ã¥¯¤«¤é¥ì¥¸¥¹¥
 and g' dest cont regenv = function (* ³ÆÌ¿Îá¤Î¥ì¥¸¥¹¥¿³ä¤êÅö¤Æ (caml2html: regalloc_gprime) *)
   | Nop | Restore _ | Ri | Rf as exp ->
       (Ans(exp), regenv)
-  | Addi(p, _) | Subi(p, _) | Muli(p, _)
-  | Xori(p, _) | Nori(p, _) | Ori(p, _) | Andi(p, _) as exp when p = zreg ->
-      (Ans(exp), regenv)
       (*Add r0 rx = Addi rx 0¤ÏÆ±¤¸¤À¤¬¸å¼Ô¤Ï¤Ê¤¤¤è¤¦¤Ë¤·¤Æ¤¤¤ë¤Ï¤º*)
-  | Add(p, x) when p = zreg -> (Ans(Add(zreg, find x Type.Int regenv)), regenv)
-  | Sub(p, x) when p = zreg -> (Ans(Sub(zreg, find x Type.Int regenv)), regenv)
-  | Mul(p, x) when p = zreg -> (Ans(Mul(zreg, find x Type.Int regenv)), regenv)
-  | And(p, x) when p = zreg -> (Ans(And(zreg, find x Type.Int regenv)), regenv)
-  | Or(p, x) when p = zreg -> (Ans(Or(zreg, find x Type.Int regenv)), regenv)
-  | Xor(p, x) when p = zreg -> (Ans(Xor(zreg, find x Type.Int regenv)), regenv)
-  | Nor(p, x) when p = zreg -> (Ans(Nor(zreg, find x Type.Int regenv)), regenv)
   | Add(x, y') -> (Ans(Add(find x Type.Int regenv, find y' Type.Int regenv)), regenv)
   | Sub(x, y') -> (Ans(Sub(find x Type.Int regenv, find y' Type.Int regenv)), regenv)
   | Mul(x, y') -> (Ans(Mul(find x Type.Int regenv, find y' Type.Int regenv)), regenv)
@@ -143,6 +133,9 @@ and g' dest cont regenv = function (* ³ÆÌ¿Îá¤Î¥ì¥¸¥¹¥¿³ä¤êÅö¤Æ (caml2html: regal
   | Nori(x, y) -> (Ans(Nori(find x Type.Int regenv, y)), regenv)
   | Load(x, y) -> (Ans(Load(find x Type.Int regenv, y)), regenv)
   | Store(x, y, z) -> (Ans(Store(find x Type.Int regenv, find y Type.Int regenv, z)), regenv)
+  | Ldr(x, y) -> (Ans(Ldr(find x Type.Int regenv, find y Type.Int regenv)), regenv)
+  | Str(x, y, z) -> (Ans(Str(find x Type.Int regenv,
+			       find y Type.Int regenv, find z Type.Int regenv)), regenv)
   | Fadd(fp, x) when fp = fzreg -> (Ans(Fadd(fzreg, find x Type.Float regenv)), regenv)
   | Fsub(fp, x) when fp = fzreg -> (Ans(Fsub(fzreg, find x Type.Float regenv)), regenv)
   | Fmul(fp, x) when fp = fzreg -> (Ans(Fmul(fzreg, find x Type.Float regenv)), regenv)
@@ -156,21 +149,22 @@ and g' dest cont regenv = function (* ³ÆÌ¿Îá¤Î¥ì¥¸¥¹¥¿³ä¤êÅö¤Æ (caml2html: regal
   | Fadd(y, x) -> (Ans(Fadd(find y Type.Float regenv, find x Type.Float regenv)), regenv)
   | Fsub(y, x) -> (Ans(Fsub(find y Type.Float regenv, find x Type.Float regenv)), regenv)
   | Fmul(y, x) -> (Ans(Fmul(find y Type.Float regenv, find x Type.Float regenv)), regenv)
-      (*TODO:*)
   | Fdiv(y, x) -> (Ans(Fdiv(find y Type.Float regenv, find x Type.Float regenv)), regenv)
   | Floor(x) -> (Ans(Floor(find x Type.Float regenv)), regenv)
   | Float_of_int(x) -> (Ans(Float_of_int(find x Type.Int regenv)), regenv)
   | Fload(x, y') when (String.sub x 0 4) = "P_fd" ->
       (Ans(Fload(x, y')), regenv)
   | Fload(x, y') -> (Ans(Fload(find x Type.Int regenv, y')), regenv)
+  | Fldr(x, y') -> (Ans(Fldr(find x Type.Int regenv, find y' Type.Int regenv)), regenv)
   | Fstore(x, y, z') ->
       (Ans(Fstore(find x Type.Float regenv, find y Type.Int regenv, z')), regenv)
+  | Fstr(x, y, z') ->
+      (Ans(Fstr(find x Type.Float regenv,
+		  find y Type.Int regenv, find z' Type.Int regenv)), regenv)
   | IfEq(x, y, e1, e2) as exp -> g'_if dest cont regenv exp
       (fun e1' e2' -> IfEq(find x Type.Int regenv, find y Type.Int regenv, e1', e2')) e1 e2
   | IfLE(x, y, e1, e2) as exp -> g'_if dest cont regenv exp
       (fun e1' e2' -> IfLE(find x Type.Int regenv, find y Type.Int regenv, e1', e2')) e1 e2
-  | IfGE(x, y, e1, e2) as exp -> g'_if dest cont regenv exp
-      (fun e1' e2' -> IfGE(find x Type.Int regenv, find y Type.Int regenv, e1', e2')) e1 e2
   | IfFEq(x, y, e1, e2) as exp -> g'_if dest cont regenv exp
       (fun e1' e2' -> IfFEq(find x Type.Float regenv, find y Type.Float regenv, e1', e2')) e1 e2
   | IfFLE(x, y, e1, e2) as exp -> g'_if dest cont regenv exp

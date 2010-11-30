@@ -101,13 +101,13 @@ let rec g al info env e = (* 型推論ルーチン (caml2html: typing_g) *)
   try
     match e with
       | Info (x, y) -> g al x env y
-    | Unit -> Type.Unit
-    | Bool(_) -> Type.Bool
+      | Unit -> Type.Unit
+      | Bool(_) -> Type.Int
     | Int(_) -> Type.Int
     | Float(_) -> Type.Float
     | Not(e) ->
-	tr e info unify Type.Bool (g al dummy env e);
-	Type.Bool
+	tr e info unify Type.Int (g al dummy env e);
+	Type.Int
     | Neg(e) ->
 	tr e info unify Type.Int (g al dummy env e);
 	Type.Int
@@ -127,9 +127,9 @@ let rec g al info env e = (* 型推論ルーチン (caml2html: typing_g) *)
 	Type.Float
     | Eq(e1, e2) | LE(e1, e2) ->
 	tr e info unify (g al dummy env e1) (g al dummy env e2);
-	Type.Bool
+	Type.Int
     | If(e1, e2, e3) ->
-	tr e info unify (g al dummy env e1) Type.Bool;
+	tr e info unify (g al dummy env e1) Type.Int;
 	let t2 = g al dummy env e2 in
 	let t3 = g al dummy env e3 in
 	tr e info unify t2 t3;

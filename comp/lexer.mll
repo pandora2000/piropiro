@@ -21,9 +21,9 @@ rule token = parse
 | ')'
     { RPAREN }
 | "true"
-    { BOOL(true) }
+    { INT(1) }
 | "false"
-    { BOOL(false) }
+    { INT(0) }
 | "not"
     { NOT }
 | digit+ (* 整数を字句解析するルール (caml2html: lexer_int) *)
@@ -35,7 +35,9 @@ rule token = parse
 | '+' (* +.より後回しにしなくても良い? 最長一致? *)
     { PLUS }
 | "*"
-	    { AST }
+	{ AST }
+| "/"
+{ SLASH }
 | "-."
     { MINUS_DOT }
 | "+."

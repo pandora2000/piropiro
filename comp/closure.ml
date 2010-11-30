@@ -7,8 +7,11 @@ type t = (* クロージャ変換後の式 (caml2html: closure_t) *)
   | Float of float
   | Neg of Id.t
   | Add of Id.t * Id.t
+  | Addi of Id.t * int
+  | Addzi of int
   | Sub of Id.t * Id.t
   | Mul of Id.t * Id.t
+  | Xor of Id.t * Id.t
   | FNeg of Id.t
   | FAdd of Id.t * Id.t
   | FSub of Id.t * Id.t
@@ -16,6 +19,12 @@ type t = (* クロージャ変換後の式 (caml2html: closure_t) *)
   | FDiv of Id.t * Id.t
   | Floor of Id.t
   | Float_of_int of Id.t
+  | IfFEqz of Id.t * t * t
+  | IfIEqz of Id.t * t * t
+  | IfFLEz of Id.t * t * t
+  | IfILEz of Id.t * t * t
+  | IfFGEz of Id.t * t * t
+  | IfIGEz of Id.t * t * t
   | IfEq of Id.t * Id.t * t * t
   | IfLE of Id.t * Id.t * t * t
   | Let of (Id.t * Type.t) * t * t
@@ -27,6 +36,8 @@ type t = (* クロージャ変換後の式 (caml2html: closure_t) *)
   | LetTuple of (Id.t * Type.t) list * Id.t * t
   | Get of Id.t * Id.t
   | Put of Id.t * Id.t * Id.t
+  | Geti of Id.t * int
+  | Puti of Id.t * int * Id.t
   | ExtTuple of Id.t
   | ExtArray of Id.l
 type fundef = { name : Id.l * Type.t;
@@ -36,10 +47,15 @@ type fundef = { name : Id.l * Type.t;
 type prog = Prog of fundef list * t
 
 let rec fv = function
-  | Unit | Int(_) | Float(_) | ExtArray(_) | ExtTuple(_) -> S.empty
-  | Neg(x) | FNeg(x) | Floor(x) | Float_of_int(x) -> S.singleton x
-  | Add(x, y) | Sub(x, y) | FAdd(x, y) | Mul(x, y)
+  | Unit | Int(_) | Float(_) | ExtArray(_) | ExtTuple(_) | Addzi(_) -> S.empty
+  | Geti(x, _)
+  | Neg(x) | FNeg(x) | Floor(x) | Float_of_int(x) | Addi(x, _) -> S.singleton x
+  | Puti(x, _, y)
+  | Add(x, y) | Sub(x, y) | FAdd(x, y) | Mul(x, y) | Xor (x, y)
   | FSub(x, y) | FMul(x, y) | FDiv(x, y) | Get(x, y) -> S.of_list [x; y]
+  | IfFLEz(x, e1, e2)| IfILEz(x, e1, e2)
+  | IfFGEz(x, e1, e2)| IfIGEz(x, e1, e2)
+  | IfFEqz(x, e1, e2)| IfIEqz(x, e1, e2) -> S.add x (S.union (fv e1) (fv e2))
   | IfEq(x, y, e1, e2)| IfLE(x, y, e1, e2) -> S.add x (S.add y (S.union (fv e1) (fv e2)))
   | Let((x, t), e1, e2) -> S.union (fv e1) (S.remove x (fv e2))
   | Var(x) -> S.singleton x
@@ -61,6 +77,8 @@ let rec g env known = function (* クロージャ変換ルーチン本体 (caml2html: closure
   | KNormal.Floor(x) -> Floor(x)
   | KNormal.Float_of_int(x) -> Float_of_int(x)
   | KNormal.Add(x, y) -> Add(x, y)
+  | KNormal.Addi(x, y) -> Addi(x, y)
+  | KNormal.Addzi(x) -> Addzi(x)
   | KNormal.Sub(x, y) -> Sub(x, y)
   | KNormal.Mul(x, y) -> Mul(x, y)
   | KNormal.Div(x, y) -> raise Exit4
@@ -69,6 +87,12 @@ let rec g env known = function (* クロージャ変換ルーチン本体 (caml2html: closure
   | KNormal.FSub(x, y) -> FSub(x, y)
   | KNormal.FMul(x, y) -> FMul(x, y)
   | KNormal.FDiv(x, y) -> FDiv(x, y)
+  | KNormal.IfFEqz(x, e1, e2) -> IfFEqz(x, g env known e1, g env known e2)
+  | KNormal.IfIEqz(x, e1, e2) -> IfIEqz(x, g env known e1, g env known e2)
+  | KNormal.IfFLEz(x, e1, e2) -> IfFLEz(x, g env known e1, g env known e2)
+  | KNormal.IfILEz(x, e1, e2) -> IfILEz(x, g env known e1, g env known e2)
+  | KNormal.IfFGEz(x, e1, e2) -> IfFGEz(x, g env known e1, g env known e2)
+  | KNormal.IfIGEz(x, e1, e2) -> IfIGEz(x, g env known e1, g env known e2)
   | KNormal.IfEq(x, y, e1, e2) -> IfEq(x, y, g env known e1, g env known e2)
   | KNormal.IfLE(x, y, e1, e2) -> IfLE(x, y, g env known e1, g env known e2)
   | KNormal.Let((x, t), e1, e2) -> Let((x, t), g env known e1, g (M.add x t env) known e2)
@@ -108,19 +132,26 @@ let rec g env known = function (* クロージャ変換ルーチン本体 (caml2html: closure
   | KNormal.App(f, xs) -> AppCls(f, xs)
   | KNormal.Tuple(xs) -> Tuple(xs)
   | KNormal.LetTuple(xts, y, e) -> LetTuple(xts, y, g (M.add_list xts env) known e)
+  | KNormal.Geti(x, y) -> Geti(x, y)
   | KNormal.Get(x, y) -> Get(x, y)
+  | KNormal.Puti(x, y, z) -> Puti(x, y, z)
   | KNormal.Put(x, y, z) -> Put(x, y, z)
   | KNormal.ExtArray(x) -> ExtArray(Id.L(x))
   | KNormal.ExtTuple(x) -> ExtTuple(x)
-  | KNormal.ExtFunApp(x, ys) -> AppDir(Id.L("min_caml_" ^ x), ys)
+  | KNormal.ExtFunApp(x, ys) ->
+      (match (x, ys) with
+	 | ("xor", [a; b]) -> Xor (a, b)
+	 | _ -> AppDir(Id.L("min_caml_" ^ x), ys))
 
 exception Exit
 
+  (*
 let flat_if (Prog (l, e)) =
   let rec efi e =
     match e with
       | MakeCls _
       | AppCls _ -> raise Exit
+      | Xor _
       | Unit 
       | Int _
       | Float _
@@ -156,7 +187,7 @@ let flat_if (Prog (l, e)) =
     Prog (List.map (fun x ->
 		      { name = x.name; args = x.args; formal_fv = x.formal_fv;
 			body = efi x.body }) l, efi e)
-
+  *)
 let f e =
   toplevel := [];
   let e' = g M.empty S.empty e in
@@ -176,6 +207,11 @@ let rec sop level e =
   let psol l s = sprintf "%s%s" (String.make l ' ') s in
   let sol = psol level in
   let tostr = function
+    | IfFLEz _ -> "IfFLEz" | IfILEz _ -> "IfILEz"
+    | IfFGEz _ -> "IfFGEz" | IfIGEz _ -> "IfIGEz"
+    | IfFEqz _ -> "IfFEqz" | IfIEqz _ -> "IfIEqz"
+    | Puti _ -> "Puti" | Geti _ -> "Geti"
+    | Xor _ -> "Xor" | Addi _ -> "Addi" | Addzi _ -> "Addzi"
     | Mul _ -> "Mul" | ExtTuple _ -> "ExtTuple"
     | Float _ -> "Float" | Int _ -> "Int" | Unit -> "Unit"
     | Floor _ -> "Floor" | Float_of_int _ -> "Float_of_int"
@@ -188,13 +224,21 @@ let rec sop level e =
     match e with
       | Unit -> sol "Unit\n"
       | Int x -> sol (sprintf "Int(%d)\n" x)
+      | Addzi x -> sol (sprintf "Addzi(%d)\n" x)
       | Float x -> sol (sprintf "Float(%f)\n" x)
       | Neg x | FNeg x | Var x | ExtArray Id.L x | ExtTuple x | Floor x
       | Float_of_int x ->
 	  sol (sprintf "%s(%s)\n" (tostr e) x)
-      | Add (x, y) | Sub (x, y) | FAdd (x, y) | FSub (x, y) | Mul (x, y)
+      | Addi (x, i) -> sol (sprintf "%s(%s, %d)\n" (tostr e) x i)
+      | Add (x, y) | Sub (x, y) | FAdd (x, y) | FSub (x, y) | Mul (x, y) | Xor (x, y)
       | FMul (x, y) | FDiv (x, y) | Get (x, y) -> sol (sprintf "%s(%s, %s)\n" (tostr e) x y)
+      | Geti (x, y) -> sol (sprintf "%s(%s, %d)\n" (tostr e) x y)
+      | Puti (x, y, z) -> sol (sprintf "%s(%s, %d, %s)\n" (tostr e) x y z)
       | Put (x, y, z) -> sol (sprintf "%s(%s, %s, %s)\n" (tostr e) x y z)
+      | IfFLEz (x, z, w) | IfILEz (x, z, w)
+      | IfFGEz (x, z, w) | IfIGEz (x, z, w)
+      | IfFEqz (x, z, w) | IfIEqz (x, z, w) ->
+	  sol (sprintf "%s(%s)\n%s%s\n%s" (tostr e) x (nsop z) (sol "Else") (nsop w))
       | IfEq (x, y, z, w) | IfLE (x, y, z, w) ->
 	  sol (sprintf "%s(%s, %s)\n%s%s\n%s" (tostr e) x y (nsop z) (sol "Else") (nsop w))
       | Let ((x, y), z, w) ->
@@ -207,16 +251,15 @@ let rec sop level e =
 		 (String.concat ", "
 		    (List.map (fun (a, b) -> sprintf "%s : %s" a (Type.string_of_t b)) x))
 		 y (nsop z))
-	    (*
-	      | MakeCls ((x, y), z, w) ->
-	      
-	      sol (sprintf "%s(%s : %s, (%s, (%s)))\n%s"
-	      (tostr e) x (Type.string_of_t y) (ltostr z.entry)
-	      (String.concat ", " z.actual_fv) (nsop w))
-	      | AppCls (x, y) ->
-	      sol (sprintf "%s(%s, (%s))\n" (tostr e) x (String.concat ", " y))
-	    *)
-      | MakeCls _ | AppCls _ -> raise Exit2
+      | MakeCls ((x, y), z, w) ->
+	  
+	  sol (sprintf "%s(%s : %s, (%s, (%s)))\n%s"
+		 (tostr e) x (Type.string_of_t y) (ltostr z.entry)
+		 (String.concat ", " z.actual_fv) (nsop w))
+      | AppCls (x, y) ->
+	  sol (sprintf "%s(%s, (%s))\n" (tostr e) x (String.concat ", " y))
+	    
+      (*      | MakeCls _ | AppCls _ -> raise Exit2*)
       | AppDir (Id.L x, y) ->
 	  sol (sprintf "%s(%s, (%s))\n" (tostr e) x (String.concat ", " y))
 	    

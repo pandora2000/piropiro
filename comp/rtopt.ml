@@ -11,8 +11,7 @@
 
 (*NOMINCAML open MiniMLRuntime;;*)
 (*NOMINCAML open Globals;;*)
-(*ここにあったtrue,falseは削除*)
-(*MINCAML*) let rec xor x y = if x then not y else y in
+(*ここにあったtrue,false,xorは削除*)
 
 (******************************************************************************
    ユーティリティー
@@ -706,7 +705,7 @@ in
 
 let rec read_parameter _ =
   (
-   read_screen_settings();
+    read_screen_settings();
    read_light();
    read_all_object ();
    read_and_network 0;
@@ -2060,13 +2059,12 @@ in
 let rec scan_line y prev cur next group_id = (
 
   if y < image_size.(1) then (
-
     if y < image_size.(1) - 1 then
       pretrace_line next (y + 1) group_id
     else ();
     scan_pixel 0 y prev cur next;
     scan_line (y + 1) cur next prev (add_mod5 group_id 2);
-   ) else ()      
+   ) else ()
 )
 in
 
@@ -2297,17 +2295,14 @@ in
 (* レイトレの各ステップを行う関数を順次呼び出す *)
 let rec rt size_x size_y =
 (
- image_size.(0) <- size_x;
+  image_size.(0) <- size_x;
   image_size.(1) <- size_y;
   (*インライン展開と定数伝播で消えると思う*)
-  (*さらに変更*)
-  image_center.(0) <- 64;
-  image_center.(1) <- 64;
-  (*
+  
   image_center.(0) <- size_x / 2;
     image_center.(1) <- size_y / 2;
-  *)
- scan_pitch.(0) <- 128.0 /. float_of_int size_x;
+  
+    scan_pitch.(0) <- 128.0 /. float_of_int size_x;
  let prev = create_pixelline () in
  let cur  = create_pixelline () in
  let next = create_pixelline () in

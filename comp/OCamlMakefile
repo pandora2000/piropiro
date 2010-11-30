@@ -60,7 +60,7 @@ export EXTLIBDIRS
 export RESULTDEPS
 export OCAML_DEFAULT_DIRS
 
-export LIBS
+LIBS := "str"
 export CLIBS
 export CFRAMEWORKS
 

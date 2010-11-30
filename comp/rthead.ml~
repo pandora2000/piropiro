@@ -1,0 +1,18 @@
+
+(*TODO:誤差の見積り必要*)
+let rec psin x = 1.0 in
+let rec pcos x = 0.0 in
+  (*-pi~piと仮定TODO:*)
+let rec sin x =
+    if x < x then sin x
+    else if x > x then sin x
+    else 
+      if x > 0.0 then
+	if x <= x then x
+	else if x <= x then x
+	else x
+      else
+	if x >= x then x
+	else if x >= x then x
+	else x in
+  ()
