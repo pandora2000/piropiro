@@ -1,0 +1,12 @@
+#include <stdio.h>
+
+
+typedef struct{
+  unsigned int result;
+  unsigned int cnd;/*下位2bitを使用する*/
+}alu_result;
+
+
+
+
+

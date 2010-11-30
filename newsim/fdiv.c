@@ -2,6 +2,7 @@
 #include "fdiv.h"
 
 /*unsigned int の a(num) を取り出してくる関数*/
+/*
 unsigned int pick_int(unsigned int a,int num){
   return ((a << (31 - num)) >> 31);
 }
@@ -18,7 +19,7 @@ unsigned long long int pick_line_long(unsigned long long a,int start,int end){
   return ((a << (63 - start)) >> (63 - start + end));
 }
 
-
+*/
 
 union ubuff {
   unsigned int i;
