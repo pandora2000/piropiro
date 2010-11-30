@@ -18,11 +18,11 @@ unsigned long long int pick_line_long(unsigned long long a,int start,int end){
 }
 
 
-fmul_result * fmul(unsigned int data1,unsigned int data2){
+unsigned int fmul(unsigned int data1,unsigned int data2){
   static unsigned int sign0,sign1,over,sign2,exp,exp1_1,exp2_1,exp1_2,exp2_2,sticky,diff,round1,round2,man_s1,man_s2,zero0,zero1,zero2;
  static unsigned long long int mul0,mul1;
 
- fmul_result *answer = malloc(sizeof(fmul_result));
+ unsigned int answer;
 
  /*clock前処理　伝播するようにする*/
  sign0 = pick_int(data1,31) ^ pick_int(data2,31);
@@ -82,16 +82,16 @@ fmul_result * fmul(unsigned int data1,unsigned int data2){
     exp = pick_line_int((exp1_2 + exp2_2 -127 + diff),7,0);
 
     if(zero2 == 1){
-      answer -> result = 0;
+      answer= 0;
     }
     else {
-      answer -> result = (sign2 << 31) | (exp << 23) | pick_line_int(man_s2,22,0);
+      answer = (sign2 << 31) | (exp << 23) | pick_line_int(man_s2,22,0);
     }
     return answer;
 }
 
 
-void print_fmul_result(fmul_result * answer){
-  printf("result = %08X\n",answer -> result);
+void print_fmul_result(unsigned int answer){
+  printf("result = %08X\n",answer);
   return;
 }
