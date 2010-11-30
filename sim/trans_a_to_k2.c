@@ -43,7 +43,7 @@ typedef struct {
 
 
 typedef struct {
-    int name[NAME_SIZE];
+  int name[NAME_SIZE];
 } instruction2;
 
 typedef struct {
@@ -408,53 +408,49 @@ int null_cal(char *null)
 
 
 #define NOP 0
-#define ADD 1
-#define SUB 2
-#define MUL 3
+#define ADD 0x8
+#define SUB 0x9
+#define MUL 0xA
 
-#define NOR 6
-#define XOR 7
-#define ADDI 9
-#define SUBI 10
-#define MULI 11
-#define NORI 14
-#define XORI 15
 
-#define FADD 16
-#define FSUB 17
-#define FMUL 18
-#define FSQRT 20
-#define FDIV 19
-#define FOI 21
-#define FIO 23
-#define FLR 22
-#define LDR 24
-#define STR 26
-#define FLDR 28
-#define FSTR 30
-#define LDI 25
-#define STI 27
-#define FLDI 29
-#define FSTI 31
+#define XOR 0xB
+#define ADDI 0xC
+#define SUBI 0xD
+#define MULI 0xE
 
-#define BEQ 32
-#define BNE 33
-#define BGT 34
-#define BLT 35
-#define FBEQ 36
-#define FBNE 37
-#define FBGT 38
-#define FBLT 39
+#define XORI 0xF
 
-#define JUMP 48
-#define CALL 52
-#define RETURN 56
+#define FADD 0x10
+#define FSUB 0x11
+#define FMUL 0x12
+#define FSQRT 0x19
+#define FDIV 0x18
+#define FOI 0x14
+#define FLR 0x15
 
-#define PTC 4
-#define PTF 5
+#define LDI 0x34
+#define STI 0x30
+#define FLDI 0x36
+#define FSTI 0x32
 
-#define RDI 12
-#define RDF 13
+#define BEQ 0x38
+#define BNE 0x39
+#define BGT 0x3A
+
+#define FBEQ 0x3C
+#define FBNE 0x3D
+#define FBGT 0x3E
+
+
+#define JUMP   0x100
+#define CALL   0x80
+#define RETURN 0x40
+
+#define PTC 0x20
+#define PTF 0x24
+
+#define RDI 0x28
+#define RDF 0x2C
 
 
 program2 *parse_all2(program * program)
@@ -483,14 +479,14 @@ program2 *parse_all2(program * program)
             PARSE_INST_1("mul", MUL)
             PARSE_INST_12("rdi", RDI)
             PARSE_INST_13("rdf", RDF)
-            PARSE_INST_1("nor", NOR)
+
           PARSE_INST_1("xor", XOR)
             PARSE_INST_2("addi", ADDI)
             PARSE_INST_2("subi", SUBI)
             PARSE_INST_2("muli", MULI)
             PARSE_INST_12("ptc", PTC)
             PARSE_INST_13("ptf", PTF)
-            PARSE_INST_2("nori", NORI)
+
             PARSE_INST_2("xori", XORI)
             PARSE_INST_3("fadd", FADD)
             PARSE_INST_3("fsub", FSUB)
@@ -504,20 +500,17 @@ program2 *parse_all2(program * program)
             PARSE_INST_2("sti", STI)
             PARSE_INST_9("fldi", FLDI)
             PARSE_INST_9("fsti", FSTI)
-            PARSE_INST_1("ldr", LDR)
-            PARSE_INST_1("str", STR)
-            PARSE_INST_11("fldr", FLDR)
-            PARSE_INST_11("fstr", FSTR)
+
             PARSE_INST_5("beq", BEQ)
             PARSE_INST_5("bne", BNE)
             PARSE_INST_5("bgt", BGT)
-            PARSE_INST_5("blt", BLT)
+
           //            PARSE_INST_5("bge", 31)
           //            PARSE_INST_5("ble", 32)
             PARSE_INST_6("fbeq", FBEQ)
             PARSE_INST_6("fbne", FBNE)
             PARSE_INST_6("fbgt", FBGT)
-            PARSE_INST_6("fblt", FBLT)
+
           //            PARSE_INST_6("fbge", 37)
           //            PARSE_INST_6("fble", 38)
             PARSE_INST_7("jump", JUMP)
@@ -539,8 +532,8 @@ program2 *parse_all2(program * program)
 void parse_all3(program2* program2, char *filename){
   FILE *fp;
   int i;
-  unsigned int buf = 0x0;
-  unsigned int buf2 = 0x0;
+  unsigned long long int buf = 0x0;
+  unsigned long long int buf2 = 0x0;
 
   fp = fopen(filename,"w");
   for(i=0;i<program2 -> inst_count;i++){
@@ -551,7 +544,7 @@ void parse_all3(program2* program2, char *filename){
     case MUL:
     case RDI:
     case RDF:
-    case NOR:
+
     case XOR:
     case FADD:
     case FSUB:
@@ -559,49 +552,45 @@ void parse_all3(program2* program2, char *filename){
     case FSQRT:
     case FDIV:
     case FOI:
-    case FIO:
-    case FLR:
-    case LDR:
-    case STR:
-    case FLDR:
-    case FSTR:
+
+
     case RETURN:
-      buf = //(program2->insts[i].name[0] * pow(2,26)) +
+      buf = (program2->insts[i].name[0] * pow(2,26)) +
           (program2->insts[i].name[1] * pow(2,21)) 
         + (program2-> insts[i].name[2] * pow(2,16)) 
         + (program2-> insts[i].name[3] * pow(2,11)); 
       break;
     case PTC:
     case PTF:
-      buf = //(program2->insts[i].name[0] * pow(2,26)) +
+      buf = (program2->insts[i].name[0] * pow(2,26)) +
         (program2->insts[i].name[1] * pow(2,16)) ;
         break;
   case ADDI:
   case SUBI:
   case MULI:
-  case NORI:
+
   case XORI:
   case BEQ:
   case BNE:
   case BGT:
-  case BLT:
+
   case FBEQ:
   case FBNE:
   case FBGT:
-  case FBLT:
+
   case LDI:
   case STI:
   case FLDI:
   case FSTI:
     if(program2 -> insts[i].name[3] < 0){
       buf2 = ((program2 -> insts[i].name[3] & 0x0000FFFF) | 0x00008000);
-      buf = //(program2->insts[i].name[0] * pow(2,26)) +
+      buf = (program2->insts[i].name[0] * pow(2,26)) +
           (program2->insts[i].name[1] * pow(2,21)) 
         + (program2-> insts[i].name[2] * pow(2,16)) 
         + buf2;
     break;
   }else{
-      buf = //(program2->insts[i].name[0] * pow(2,26)) +
+      buf = (program2->insts[i].name[0] * pow(2,26)) +
        (program2->insts[i].name[1] * pow(2,21)) 
       + (program2-> insts[i].name[2] * pow(2,16)) 
       + (program2-> insts[i].name[3]); 
@@ -609,14 +598,15 @@ void parse_all3(program2* program2, char *filename){
   }
  case JUMP:
     case CALL:
-      buf = // (program2->insts[i].name[0] * pow(2,26)) +
+      buf = (program2->insts[i].name[0] * pow(2,26)) +
        (program2->insts[i].name[1]); 
     break;
     }
-    fprintf(fp,"%06X\n",buf);
+    fprintf(fp,"F");
+    fprintf(fp,"%09llX\n",buf);
   }
 
-  fprintf(fp,"%08X\n",0xFFFFFFFF);
+  fprintf(fp,"FFFFFFFFFF\n");
   fclose(fp);
 
   return;
