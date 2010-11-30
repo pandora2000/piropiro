@@ -408,16 +408,14 @@ int null_cal(char *null)
 
 
 #define NOP 0
+
 #define ADD 0x8
 #define SUB 0x9
 #define MUL 0xA
-
-
 #define XOR 0xB
 #define ADDI 0xC
 #define SUBI 0xD
 #define MULI 0xE
-
 #define XORI 0xF
 
 #define FADD 0x10
@@ -426,7 +424,7 @@ int null_cal(char *null)
 #define FSQRT 0x19
 #define FDIV 0x18
 #define FOI 0x14
-#define FLR 0x15
+#define FLR 0x13
 
 #define LDI 0x34
 #define STI 0x30
@@ -440,7 +438,6 @@ int null_cal(char *null)
 #define FBEQ 0x3C
 #define FBNE 0x3D
 #define FBGT 0x3E
-
 
 #define JUMP   0x100
 #define CALL   0x80
