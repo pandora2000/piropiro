@@ -13,6 +13,7 @@
 	sti	r4 r0 1906
 	jump	min_caml_end
 min_caml_create_array : 
+	bp	2 0
 	add	r7 r0 r3
 	add	r3 r4 r3
 	sub	r4 r3 r4
@@ -30,6 +31,7 @@ L_else_23318 :
 	addi	r4 r4 1
 	jump	min_caml_init_array
 min_caml_create_float_array : 
+	bp	1 1
 	add	r7 r0 r3
 	add	r3 r4 r3
 	sub	r4 r3 r4
@@ -46,15 +48,19 @@ L_else_23319 :
 	addi	r4 r4 1
 	jump	min_caml_init_float_array
 min_caml_read_int : 
+	bp	0 0
 	rdi	r4
 	return
 min_caml_read_float : 
+	bp	0 0
 	rdf	f2
 	return
 min_caml_print_char : 
+	bp	1 0
 	ptc	r4
 	return
 min_caml_print_float : 
+	bp	0 1
 	ptf	f2
 	return
 L_sin_1870 : 
