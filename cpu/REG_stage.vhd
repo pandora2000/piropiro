@@ -5,6 +5,7 @@ use ieee.std_logic_unsigned.all;
 entity REG_stage is
   port (
     clk                 : in std_logic;
+    missprd             : in std_logic;
     unit                : in std_logic_vector(2 downto 0);
     reg_or_imm          : in std_logic;
     rf                  : in std_logic_vector(7 downto 0);
@@ -98,7 +99,11 @@ begin
       else
         data3 <= f_data_r3;
       end if;
-      unit_out <= unit;
+      if missprd = '1' then
+        unit_out <= "000";
+      else
+        unit_out <= unit;
+      end if;
       pc_out <= pc;
       imm_out <= imm_expand;
       reg_or_imm_out <= reg_or_imm;

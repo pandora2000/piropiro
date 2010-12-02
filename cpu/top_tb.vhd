@@ -85,6 +85,7 @@ architecture behavior of top_tb is
   component REG_stage 
     port (
       clk                 : in std_logic;
+      missprd             : in std_logic;
       unit                : in std_logic_vector(2 downto 0);
       reg_or_imm          : in std_logic;
       rf                  : in std_logic_vector(7 downto 0);
@@ -140,7 +141,6 @@ architecture behavior of top_tb is
   component fdiv
     port (
       clk          : in std_logic;
-      missprd      : in std_logic;
       unit         : in std_logic_vector(2 downto 0);
       data1, data2 : in std_logic_vector(31 downto 0);  -- data1/data2
       result       : out std_logic_vector(31 downto 0);
@@ -181,7 +181,6 @@ architecture behavior of top_tb is
       clk       : in std_logic;
       ist_set   : in std_logic;
       ready     : in std_logic;
-      missprd   : in std_logic;
       unit      : in std_logic_vector(2 downto 0);
       r_or_f    : in std_logic;
       data_in   : in std_logic_vector(31 downto 0);
@@ -195,18 +194,17 @@ architecture behavior of top_tb is
       clk      : in std_logic;
       r_or_f   : in std_logic;
       unit     : in std_logic_vector(2 downto 0);
-      missprd  : in std_logic;
       data     : in std_logic_vector(31 downto 0);
-      unitmiss : out std_logic_vector(3 downto 0);
+      unit_out : out std_logic_vector(2 downto 0);
       result   : out std_logic_vector(7 downto 0));
   end component;
   signal data_iof : std_logic_vector(7 downto 0);
-  signal unitmiss : std_logic_vector(3 downto 0);
+  signal unit_iof : std_logic_vector(3 downto 0);
 
   component send_buffer
     port (
       clk      : in std_logic;
-      unitmiss : in std_logic_vector(3 downto 0);
+      unit     : in std_logic_vector(2 downto 0);
       send_cmt : in std_logic;
       data_in  : in std_logic_vector(7 downto 0);
       busy     : out std_logic;
@@ -239,7 +237,7 @@ begin
     dst_ld, dst_ffpu, dst_sfpu, dst_rd); 
 
   REG_stage1: REG_stage port map (
-    clk, unit_ID, reg_or_imm_ID, rf, pc_ID, op_ID, reg_w_set,
+    clk, missprd, unit_ID, reg_or_imm_ID, rf, pc_ID, op_ID, reg_w_set,
     src1, src2, src3, imm_ID, data_alu, data_ffpu, data_ld, data_sfpu, data_rd,
     dst_alu, dst_ffpu, dst_ld, dst_sfpu, dst_rd, sfpu_finish, rd_port,
     unit_REG, pc_REG, op_REG, data1, data2, data3, imm_REG, reg_or_imm_REG);
@@ -248,8 +246,7 @@ begin
 
   ffpu1: ffpu port map (clk, op_REG, data1, data2, data_ffpu);
 
-  sfpu1: fdiv port map (clk, missprd, unit_REG, data1, data2, data_sfpu,
-                        sfpu_finish);
+  sfpu1: fdiv port map (clk, unit_REG, data1, data2, data_sfpu, sfpu_finish);
 
   brancher1: brancher port map (
     isbrc, op_REG, pc_REG, data3, data1, imm_REG, missprd, brc_commit, brc_pc);
@@ -257,16 +254,16 @@ begin
   addr_cal1: addr_cal port map (reg_or_imm_REG, data1, data2, imm_REG, addr);
 
   recv_buffer1: recv_buffer port map (
-    clk, ist_set, ready, missprd, unit_REG, op_REG(0), data_recv, rd_finish,
+    clk, ist_set, ready, unit_REG, op_REG(0), data_recv, rd_finish,
     rd_port, data_rd);
 
   iof1: iof port map (
-    clk, op_REG(0), unit_REG, missprd, data1, unitmiss, data_iof);
+    clk, op_REG(0), unit_REG, data1, unit_iof, data_iof);
   
   sram_sim1: sram_sim port map (clk, mem_rw_set, addr, data3, data_ld);
 
   send_buffer1: send_buffer port map (
-    clk, unitmiss, send_cmt, data_iof, pt_busy, send_pmt, data_sendbuf); 
+    clk, unit_iof, send_cmt, data_iof, pt_busy, send_pmt, data_sendbuf); 
 
   clockgen: process 
   begin

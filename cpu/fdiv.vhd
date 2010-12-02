@@ -5,7 +5,6 @@ use ieee.std_logic_unsigned.all;
 entity fdiv is
   port (
     clk          : in std_logic;
-    missprd      : in std_logic;
     unit         : in std_logic_vector(2 downto 0);
     data1, data2 : in std_logic_vector(31 downto 0);  -- data1/data2
     result       : out std_logic_vector(31 downto 0);
@@ -25,18 +24,10 @@ architecture behavior of fdiv is
   signal man_s          : std_logic_vector(24 downto 0);
   signal diff           : std_logic_vector(1 downto 0);
   signal exp            : std_logic_vector(7 downto 0);
-  signal missprd0       : std_logic;
   signal data1s, data2s : std_logic_vector(8 downto 0);
   signal zero           : std_logic;
   
 begin 
- 
-  missprd_test: process (clk)
-  begin 
-    if rising_edge(clk) then 
-      missprd0 <= missprd;
-    end if;
-  end process;
   
   nd <= (not dr) + 1;
   mul1 <= dr * nd;
@@ -47,7 +38,7 @@ begin
   begin 
     if rising_edge(clk) then
       if count1 = 0 then
-        if unit = "011" and missprd0 = '0' then 
+        if unit = "011" then 
           dr <= "01" & data2(22 downto 0) & "00000";
           zr <= "01" & data1(22 downto 0) & "00000";
           data1s <= data1(31 downto 23);
@@ -91,7 +82,7 @@ begin
   ct2: process (clk)
   begin 
     if rising_edge(clk) then
-      if unit = "011" and missprd0 = '0' then
+      if unit = "011" then
         count2 <= "110";
       elsif count2 /= 0 then
         count2 <= count2 - 1;

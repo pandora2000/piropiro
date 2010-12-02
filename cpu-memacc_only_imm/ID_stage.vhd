@@ -1,0 +1,361 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
+
+entity ID_stage is
+  port (
+    clk                 : in std_logic;
+    ist_set             : in std_logic;
+    missprd, brc_commit : in std_logic;
+    sfpu_finish         : in std_logic;
+    rd_finish           : in std_logic;
+    pt_busy             : in std_logic;
+    pc                  : in std_logic_vector(13 downto 0);
+    ist                 : in std_logic_vector(31 downto 0);
+    pc_out              : out std_logic_vector(13 downto 0);
+    next_pc             : out std_logic_vector(13 downto 0);
+    unit_out            : out std_logic_vector(2 downto 0);
+    op_out              : out std_logic_vector(2 downto 0);
+    rf_out              : out std_logic_vector(1 downto 0);
+    src1_out            : out std_logic_vector(4 downto 0);
+    src2_out            : out std_logic_vector(4 downto 0);
+    imm_out             : out std_logic_vector(15 downto 0);
+    reg_or_imm_out      : out std_logic;
+    isbrc_out           : out std_logic;
+    reg_w_set           : out std_logic_vector(3 downto 0);
+    mem_rw_set          : out std_logic;
+    dst_alu, dst_ld     : out std_logic_vector(4 downto 0);
+    dst_ffpu, dst_sfpu  : out std_logic_vector(4 downto 0);
+    dst_rd              : out std_logic_vector(4 downto 0));
+end ID_stage;
+
+architecture behavior of ID_stage is
+
+  -- destinationを格納するシフトレジスタ
+  signal ffpu_reg : std_logic_vector(14 downto 0) := (others => '0');
+  signal sfpu_reg : std_logic_vector(4 downto 0) := (others => '0');
+  signal alu_reg  : std_logic_vector(4 downto 0) := (others => '0');
+  signal ld_reg   : std_logic_vector(17 downto 0) := (others => '0');
+  signal rd_reg   : std_logic_vector(5 downto 0) := (others => '0');
+  
+  -- レジスタ書き込みポート、メモリ読み書き、分岐命令を保持するシフトレジスタ
+  signal reg_w_reg   : std_logic_vector(11 downto 0) := (others => '0');
+  signal mem_rw_reg  : std_logic := '1';
+  signal brc_reg     : std_logic := '0';
+
+  signal raw       : std_logic;
+  signal waw       : std_logic;
+  signal nop       : std_logic;
+  signal phtjump   : std_logic_vector(1 downto 0) := "00";
+  signal sfpu_busy : std_logic := '0';
+  signal sfpu_go   : std_logic := '0';
+  signal rd_busy   : std_logic := '0';
+  signal rd_go     : std_logic := '0';
+                                                                  
+  component decoder 
+    port (
+      ist                : in std_logic_vector(31 downto 0);
+      unit               : out std_logic_vector(2 downto 0);
+      op                 : out std_logic_vector(2 downto 0);  
+      src1, src2         : out std_logic_vector(4 downto 0);
+      dst                : out std_logic_vector(4 downto 0);
+      imm                : out std_logic_vector(15 downto 0);
+      rf                 : out std_logic_vector(2 downto 0);
+      reg_w              : out std_logic_vector(11 downto 0);
+      mem_rw, reg_or_imm : out std_logic;
+      isbrc, isret       : out std_logic;
+      isjump, iscall     : out std_logic);
+  end component;
+  signal unit             : std_logic_vector(2 downto 0);
+  signal src1, src2       : std_logic_vector(4 downto 0);
+  signal dst              : std_logic_vector(4 downto 0);
+  signal rf               : std_logic_vector(2 downto 0);
+  signal op               : std_logic_vector(2 downto 0);
+  signal imm              : std_logic_vector(15 downto 0);
+  signal reg_or_imm       : std_logic;
+  signal reg_w            : std_logic_vector(11 downto 0);
+  signal mem_rw           : std_logic;
+  signal isbrc            : std_logic;
+  signal isret            : std_logic;
+  signal isjump           : std_logic;
+  signal iscall           : std_logic;
+
+  component ret_stack
+    port (
+      clk        : in std_logic;
+      push, pop  : in std_logic;
+      data_w     : in std_logic_vector(13 downto 0);
+      data_r     : out std_logic_vector(13 downto 0));
+  end component;
+  signal brc_start, push, pop : std_logic;
+  signal ret_pc_w, ret_pc_r   : std_logic_vector(13 downto 0);
+
+begin 
+
+  decoder1: decoder port map (
+    ist, unit, op, src1, src2, dst, imm, rf, reg_w, mem_rw,
+    reg_or_imm, isbrc, isret, isjump, iscall);
+
+  ret_stack1: ret_stack port map (clk, push, pop, ret_pc_w, ret_pc_r);
+
+  next_pc <= pc               when ist_set = '1' else
+             ist(13 downto 0) when phtjump = 0 and isjump = '1' else 
+             ret_pc_r         when phtjump = 0 and isret = '1' else
+             pc               when isjump = '1' or isret = '1' or
+                                   raw = '1' or waw = '1' or
+                                   (unit = "011" and sfpu_busy = '1') or 
+                                   (unit = "101" and rd_busy = '1') or
+                                   (unit = "100" and pt_busy = '1') else
+             pc + 1;
+
+  pht_jp: process(clk)
+  begin
+    if rising_edge(clk) then
+      if missprd = '1' then
+        phtjump <= "00";
+      elsif brc_start = '1' and brc_commit = '1' then
+        phtjump <= phtjump;
+      elsif brc_start = '1' then
+        phtjump <= phtjump + 1;
+      elsif brc_commit = '1' then
+        phtjump <= phtjump - 1;
+      end if;
+    end if;
+  end process;
+
+  ret_pc_w <= pc + 1; 
+
+  push <= '1' when phtjump = 0 and iscall = '1' else '0';
+  
+  pop <= '1' when phtjump = 0 and isret = '1' else '0';
+
+  brc_start <= '1' when isbrc = '1' and nop = '0' else '0';
+             
+  nop <= '1' when raw = '1' or waw = '1' or ist(31 downto 30) = "11" or
+                  (unit = "011" and sfpu_busy = '1') or 
+                  (unit = "101" and rd_busy = '1') or
+                  (unit = "100" and pt_busy = '1') else
+         '0';
+
+  -- istと先行のWAW
+  waw <= '1' when dst /= 0 and
+                  (rf(2) & dst = ld_reg(17 downto 12) or
+                   rf(2) & dst = ld_reg(11 downto 6) or
+                   rf(2) & dst = ld_reg(5 downto 0) or 
+                   rf(2) & dst = rd_reg or
+                   (rf(2) = '0' and dst = alu_reg) or
+                   (rf(2) = '1' and
+                    (dst = sfpu_reg or
+                     dst = ffpu_reg(14 downto 10) or
+                     dst = ffpu_reg(9 downto 5) or
+                     dst = ffpu_reg(4 downto 0)))) else
+          '0';
+
+  -- istと先行のRAW
+  raw <= '1' when (src1 /= 0 and
+                   (rf(1) & src1 = ld_reg(17 downto 12) or
+                    rf(1) & src1 = ld_reg(11 downto 6) or
+                    rf(1) & src1 = ld_reg(5 downto 0) or 
+                    rf(1) & src1 = rd_reg or
+                    (rf(1) = '0' and src1 = alu_reg) or
+                    (rf(1) = '1' and
+                      (src1 = sfpu_reg or
+                       src1 = ffpu_reg(14 downto 10) or
+                       src1 = ffpu_reg(9 downto 5) or
+                       src1 = ffpu_reg(4 downto 0))))) or
+                    (src2 /= 0 and 
+                     (rf(0) & src2 = ld_reg(17 downto 12) or
+                      rf(0) & src2 = ld_reg(11 downto 6) or
+                      rf(0) & src2 = ld_reg(5 downto 0) or 
+                      rf(0) & src2 = rd_reg or
+                      (rf(0) = '0' and src2 = alu_reg) or
+                      (rf(0) = '1' and 
+                       (src2 = sfpu_reg or
+                        src2 = ffpu_reg(14 downto 10) or
+                        src2 = ffpu_reg(9 downto 5) or
+                        src2 = ffpu_reg(4 downto 0))))) else
+          '0';
+
+  shift_reg_w_reg: process (clk)
+  begin 
+    if rising_edge(clk) then 
+      if missprd = '1' then            -- missprd
+        reg_w_reg <= x"00" & reg_w_reg(7 downto 4);
+      elsif nop = '1' then             -- stall
+        reg_w_reg <= x"0" & reg_w_reg(11 downto 4);
+      else 
+        reg_w_reg <= reg_w or (x"0" & reg_w_reg(11 downto 4));
+      end if;
+    end if;
+  end process;
+
+  set_reg_w_set: process (clk)
+  begin 
+    if rising_edge(clk) then 
+      if missprd = '1' then  -- ALU命令はreg_w_regでクリアできない
+        reg_w_set <= reg_w_reg(3 downto 0) and "1110";
+      else
+        reg_w_set <= reg_w_reg(3 downto 0); 
+      end if;
+    end if;
+  end process;
+        
+  shift_dst_reg: process (clk)
+  begin 
+    if rising_edge(clk) then
+      if missprd = '1' then
+        alu_reg <= "00000";
+      elsif unit = "001" and nop = '0' then
+        alu_reg <= dst;
+      else
+        alu_reg <= "00000";
+      end if;
+      if missprd = '1' then
+        ffpu_reg <= "0000000000" & ffpu_reg(9 downto 5);
+      elsif unit = "010" and nop = '0' then
+        ffpu_reg <= dst & ffpu_reg(14 downto 5);
+      else
+        ffpu_reg <= "00000" & ffpu_reg(14 downto 5);
+      end if;
+      if missprd = '1' then
+        ld_reg <= "000000000000" & ld_reg(11 downto 6);
+      elsif unit = "110" and nop = '0' then
+        ld_reg <= rf(2) & dst & ld_reg(17 downto 6);
+      else
+        ld_reg <= "000000" & ld_reg(17 downto 6);
+      end if;
+      if sfpu_finish = '1' or (sfpu_go = '1' and missprd = '1') then
+        sfpu_reg <= "00000";
+      elsif unit = "011" and nop = '0' then
+        sfpu_reg <= dst;
+      end if;
+      if rd_finish = '1' or (rd_go = '1' and missprd = '1') then
+        rd_reg <= "000000";
+      elsif unit = "101" and nop = '0' then
+        rd_reg <= rf(2) & dst;
+      end if;
+    end if;
+  end process;
+
+  set_dst_reg: process (clk)
+  begin 
+    if rising_edge(clk) then
+      dst_alu <= alu_reg;
+      dst_ffpu <= ffpu_reg(4 downto 0);
+      dst_ld <= ld_reg(4 downto 0);
+      dst_sfpu <= sfpu_reg;
+      dst_rd <= rd_reg(4 downto 0);
+    end if;
+  end process;
+
+  shift_mem_rw_reg: process (clk)
+  begin 
+    if rising_edge(clk) then 
+      if missprd = '1' then
+        mem_rw_reg <= '1';
+      elsif unit = "110" and nop = '0' then
+        mem_rw_reg <= mem_rw;
+      else
+        mem_rw_reg <= '1';
+      end if;
+    end if;
+  end process;
+
+  set_mem_rw_set: process (clk)
+  begin 
+    if rising_edge(clk) then 
+      if missprd = '1' then
+        mem_rw_set <= '1';
+      else
+        mem_rw_set <= mem_rw_reg;
+      end if;
+    end if;
+  end process;
+
+  shift_brc_reg: process (clk)
+  begin 
+    if rising_edge(clk) then
+      if missprd = '1' then
+        brc_reg <= '0';
+      elsif isbrc = '1' and nop = '0' then
+        brc_reg <= '1';
+      else
+        brc_reg <= '0';  
+      end if;
+    end if;
+  end process;
+
+  set_isbrc_out: process (clk)
+  begin 
+    if rising_edge(clk) then 
+      if missprd = '1' then
+        isbrc_out <= '0';
+      else
+        isbrc_out <= brc_reg;
+      end if;
+    end if;
+  end process;
+
+  set_sfpu_busy: process (clk)
+  begin 
+    if rising_edge(clk) then
+      if sfpu_finish = '1' or (sfpu_go = '1' and missprd = '1') then
+        sfpu_busy <= '0';
+      elsif unit = "011" and nop = '0' then
+        sfpu_busy <= '1';
+      end if;               
+    end if;
+  end process;
+
+  set_sfpu_go: process (clk)
+  begin 
+    if rising_edge(clk) then
+      if unit = "011" and nop = '0' then 
+        sfpu_go <= '1';
+      else
+        sfpu_go <= '0';
+      end if;
+    end if;
+  end process;
+
+  set_rd_busy: process (clk)
+  begin 
+    if rising_edge(clk) then 
+      if rd_finish = '1' or (rd_go = '1' and missprd = '1') then
+        rd_busy <= '0';
+      elsif unit = "101" and nop = '0' then
+        rd_busy <= '1';
+      end if;
+    end if;
+  end process;
+
+  set_rd_go: process (clk)
+  begin 
+    if rising_edge(clk) then 
+      if unit = "101" and nop = '0' then
+        rd_go <= '1';
+      else
+        rd_go <= '0';
+      end if;
+    end if;
+  end process;
+
+  to_REG: process (clk)
+  begin 
+    if rising_edge(clk) then
+      if nop = '0' then
+        unit_out <= unit;
+      else
+        unit_out <= "000";
+      end if;
+      src1_out <= src1;
+      src2_out <= src2;
+      pc_out <= pc;
+      op_out <= op;
+      rf_out <= rf(1 downto 0);
+      reg_or_imm_out <= reg_or_imm;
+      imm_out <= imm;
+    end if;
+  end process;
+
+end behavior;

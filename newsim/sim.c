@@ -721,7 +721,7 @@ int do_assemble2(program *program, program2 * program2)
       op1.f = freg[ist.name[2]];
       op2.f = freg[ist.name[3]];
       fmul(op1.i,op2.i);
-      op3.i = (fmul(op1.i,op2.i))->result;
+      op3.i = fmul(op1.i,op2.i);
       freg[ist.name[1]] = op3.f;
       //freg[ist.name[1]] = freg[ist.name[2]] * freg[ist.name[3]];
     }
