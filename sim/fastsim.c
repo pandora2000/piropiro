@@ -1086,6 +1086,7 @@ int main(int argc, char *argv[])
   char buf[100000][100];	/*命令 読み込み用バッファ */
   char fpt[FPT_MAX_COUNT][20];
   char ofname[1000] = "result";
+  char ansname[1000] = "s_contest_latest";
   char tmpname[1000] = "tmp";
   char asmname[1000] = "a.s";
   char fptname[1000] = "fp.s";
@@ -1097,8 +1098,11 @@ int main(int argc, char *argv[])
   bool doprintregs = false, doprintmem = false;
   double t2, t1;
   union umemory t;
+  size_t size1,size2,size_i;
+  char data1[10000];
+  char data2[10000];
 
-  while ((result = getopt(argc, argv, "rmo:t:s:")) != -1) {
+  while ((result = getopt(argc, argv, "rmo:t:s:a:")) != -1) {
     switch (result) {
 
       /* 値をとらないオプション */
@@ -1119,6 +1123,9 @@ int main(int argc, char *argv[])
       break;
     case 's':
       strcpy(sldname, optarg);
+      break;
+    case 'a':
+      strcpy(ansname, optarg);
       break;
     }
   }
@@ -1216,5 +1223,42 @@ int main(int argc, char *argv[])
   fclose(fp2);
   fclose(out_fp);
     
+  //resultがあっているかどうかを確認する。
+  fp = fopen(ofname,"rb");
+  if(fp == NULL ){
+    printf("チェックの為に%sを開こうとしましたが開けませんでした。\n",ofname);
+    return 1;
+  }
+
+  fp2 = fopen(answer_file,"rb");
+  if(fp == NULL ){
+    printf("s_contest_latestが開けませんでした。\n");
+    return 1;
+  }
+
+  while(1){
+  size1 = fread(data1,1,8000,fp);
+  size2 = fread(data2,1,8000,fp2);
+  if(size1 == 0 && size2 == 0){
+    printf("result1は正しいです。\n");
+    break;
+  }
+  if(size1 != size2){
+    printf("result はサイズが違います\n");
+    break;
+  }
+  for(size_i=0;size_i<size1;size_i++){
+    if(data1[size_i] != data2[size_i]){
+    printf("result は違います\n");
+    fclose(fp);
+    fclose(fp2);
+    return 1;
+    }
+  }
+  }
+  fclose(fp);
+  fclose(fp2);
+
+
   return 0;
 }
