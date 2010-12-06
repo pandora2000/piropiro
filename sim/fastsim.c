@@ -16,8 +16,8 @@
 
 #define FPT_MAX_COUNT 100
 
-#define  ACCESS_GOOD 0
-#define  ACCESS_BAD -1
+#define ACCESS_GOOD 0
+#define ACCESS_BAD -1
 
 #define POW_2_15 32768
 #define POW_2_25 33554432
@@ -26,6 +26,9 @@
 
 #define REG_COUNT 64
 #define FREG_COUNT 64
+
+/*スタックの実装*/
+#define STACK_MAX_COUNT 10000
 
 #ifdef OUTDEB
 #ifdef FAST
@@ -59,16 +62,17 @@ typedef struct {
   int inst_count;
 } program2;
 
-void fprint_label_from_index(FILE *fp, program *program, int index);
-
-/*スタックの実装*/
-#define STACK_MAX_COUNT 10000
-
 typedef struct tstack {
   int stack_count;
   int stack[STACK_MAX_COUNT];
 } stack;
 
+union umemory {
+  int i;
+  float d;
+};
+
+void fprint_label_from_index(FILE *fp, program *program, int index);
 
 void fprint_stack_label(FILE *fp, program* program, stack * stack)
 {
@@ -153,10 +157,17 @@ instruction *parse_one_line_instruction(char *str, instruction * inst)
 }
 
 
-
 void print_instruction(instruction inst)
 {
   printf("%s\t%s %s %s\n", inst.name[0], inst.name[1], inst.name[2],
+	 inst.name[3]);
+  return;
+}
+
+
+void sprint_instruction(char *p, instruction inst)
+{
+  sprintf(p, "   %s %s %s %s", inst.name[0], inst.name[1], inst.name[2],
 	 inst.name[3]);
   return;
 }
@@ -268,17 +279,23 @@ static int reg[REG_COUNT];
 static float freg[FREG_COUNT];
 
 static stack call_stack = { 0 };	/*call_stackのサイズを0で初期化 */
+
+#ifndef FAST
 static stack cistack = { 0 };
 static stack sustack = { 0 };
-
-union umemory {
-  int i;
-  float d;
-};
+static long long instcounts[INST_MAX_COUNT] = { 0 };
+#endif
 
 static union umemory memory[MEMORY_SIZE];
 
 static bool memoryf[MEMORY_SIZE];
+
+static FILE *out_fp;
+static FILE *sld_fp;
+static long long cnt = 0;
+
+static program *prog;
+static program2 *prog2;
 
 
 /*メモリーの範囲内をアクセスしているか調べる*/
@@ -454,7 +471,7 @@ float read_float()
   bool f;
 
   for (i = 0, f = false; true;) {
-    a = fgetc(stdin);
+    a = fgetc(sld_fp);
     if (f) {
       if (a == EOF || isspace(a)) {
 	s[i] = '\0';
@@ -479,7 +496,7 @@ int read_int()
   bool f;
 
   for (i = 0, f = false; true;) {
-    a = fgetc(stdin);
+    a = fgetc(sld_fp);
     if (f) {
       if (a == EOF || isspace(a)) {
 	s[i] = '\0';
@@ -642,12 +659,6 @@ program2 *parse_all2(program * program)
   return answer;
 }
 
-FILE *out_fp;
-long long cnt = 0;
-
-program *prog;
-program2 *prog2;
-
 int do_assemble2(char *tmp)
 {
   int pc = 0, nextpc = 0;
@@ -674,7 +685,7 @@ int do_assemble2(char *tmp)
     pc = nextpc;
 
 #ifdef INSTCNT
-    if((cnt & 0b1111111111111111111111111) == 0)
+    if((cnt & 0b111111111111111111111111111) == 0)
       {
 	printf("%lld\n", cnt);
       }
@@ -687,7 +698,8 @@ int do_assemble2(char *tmp)
     arg2 = ist->name[2];
     arg3 = ist->name[3];
 
-#ifndef FAST    
+#ifndef FAST
+    ++instcounts[pc];
     ++icount[iname];
     if(callpc != -1)
       {
@@ -985,6 +997,7 @@ int do_assemble2(char *tmp)
 #ifndef FAST
   int i, j, k;
   char *p;
+  char q[1000];
   
   for(i = 0; i < ICOUNT; ++i)
     {
@@ -1032,6 +1045,25 @@ int do_assemble2(char *tmp)
 
   printf("stack use: %lld\n", stack_use);
   printf("max stack top: %d\n", max_sttop);
+  
+#ifdef OUTICS
+  FILE *ics_fp = fopen("ics", "w");
+  
+  for(i = 0; i < prog2->inst_count; ++i)
+    {
+      fprint_label_from_index(ics_fp, prog, i);
+      sprint_instruction(q, prog->insts[i]);
+      j = strlen(q);
+      fprintf(ics_fp, "%s", q);
+      for(k = 0; k < 50 - j; ++k)
+	{
+	  fprintf(ics_fp, " ");
+	}
+      fprintf(ics_fp, "%lld\n", instcounts[i]);
+    }
+
+  fclose(ics_fp);
+#endif
 #endif
 
 #ifdef OUTDEB
@@ -1055,6 +1087,9 @@ int main(int argc, char *argv[])
   char fpt[FPT_MAX_COUNT][20];
   char ofname[1000] = "result";
   char tmpname[1000] = "tmp";
+  char asmname[1000] = "a.s";
+  char fptname[1000] = "fp.s";
+  char sldname[1000] = "sld/contest.sld";
   int i = 0, j;
   //メモリ上の浮動小数点テーブルの位置
   int fpmemoffset = 0;
@@ -1063,7 +1098,7 @@ int main(int argc, char *argv[])
   double t2, t1;
   union umemory t;
 
-  while ((result = getopt(argc, argv, "rmo:t:")) != -1) {
+  while ((result = getopt(argc, argv, "rmo:t:s:")) != -1) {
     switch (result) {
 
       /* 値をとらないオプション */
@@ -1081,6 +1116,9 @@ int main(int argc, char *argv[])
       break;
     case 't':
       strcpy(tmpname, optarg);
+      break;
+    case 's':
+      strcpy(sldname, optarg);
       break;
     }
   }
@@ -1105,18 +1143,31 @@ int main(int argc, char *argv[])
       memoryf[j] = false;
     }
 
-  /*assembler-file open and read */
-  fp = fopen(argv[0], "r");
-  if (fp == NULL) {
-    printf("%sが開けませんaa\n", argv[0]);
+  if(argc > 0) {
+    strcpy(asmname, argv[0]);
+    if(argc > 1) {
+      strcpy(fptname, argv[1]);
+    }
+  }
+  
+  fp = fopen(asmname, "r");
+  if(fp == NULL) {
+    printf("%sが開けません\n", asmname);
     return 1;
   }
 
-  fp2 = fopen(argv[1], "r");
-  if (fp2 == NULL) {
-    printf("%sが開けません\n", argv[1]);
+  fp2 = fopen(fptname, "r");
+  if(fp2 == NULL) {
+    printf("%sが開けません\n", fptname);
     return 1;
   }
+
+  sld_fp = fopen(sldname, "r");
+  if(fp2 == NULL) {
+    printf("Cannot open sld file: %s\n", sldname);
+    return 1;
+  }
+  
   for (i = 0; i < FPT_MAX_COUNT; ++i) {
     if (fgets(fpt[i], 20, fp2) == NULL) {	/* １行読み込み */
       break;		/* 末尾まで完了したか、エラー発生で終了 */
