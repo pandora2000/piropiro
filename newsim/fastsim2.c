@@ -1195,7 +1195,6 @@ int do_assemble2(char *tmp)
   printf("stack use: %lld\n", stack_use);
   printf("max stack top: %d\n", max_sttop);
   
-  printf("stack count\n");
   //stall 回数の表示
   print_stall(icount);
 
