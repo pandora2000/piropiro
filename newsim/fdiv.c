@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "fdiv.h"
+/*./piropiro/cpu/fdiv参考にする*/
 
 /*unsigned int の a(num) を取り出してくる関数*/
 /*
