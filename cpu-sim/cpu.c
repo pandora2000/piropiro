@@ -37,7 +37,7 @@ union ubuff{
 };
 
 
-int main(){
+int main(int argc,char *argv[]){
   FILE *input_fp;
   FILE *output_fp;
 
@@ -51,8 +51,8 @@ int main(){
   char my_answer_c[33];
 
   
-  input_fp = fopen("fdiv-result.txt","r");
-  output_fp = fopen("fdiv-result3.txt","w");
+  input_fp = fopen(argv[1],"r");
+  output_fp = fopen(argv[2],"w");
 
 
 
@@ -68,7 +68,11 @@ int main(){
     buf2.i = trans_char_to_unsigned(buf2_c);
 
     my_answer.f = fdiv(buf1.f,buf2.f);
+
     trans_unsigned_to_char(my_answer.i,my_answer_c);
+    trans_unsigned_to_char(buf1.i,buf1_c);
+    trans_unsigned_to_char(buf2.i,buf2_c);
+
     
     fprintf(output_fp,"%s\n",buf1_c);
     fprintf(output_fp,"%s\n",buf2_c);
