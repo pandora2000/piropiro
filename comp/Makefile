@@ -3,12 +3,12 @@
 # ack.mlなどのテストプログラムをtest/に用意してmake do_testを実行すると、
 # min-camlとocamlでコンパイル・実行した結果を自動で比較します。
 
-RESULT = min-caml
-NCSUFFIX = .opt
+RESULT = mc
+NCSUFFIX = 
 CC = gcc
-CFLAGS = -g -O2 -Wall
+CFLAGS = -g -O3 -Wall
 
-default: debug-code top $(RESULT) do_test
+default: nc #debug-code top $(RESULT) do_test
 ## [自分（住井）用の注]
 ## ・makeコマンドはdebug-codeでmin-camlが作られることを知らない(?)ので、
 ##   $(RESULT)を入れておかないとdo_testで「min-camlがない」というエラーになる
@@ -16,15 +16,14 @@ default: debug-code top $(RESULT) do_test
 ##   .mliがコンパイルされてしまうので、両方ともdefault:の右辺に入れると
 ##   再make時に（.mliが変更されているので）.mlも再コンパイルされる
 clean:: nobackup
-	rm -rf *.s
+	rm -rf *.cmi *.cmo *.o *.dot *.png
 
 # ↓もし実装を改造したら、それに合わせて変える
-SOURCES = float.c type.ml id.ml m.ml s.ml listSet.ml \
-syntax.ml parser.mly lexer.mll typing.mli typing.ml kNormal.mli kNormal.ml \
+SOURCES = float.c time.ml type.ml id.ml m.ml s.ml listEx.ml \
+syntax.ml parser.mly lexer.mll typing.mli typing.ml optt.ml kNormal.mli kNormal.ml \
 alpha.mli alpha.ml beta.mli beta.ml assoc.mli assoc.ml \
-inline.mli inline.ml constFold.mli constFold.ml elim.mli elim.ml \
-closure.mli closure.ml graph.ml optt.ml cfg.ml loop.ml live.ml alloc.ml output.ml opt.ml asm.mli asm.ml virtual.mli virtual.ml \
-simm.mli simm.ml regAlloc.mli regAlloc.ml emit.mli emit.ml \
+inline.mli inline.ml constFold.mli constFold.ml elim.mli elim.ml easyLoop.ml \
+closure.mli closure.ml graph.ml translateTpl.ml live.ml cfg.ml elimExp.ml pre.ml elimArgs.ml alloc.ml output.ml opt.ml \
 main.mli main.ml
 
 # ↓テストプログラムが増えたら、これも増やす

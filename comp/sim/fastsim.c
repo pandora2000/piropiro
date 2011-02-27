@@ -4,18 +4,37 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <ctype.h>
+#include <sys/time.h>
 
 #define NAME_MAX_COUNT 4
 #define NAME_SIZE 40
 
-#define INST_MAX_COUNT 20000
+#define INST_MAX_COUNT 40000
 
 #define LABEL_MAX_COUNT 10000
 
 #define FPT_MAX_COUNT 100
 
-#define  ACSESS_GOOD 0
-#define  ACSESS_BAD -1
+#define ACCESS_GOOD 0
+#define ACCESS_BAD -1
+
+#define POW_2_15 32768
+#define POW_2_25 33554432
+
+#define MEMORY_SIZE 300000
+
+#define REG_COUNT 64
+#define FREG_COUNT 64
+
+/*スタックの実装*/
+#define STACK_MAX_COUNT 10000
+
+#ifdef OUTDEB
+#ifdef FAST
+#undef FAST
+#endif
+#endif
 
 typedef struct {
   char name[NAME_MAX_COUNT][NAME_SIZE];
@@ -43,14 +62,29 @@ typedef struct {
   int inst_count;
 } program2;
 
-/*スタックの実装*/
-#define STACK_MAX_COUNT 10000
-
 typedef struct tstack {
   int stack_count;
   int stack[STACK_MAX_COUNT];
 } stack;
 
+union umemory {
+  int i;
+  float d;
+};
+
+void fprint_label_from_index(FILE *fp, program *program, int index);
+
+void fprint_stack_label(FILE *fp, program* program, stack * stack)
+{
+  int i;
+
+  for(i = 0; i < stack->stack_count; ++i)
+    {
+      fprint_label_from_index(fp, program, stack->stack[i]);
+      fprintf(fp, ", ");
+    }
+  fflush(fp);
+}
 
 void push(stack * stack, int number)
 {
@@ -82,7 +116,6 @@ bool is_seperator(char c)
 /*1line_instructionのparse (入力は\nで終わっていることを前提とする。）*/
 instruction *parse_one_line_instruction(char *str, instruction * inst)
 {
-  int len = strlen(str);
   int i = 0;
   int name_number = 0;
   int name_now = 0;
@@ -103,7 +136,7 @@ instruction *parse_one_line_instruction(char *str, instruction * inst)
       i++;
     } else {
       if (name_number == NAME_MAX_COUNT) {
-	printf("Error:operant is too many!: %s\n", str);
+	printf("Too many operand: %s\n", str);
 	exit(1);
       }
       inst->name[name_number][name_now] = str[i];
@@ -124,11 +157,18 @@ instruction *parse_one_line_instruction(char *str, instruction * inst)
 }
 
 
-
 void print_instruction(instruction inst)
 {
-  printf("%s | %s | %s | %s\n", inst.name[0], inst.name[1], inst.name[2],
+  printf("%s\t%s %s %s\n", inst.name[0], inst.name[1], inst.name[2],
 	 inst.name[3]);
+  return;
+}
+
+
+void sprint_instruction(char *p, instruction inst)
+{
+  sprintf(p, "   %s %s %s %s", inst.name[0], inst.name[1], inst.name[2],
+	  inst.name[3]);
   return;
 }
 
@@ -138,13 +178,40 @@ void print_label(label * label)
   return;
 }
 
+char *get_label_from_index(program *program, int index)
+{
+  int j;
+     
+  for (j = 0; j < program->label_count; ++j) {
+    if (program->labels[j]->index == index) {
+      return program->labels[j]->name;
+    }
+  }
+
+  return NULL;
+}
+
+void fprint_label_from_index(FILE *fp, program *program, int index)
+{
+  int j;
+     
+  for (j = 0; j < program->label_count; ++j) {
+    if (program->labels[j]->index == index) {
+      fprintf(fp, "%s :\n", program->labels[j]->name);
+      fflush(fp);
+    }
+  }
+
+  return;
+}
+
 void print_label_from_index(program *program, int index)
 {
   int j;
      
   for (j = 0; j < program->label_count; ++j) {
     if (program->labels[j]->index == index) {
-      printf("%s:\n", program->labels[j]->name);
+      printf("%s :\n", program->labels[j]->name);
     }
   }
 
@@ -153,13 +220,12 @@ void print_label_from_index(program *program, int index)
 
 void print_program(program * program)
 {
-  int label_i = 0;
   int i, j;
 
   for (i = 0; i < program->inst_count; ++i) {
     for (j = 0; j < program->label_count; ++j) {
       if (program->labels[j]->index == i) {
-	printf("%s:\n", program->labels[j]->name);
+	printf("%s :\n", program->labels[j]->name);
       }
     }
     printf("%d ", i);
@@ -207,48 +273,80 @@ program *parse_all(char buf[][100], int buf_size)
   return answer;
 }
 
-#define REG_COUNT 32
-#define FREG_COUNT 32
-
 
 /*CPU の設定*/
-int regist[REG_COUNT] =
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0
-  };
+static int reg[REG_COUNT];
+static float freg[FREG_COUNT];
 
-float freg[FREG_COUNT] =
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0
-  };
-stack call_stack = { 0 };	/*call_stackのサイズを0で初期化 */
+static stack call_stack = { 0 };	/*call_stackのサイズを0で初期化 */
 
-#define MEMORY_SIZE 1000000
+#ifndef FAST
+static stack cistack = { 0 };
+static stack sustack = { 0 };
+static long long instcounts[INST_MAX_COUNT] = { 0 };
+#endif
 
-union umemory {
-  int i;
-  float d;
-};
+static union umemory memory[MEMORY_SIZE];
 
-union umemory memory[MEMORY_SIZE];
+static bool memoryf[MEMORY_SIZE];
 
+static FILE *out_fp;
+static FILE *sld_fp;
+static long long cnt = 0;
+
+static program *prog;
+static program2 *prog2;
 
 
 /*メモリーの範囲内をアクセスしているか調べる*/
 int check_memory(int num)
 {
   if (0 <= num && num < MEMORY_SIZE) {
-    return ACSESS_GOOD;
+    return ACCESS_GOOD;
   }
-  return ACSESS_BAD;
+  return ACCESS_BAD;
+}
+
+/*即値が16bit以内(-32768~32767)以内に入っているかどうか確かめる。
+  間違っていたら、error表示をしてexitする。*/
+void check_sokuti(int num) {
+  if(-POW_2_15 <= num && num < POW_2_15) {
+    return;
+  }
+  printf("error:sokkuti over 16bit:%d\n",num);
+  exit(1);
+  return;
+}
+
+/*ジャンプ即値が26bit以内に入っているかどうか確かめる。
+  間違っていたら、error表示をしてexitする。*/
+void check_jump(int num) {
+  if(-POW_2_25 <= num && num < POW_2_25) {
+    return;
+  }
+  printf("error:jump sokkuti over 26bit:%d\n",num);
+  exit(1);
+  return;
+}
+
+int atoic(char *str){
+  int temp = atoi(str);
+  check_sokuti(temp);
+  return temp;
+}
+
+int atoic_jump(char *str){
+  int temp = atoi(str);
+  check_jump(temp);
+  return temp;
 }
 
 /*print系*/
-print_memory()
+void print_memory()
 {
   int i;
 
-  printf("===memory===\n");
+  printf("---- memory ----\n");
   for (i = 0; i < MEMORY_SIZE; i++) {
     if (memory[i].i != 0) {
       printf("%d\t%d\t%20f\n", i, memory[i].i, memory[i].d);
@@ -262,13 +360,13 @@ void print_register()
 {
   int i;
 
-  printf("===register===\n");
+  printf("---- regs ----\n");
   for (i = 0; i < REG_COUNT; ++i) {
-    if (regist[i] != 0) {
-      printf("%d\t%d\n", i, regist[i]);
+    if (reg[i] != 0) {
+      printf("%d\t%d\n", i, reg[i]);
     }
   }
-  printf("===fpregister===\n");
+  printf("---- fregs ----\n");
   for (i = 0; i < FREG_COUNT; ++i) {
     if (freg[i] != 0.0) {
       printf("%d\t%f\n", i, freg[i]);
@@ -287,7 +385,7 @@ int int_of_register(char *regist)
     return atoi(regist + 1);
   }
   //r f以外の場合
-  printf("Error:register name is not iligal!\n");
+  printf("Illegal register name: %s\n", regist);
   exit(1);
   return -1;
 }
@@ -302,7 +400,7 @@ int new_label_trans(char *label, program * program)
       || label[0] == '2' || label[0] == '3' || label[0] == '4'
       || label[0] == '5' || label[0] == '6' || label[0] == '7'
       || label[0] == '8' || label[0] == '9') {
-    return atoi(label);
+    return atoic(label);
   }
   /*label */
   /*特殊ラベル*/
@@ -314,8 +412,7 @@ int new_label_trans(char *label, program * program)
       return program->labels[i]->index;
     }
   }
-  fprintf(stderr, "%s\n", label);
-  printf("label not found");
+  printf("Label not found: %s\n", label);
   exit(1);
   return -1;
 }
@@ -338,8 +435,7 @@ int label_trans(char *label, program * program)
       return program->labels[i]->index;
     }
   }
-  fprintf(stderr, "%s\n", label);
-  printf("label not found");
+  printf("Label not found: %s\n", label);
   exit(1);
   return -1;
 }
@@ -354,7 +450,7 @@ int label_trans_soutai(char *label, program * program, int nowpc)
       || label[0] == '2' || label[0] == '3' || label[0] == '4'
       || label[0] == '5' || label[0] == '6' || label[0] == '7'
       || label[0] == '8' || label[0] == '9') {
-    return atoi(label);
+    return atoic_jump(label);
   }
   /*label */
   for (i = 0; i < program->label_count; i++) {
@@ -362,7 +458,7 @@ int label_trans_soutai(char *label, program * program, int nowpc)
       return program->labels[i]->index - nowpc;
     }
   }
-  printf("label not found");
+  printf("Label not found: %s\n", label);
   exit(1);
   return -1;
 }
@@ -375,7 +471,7 @@ float read_float()
   bool f;
 
   for (i = 0, f = false; true;) {
-    a = fgetc(stdin);
+    a = fgetc(sld_fp);
     if (f) {
       if (a == EOF || isspace(a)) {
 	s[i] = '\0';
@@ -400,7 +496,7 @@ int read_int()
   bool f;
 
   for (i = 0, f = false; true;) {
-    a = fgetc(stdin);
+    a = fgetc(sld_fp);
     if (f) {
       if (a == EOF || isspace(a)) {
 	s[i] = '\0';
@@ -418,98 +514,89 @@ int read_int()
 }
 
 /*レジスターの番号をcharからintに変換する*/
-int int_of_regi(char *regist)
+int ior(char *regist)
 {
   if (regist[0] == 'r') {
     return atoi(regist + 1);
   }
-  //r f以外の場合
-  printf("Error:register name is iligal!:%s\n", regist);
+  printf("Illegal register name: %s\n", regist);
   exit(1);
   return -1;
 }
 
-int int_of_fregi(char *regist)
+int iofr(char *regist)
 {
   if (regist[0] == 'f') {
     return atoi(regist + 1);
   }
-  //r f以外の場合
-  printf("Error:register name is iligal!:%s\n", regist);
+  printf("Illegal fregister name: %s\n", regist);
   exit(1);
   return -1;
 }
 
-int null_cal(char *null)
+enum einst
+  {
+    NOP,
+    ADD, SUB, MUL, ADDI, XOR,
+    FADD, FSUB, FMUL, FDIV, FSQRT, FLR, FOI,
+    LDI, STI,
+    FLDI, FSTI,
+    BNE, BGT,
+    FBNE, FBGT,
+    JUMP, CALL, RETURN,
+    RDI, RDF, PTC, PTF,
+    LDR, STR, FLDR, FSTR,
+    BP, DEB, DEBF, INFO, INFO2, HALT,
+    ICOUNT,
+  };
+
+char instnames[][10] =
+  {
+    "nop",
+    "add", "sub", "mul", "addi", "xor",
+    "fadd", "fsub", "fmul", "fdiv", "fsqrt", "flr", "foi",
+    "ldi", "sti",
+    "fldi", "fsti",
+    "bne", "bgt",
+    "fbne", "fbgt",
+    "jump", "call", "return",
+    "rdi", "rdf", "ptc", "ptf",
+    "ldr", "str", "fldr", "fstr",
+    "bp", "deb", "debf", "info", "info2", "halt",
+  };
+
+int null_arg(char *d)
 {
   return 0;
 }
 
-//マクロ
-
-
-
-
-
-#define PARSE_INST(INST,INST_NUM,OP1,OP2,OP3)		\
-  else if(strcmp(iname,INST) == 0){			\
+#define PARSE_3ARG_INST(INST_NUM,OP1,OP2,OP3)		\
+  else if(strcmp(iname,instnames[INST_NUM]) == 0){	\
     answer -> insts[i].name[0] = INST_NUM;		\
     answer -> insts[i].name[1] = OP1(ist.name[1]);	\
     answer -> insts[i].name[2] = OP2(ist.name[2]);	\
     answer -> insts[i].name[3] = OP3(ist.name[3]);	\
   }
 
-
-#define PARSE_INST_1(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_regi,int_of_regi,int_of_regi)
-#define PARSE_INST_2(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_regi,int_of_regi,atoi)
-#define PARSE_INST_9(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_fregi,int_of_regi,atoi)
-#define PARSE_INST_3(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_fregi,int_of_fregi,int_of_fregi)
-#define PARSE_INST_4(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_fregi,int_of_fregi,null_cal)
-
-
-#define PARSE_INST_5(INST,INST_NUM)					\
-  else if(strcmp(iname,INST) == 0){					\
+#define PARSE_2ARG_1LABEL_INST(INST_NUM,OP1,OP2)			\
+  else if(strcmp(iname,instnames[INST_NUM]) == 0){			\
     answer -> insts[i].name[0] = INST_NUM;				\
-    answer -> insts[i].name[1] = int_of_regi(ist.name[1]);		\
-    answer -> insts[i].name[2] = int_of_regi(ist.name[2]);		\
-    answer -> insts[i].name[3] =  label_trans_soutai(ist.name[3],program,i); \
+    answer -> insts[i].name[1] = OP1(ist.name[1]);			\
+    answer -> insts[i].name[2] = OP2(ist.name[2]);			\
+    answer -> insts[i].name[3] = label_trans_soutai(ist.name[3],program,i); \
   }
 
-#define PARSE_INST_6(INST,INST_NUM)					\
-  else if(strcmp(iname,INST) == 0){					\
-    answer -> insts[i].name[0] = INST_NUM;				\
-    answer -> insts[i].name[1] = int_of_fregi(ist.name[1]);		\
-    answer -> insts[i].name[2] = int_of_fregi(ist.name[2]);		\
-    answer -> insts[i].name[3] =  label_trans_soutai(ist.name[3],program,i); \
-  }
-
-#define PARSE_INST_7(INST,INST_NUM)					\
-  else if(strcmp(iname,INST) == 0){					\
+#define PARSE_0ARG_1LABEL_INST(INST_NUM)				\
+  else if(strcmp(iname,instnames[INST_NUM]) == 0){			\
     answer -> insts[i].name[0] = INST_NUM;				\
     answer -> insts[i].name[1] = new_label_trans(ist.name[1],program);	\
   }
 
-#define PARSE_INST_8(INST,INST_NUM)             \
-  else if(strcmp (iname,INST) == 0){		\
-    answer -> insts[i].name[0] = INST_NUM;	\
-  }
+#define PARSE_2ARG_INST(INST_NUM,OP1,OP2) PARSE_3ARG_INST(INST_NUM,OP1,OP2,null_arg)
 
-#define PARSE_INST_10(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_fregi,int_of_regi,null_cal)
+#define PARSE_1ARG_INST(INST_NUM,OP1) PARSE_2ARG_INST(INST_NUM,OP1,null_arg)
 
-
-
-#define PARSE_INST_11(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_fregi,int_of_regi,int_of_regi)
-
-#define PARSE_INST_12(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_regi,null_cal,null_cal)
-#define PARSE_INST_13(INST,INST_NUM) PARSE_INST(INST,INST_NUM,int_of_fregi,null_cal,null_cal)
-
-
-#define PTC 400
-#define PTF 500
-
-#define RDI 120
-#define RDF 130
-
+#define PARSE_0ARG_INST(INST_NUM) PARSE_1ARG_INST(INST_NUM,null_arg)
 
 program2 *parse_all2(program * program)
 {
@@ -530,375 +617,495 @@ program2 *parse_all2(program * program)
     arg2 = ist.name[2];
     arg3 = ist.name[3];
     //printf("%s\t%s %s %s\n", ist.name[0], ist.name[1], ist.name[2], ist.name[3]);
-    if (strcmp(iname, "nop") == 0) {
-      answer->insts[i].name[0] = 0;
-    }
-    PARSE_INST_1("add", 1)
-      PARSE_INST_1("sub", 2)
-      PARSE_INST_1("mul", 3)
-      PARSE_INST_1("and", 4)
-      PARSE_INST_1("or", 5)
-      PARSE_INST_1("nor", 6)
-      PARSE_INST_1("xor", 7)
-      PARSE_INST_2("addi", 8)
-      PARSE_INST_2("subi", 9)
-      PARSE_INST_2("muli", 10)
-      PARSE_INST_2("andi", 11)
-      PARSE_INST_2("ori", 12)
-      PARSE_INST_2("nori", 13)
-      PARSE_INST_2("xori", 14)
-      PARSE_INST_3("fadd", 15)
-      PARSE_INST_3("fsub", 16)
-      PARSE_INST_3("fmul", 17)
-      PARSE_INST_3("fdiv", 18)
-      PARSE_INST_4("finv", 19)
-      PARSE_INST_4("fsqrt", 20)
-      PARSE_INST_4("flr", 21)
-      PARSE_INST_10("foi", 22)
-      PARSE_INST_2("ldi", 23)
-      PARSE_INST_2("sti", 24)
-      PARSE_INST_9("fldi", 25)
-      PARSE_INST_9("fsti", 26)
-      PARSE_INST_5("beq", 27)
-      PARSE_INST_5("bne", 28)
-      PARSE_INST_5("bgt", 29)
-      PARSE_INST_5("blt", 30)
-      PARSE_INST_5("bge", 31)
-      PARSE_INST_5("ble", 32)
-      PARSE_INST_6("beq", 33)
-      PARSE_INST_6("fbne", 34)
-      PARSE_INST_6("fbgt", 35)
-      PARSE_INST_6("fblt", 36)
-      PARSE_INST_6("fbge", 37)
-      PARSE_INST_6("fble", 38)
-      PARSE_INST_7("jump", 39)
-      PARSE_INST_7("call", 40)
-      PARSE_INST_8("return", 41)
-      PARSE_INST_8("bp", 42)
-
-            PARSE_INST_12("rdi", RDI)
-            PARSE_INST_13("rdf", RDF)
-            PARSE_INST_12("ptc", PTC)
-            PARSE_INST_13("ptf", PTF)      
+    //print_label_from_index(program, i);
+    //print_instruction(ist);
+    if(false) {}
+    PARSE_0ARG_INST(NOP)
+      PARSE_3ARG_INST(ADD,ior,ior,ior)
+      PARSE_3ARG_INST(SUB,ior,ior,ior)
+      PARSE_3ARG_INST(MUL,ior,ior,ior)
+      PARSE_3ARG_INST(ADDI,ior,ior,atoic)
+      PARSE_3ARG_INST(XOR,ior,ior,ior)
+      PARSE_3ARG_INST(FADD,iofr,iofr,iofr)
+      PARSE_3ARG_INST(FSUB,iofr,iofr,iofr)
+      PARSE_3ARG_INST(FMUL,iofr,iofr,iofr)
+      PARSE_3ARG_INST(FDIV,iofr,iofr,iofr)
+      PARSE_2ARG_INST(FLR,iofr,iofr)
+      PARSE_2ARG_INST(FOI,iofr,ior)
+      PARSE_3ARG_INST(LDI,ior,ior,atoic)
+      PARSE_3ARG_INST(STI,ior,ior,atoic)
+      PARSE_3ARG_INST(FLDI,iofr,ior,atoic)
+      PARSE_3ARG_INST(FSTI,iofr,ior,atoic)
+      PARSE_2ARG_1LABEL_INST(BNE,ior,ior)
+      PARSE_2ARG_1LABEL_INST(BGT,ior,ior)
+      PARSE_2ARG_1LABEL_INST(FBNE,iofr,iofr)
+      PARSE_2ARG_1LABEL_INST(FBGT,iofr,iofr)
+      PARSE_0ARG_1LABEL_INST(JUMP)
+      PARSE_0ARG_1LABEL_INST(CALL)
+      PARSE_0ARG_INST(RETURN)
+      PARSE_1ARG_INST(RDI,ior)
+      PARSE_1ARG_INST(RDF,iofr)
+      PARSE_1ARG_INST(PTC,ior)
+      PARSE_1ARG_INST(PTF,iofr)
+      PARSE_3ARG_INST(LDR,ior,ior,ior)
+      PARSE_3ARG_INST(STR,ior,ior,ior)
+      PARSE_3ARG_INST(FLDR,iofr,ior,ior)
+      PARSE_3ARG_INST(FSTR,iofr,ior,ior)
+      PARSE_2ARG_INST(BP,atoi,atoi)
+      PARSE_3ARG_INST(DEB,ior,ior,atoi)
+      PARSE_3ARG_INST(DEBF,iofr,ior,atoi)
+      PARSE_2ARG_INST(FSQRT,iofr,iofr)
+      PARSE_3ARG_INST(INFO, atoi, atoi, atoi)
+      PARSE_3ARG_INST(INFO2, atoi, atoi, atoi)
+      PARSE_0ARG_INST(HALT)
     else {
-      printf("Error : this is iligal inst!: %s\n", iname);
+      printf("Illegal instruction: %s\n", iname);
       exit(1);
     }
   }
   return answer;
 }
 
-
-#define DO_INST_1(INST_NUM,OP)						\
-  else if(iname == INST_NUM){						\
-    regist[ist.name[1]] = regist[ist.name[2]] OP regist[ist.name[3]];	\
-  }
-
-long long counter = 0;
-FILE *out_fp;
-
-void print_int()
+int do_assemble2(char *tmp)
 {
-  if(counter == 0)
-    {
-      fprintf(out_fp, "P3\n%d ", regist[4]);
-    }
-  else if(counter % 3 == 2)
-    {
-      fprintf(out_fp, "%d\n", regist[4]);
-    }
-  else
-    {
-      fprintf(out_fp, "%d ", regist[4]);
-    }
-  ++counter;
-}
-
-void print_float()
-{
-  if(counter % 3 == 2)
-    {
-      fprintf(out_fp, "%d\n", (int)freg[2]);
-    }
-  else
-    {
-      fprintf(out_fp, "%d ", (int)freg[2]);
-    }
-  ++counter;
-}
-
-long long cnt = 0;
-
-int do_assemble2(program *program, program2 * program2)
-{
-  int pc = 0;
-  int nextpc = 0;
-  instruction2 ist;
-  int iname, arg1, arg2, arg3;
-  int marume;
+  int pc = 0, nextpc = 0;
+  int iname, arg1, arg2, arg3, round, firstflag = 1;
+  instruction2 *ist;
+#ifndef FAST
+  int icount[1000] = { 0 };
+  int callpc = -1;
+  static int callcount[50000] = { 0 };
+  static int funcsize[50000] = { 0 };
+  static long long transcount[4] = { 0 };
+  long long stack_use = 0;
+  long long fptblcount = 0;
+  int max_sttop = 0;
+  int sttop = 256;
+#endif
+#ifdef OUTDEB
+  long long cc = 0, targetcc = 435322;
+  int a, l;
+  float b;
+  FILE *fp = fopen(tmp, "w");
+#endif
   
   while (1) {
     pc = nextpc;
 
-    if(cnt % 10000000 == 0)
+#ifdef INSTCNT
+    if((cnt & 0b111111111111111111111111111) == 0)
       {
 	printf("%lld\n", cnt);
       }
+#endif
     cnt++;
     
-    ist = program2->insts[pc];
-    iname = ist.name[0];
-    arg1 = ist.name[1];
-    arg2 = ist.name[2];
-    arg3 = ist.name[3];
+    ist = &(prog2->insts[pc]);
+    iname = ist->name[0];
+    arg1 = ist->name[1];
+    arg2 = ist->name[2];
+    arg3 = ist->name[3];
 
-    /*
-      ++counter;
-
-      if(counter > 575600 && counter < 575719)
+#ifndef FAST
+    ++instcounts[pc];
+    ++icount[iname];
+    if(callpc != -1)
       {
-      print_label_from_index(program, pc);
-      print_instruction(program->insts[pc]);
-      print_register();
+	++funcsize[callpc];
       }
-    */
-	
-    if (iname == 0) {
-      // printf("this is nop\n");
-    }
-    DO_INST_1(1, +)
-      DO_INST_1(2, -)
-      DO_INST_1(3, *)
-      DO_INST_1(4, &)
-      DO_INST_1(5, |)
-      /*ALU命令 */
-    else if (iname == 6) {
-      regist[ist.name[1]] = ~(regist[ist.name[2]] | regist[ist.name[3]]);
-    }
-    else if (iname == 7) {
-      regist[ist.name[1]] = regist[ist.name[2]] ^ regist[ist.name[3]];
-    }
-    else if (iname == 8) {
-      regist[ist.name[1]] = regist[ist.name[2]] + ist.name[3];
-    }
-    else if (iname == 9) {
-      regist[ist.name[1]] = regist[ist.name[2]] - ist.name[3];
-    }
-    else if (iname == 10) {
-      regist[ist.name[1]] = regist[ist.name[2]] * ist.name[3];
-    }
-    else if (iname == 11) {
-      regist[ist.name[1]] = regist[ist.name[2]] & ist.name[3];
-    }
-    else if (iname == 12) {
-      regist[ist.name[1]] = regist[ist.name[2]] | ist.name[3];
-    }
-    else if (iname == 13) {
-      regist[ist.name[1]] = ~(regist[ist.name[2]] | ist.name[3]);
-    }
-    else if (iname == 14) {
-      regist[ist.name[1]] = regist[ist.name[2]] ^ ist.name[3];
-    }
-    /*FPU命令 */
-    else if (iname == 15) {
-      freg[ist.name[1]] = freg[ist.name[2]] + freg[ist.name[3]];
-    }
-    else if (iname == 16) {
-      freg[ist.name[1]] = freg[ist.name[2]] - freg[ist.name[3]];
-    }
-    else if (iname == 17) {
-      freg[ist.name[1]] = freg[ist.name[2]] * freg[ist.name[3]];
-    }
-    else if (iname == 18) {
-      freg[ist.name[1]] = freg[ist.name[2]] / freg[ist.name[3]];
-    }
-    else if (iname == 19) {
-      freg[ist.name[1]] = 1 / freg[ist.name[2]];
-    }
-    else if (iname == 20) {
-      freg[ist.name[1]] = sqrt(freg[ist.name[2]]);
-    }
-    else if (iname == 21) {
-      freg[ist.name[1]] = floor(freg[ist.name[2]]);
-    }
-    else if (iname == 22) {
-      freg[ist.name[1]] = (float) (regist[ist.name[2]]);
-    }
+    else
+      {
+	++funcsize[0];
+      }
+#endif
 
 
-    /*MEM ACSESS命令 */
-    else if (iname == 23) {
-      //memory_check
-      if (check_memory(regist[ist.name[2]] + ist.name[3]) == ACSESS_BAD) {
-	printf("Error:ACSESS_BAD :\n");
-	//	 printf("%d\n", iname);
-	//printf("%lld\n", counter);
+    if(iname == LDI) {
+#ifndef FAST
+      if(check_memory(reg[arg2] + arg3) == ACCESS_BAD) {
+	printf("Bad access\n");
 	exit(1);
       }
-      regist[ist.name[1]] = memory[regist[ist.name[2]] + ist.name[3]].i;
-    }
-
-    else if (iname == 24) {
-      //memory_check
-      /*
-	if (check_memory(regist[ist.name[2]] + ist.name[3]) == ACSESS_BAD) {
-	printf("Error:ACSESS_BAD :\n");
-	//printf("%d\n", iname);
-	exit(1);
+      if(!memoryf[reg[arg2] + arg3])
+	{
+	  printf("Access uninitialized memory: %d\n", reg[arg2] + arg3);
+	  exit(1);
 	}
-      */
-      memory[regist[ist.name[2]] + ist.name[3]].i =  regist[ist.name[1]];
+#endif
+      reg[arg1] = memory[reg[arg2] + arg3].i;
     }
-
-    else if (iname == 25) {
-      //memory_check
-      /*
-	if (check_memory(regist[ist.name[2]] + ist.name[3])
-	== ACSESS_BAD) {
-	printf("Error:ACSESS_BAD :\n");
-	//printf("%d\n", iname);
-	exit(1);
-	}
-      */
-      freg[ist.name[1]] =
-	memory[regist[ist.name[2]] + ist.name[3]].d;
-    }
-
-    else if (iname == 26) {
-      //memory_check
-      if (check_memory(regist[ist.name[2]] + ist.name[3])
-	  == ACSESS_BAD) {
-	printf("Error:ACSESS_BAD :\n");
-	// printf("%d\n", iname);
+    else if(iname == FLDI) {
+#ifndef FAST
+      if(check_memory(reg[arg2] + arg3) == ACCESS_BAD) {
+	printf("Bad access\n");
 	exit(1);
       }
-      memory[regist[ist.name[2]] + ist.name[3]].d =
-	freg[ist.name[1]];
+      if(!memoryf[reg[arg2] + arg3]) {
+	printf("Access uninitialized memory: %d\n", reg[arg2] + arg3);
+	exit(1);
+      }
+#endif
+      freg[arg1] = memory[reg[arg2] + arg3].d;
     }
-
-
-    /*BRANCH命令 */
-    else if (iname == 27) {
-      if (regist[ist.name[1]] == regist[ist.name[2]]) {
-	nextpc = pc + ist.name[3] - 1;
+    else if(iname == BNE) {
+      if (reg[arg1] != reg[arg2]) {
+	nextpc = pc + arg3 - 1;
       }
     }
-
-    else if (iname == 28) {
-      if (regist[ist.name[1]] != regist[ist.name[2]]) {
-	nextpc = pc + ist.name[3] - 1;
+    else if(iname == FMUL) {
+      freg[arg1] = freg[arg2] * freg[arg3];
+    }
+    else if(iname == ADDI) {
+      reg[arg1] = reg[arg2] + arg3;
+    }
+    else
+      {
+	switch(iname)
+	  {
+	  case ADD:
+	    reg[arg1] = reg[arg2] + reg[arg3];
+	    break;
+	  case FADD:
+	    freg[arg1] = freg[arg2] + freg[arg3];
+	    break;
+	  case FBGT:
+	    if (freg[arg1] > freg[arg2]) {
+	      nextpc = pc + arg3 - 1;
+	    }
+	    break;
+	  case FSUB:
+	    freg[arg1] = freg[arg2] - freg[arg3];
+	    break;
+	  case JUMP:
+#ifdef OUTDEB
+	    if(strncmp(prog->insts[pc].name[1], "L_cont", 6) != 0)
+	      {
+		if(cc == targetcc + 1)
+		  {
+		    fflush(fp);
+		    exit(1);
+		  }
+		fprintf(fp, "%s %lld\n", prog->insts[pc].name[1], cc);
+		//if(cc == targetcc)
+		//{
+		fprint_stack_label(fp, prog, &cistack);
+		fprint_label_from_index(fp, prog, callpc);
+		//}
+		++cc;
+	      }
+#endif      
+	    nextpc = arg1 - 1;
+	    break;
+	  case CALL:
+#ifdef OUTDEB
+	    if(cc == targetcc + 1)
+	      {
+		fflush(fp);
+		exit(1);
+	      }
+	    fprintf(fp, "%s %lld\n", prog->insts[pc].name[1], cc);
+	    //if(cc == targetcc)
+	    //{
+	    fprint_stack_label(fp, prog, &cistack);
+	    fprint_label_from_index(fp, prog, callpc);
+	    //}
+	    ++cc;
+#endif
+      
+	    nextpc = arg1 - 1;
+#ifndef FAST
+	    push(&sustack, sttop);
+	    if(reg[2] > sttop)
+	      {
+		stack_use += 2 * (reg[2] - sttop) + 2;
+		sttop = reg[2];
+	      }
+	    max_sttop = max_sttop < reg[2] ? reg[2] : max_sttop;
+	    push(&cistack, callpc);
+	    callpc = nextpc + 1;
+	    ++callcount[callpc];
+#endif
+	    push(&call_stack, (pc + 1));
+	    break;
+	  case RETURN:
+#ifndef FAST
+	    sttop = pop(&sustack);
+	    callpc = pop(&cistack);
+#endif
+	    nextpc = pop(&call_stack) - 1;
+	    break;
+	  case FDIV:
+	    freg[arg1] = freg[arg2] / freg[arg3];
+	    break;
+	    //ここから順番適当
+	  case FSQRT:
+	    freg[arg1] = sqrt(freg[arg2]);
+	    break;
+	  case SUB:
+	    reg[arg1] = reg[arg2] - reg[arg3];
+	    break;
+	  case MUL:
+	    reg[arg1] = reg[arg2] * reg[arg3];
+	    break;
+	  case XOR:
+	    reg[arg1] = reg[arg2] ^ reg[arg3];
+	    break;
+	  case FLR:
+	    freg[arg1] = floor(freg[arg2]);
+	    break;
+	  case FOI:
+	    freg[arg1] = (float)reg[arg2];
+	    break;
+	  case STI:
+#ifndef FAST
+	    if (check_memory(reg[arg2] + arg3) == ACCESS_BAD) {
+	      printf("Bad access: %d\n", reg[arg2] + arg3);
+	      exit(1);
+	    }
+	    memoryf[reg[arg2] + arg3] = true;
+#endif
+	    memory[reg[arg2] + arg3].i = reg[arg1];
+	    break;
+	  case FSTI:
+#ifndef FAST
+	    if (check_memory(reg[arg2] + arg3) == ACCESS_BAD) {
+	      printf("Bad access: %d\n", reg[arg2] + arg3);
+	      exit(1);
+	    }
+	    memoryf[reg[arg2] + arg3] = true;
+#endif
+	    memory[reg[arg2] + arg3].d = freg[arg1];
+	    break;
+	  case BGT:
+	    if (reg[arg1] > reg[arg2]) {
+	      nextpc = pc + arg3 - 1;
+	    }
+	    break;
+	  case FBNE:
+	    if (freg[arg1] != freg[arg2]) {
+	      nextpc = pc + arg3 - 1;
+	    }
+	    break;
+	  case RDI:
+#ifdef OUTDEB
+	    a = read_int();
+	    fprintf(fp, "read_int %d\n", a);
+	    reg[arg1] = a;
+#else
+	    reg[arg1] = read_int();
+	    break;
+#endif
+	  case RDF:
+#ifdef OUTDEB
+	    b = read_float();
+	    fprintf(fp, "read_float %f\n", b);
+	    freg[arg1] = b;
+#else
+	    freg[arg1] = read_float();;
+#endif
+	    break;
+	  case PTC:
+	    /*最初のOXAAは無視する*/
+	    if(firstflag == 1) {
+	      if(reg[arg1] != 170) {
+		printf("First char is not 0xAA: %c\n",reg[arg1]);
+		exit(1);
+	      }
+	      firstflag = 0;
+	    } else {
+	      fprintf(out_fp, "%c",reg[arg1]);
+	    }
+	    break;
+	  case PTF:
+	    round = (int)(freg[arg1] + 0.5);
+	    if(round > 255) {
+	      round = 255;
+	    } else if(round < 0) {
+	      round = 0;
+	    }
+	    fprintf(out_fp, "%c", (char)round);
+	    break;
+	  case HALT:
+	    return 0;
+#ifndef FAST
+#ifdef REGDISP
+	  case LDR:
+	    reg[arg1] = memory[reg[arg2] + reg[arg3]].i;
+	    break;
+	  case STR:
+	    memory[reg[arg2] + reg[arg3]].i = reg[arg1];
+	    break;
+	  case FLDR:
+	    freg[arg1] = memory[reg[arg2] + reg[arg3]].d;
+	    break;
+	  case FSTR:
+	    memory[reg[arg2] + reg[arg3]].d = freg[arg1];
+	    break;
+#endif
+	  case BP:
+#ifdef OUTDEB
+	    fprintf(fp, "%d %d\n", arg1, arg2);
+	    for (l = 0; l < arg1; ++l) {
+	      fprintf(fp, "%d\n", reg[l + 4]);
+	    }
+	    for (l = 0; l < arg2; ++l) {
+	      fprintf(fp, "%.15f\n", freg[l + 2]);
+	    }
+	    --cnt;
+#endif
+	    break;
+	  case DEB:
+#ifdef OUTDEB
+	    fprintf(fp, "i %d %d %lld\n", reg[arg2] + arg3, reg[arg1], cc);
+	    /*      if(cc == targetcc)
+		    {
+		    fprint_stack_label(fp, prog, &cistack);
+		    fprint_label_from_index(fp, prog, callpc);
+		    }*/
+	    ++cc;
+	    --cnt;
+#endif
+	    break;
+	  case DEBF:
+#ifdef OUTDEB
+	    fprintf(fp, "f %d %.15f %lld\n", reg[arg2] + arg3, freg[arg1], cc);
+	    /*if(cc == targetcc)
+	      {
+	      fprint_stack_label(fp, prog, &cistack);
+	      fprint_label_from_index(fp, prog, callpc);
+	      }*/
+	    ++cc;
+	    --cnt;
+#endif
+	    break;
+	  case INFO:
+#ifdef OUTDEB
+	    if(arg1 == 0)
+	      {
+		fprintf(fp, "%d\n", reg[arg2]);
+	      }
+	    else if(arg1 == 1)
+	      {
+		fprintf(fp, "%.15f\n", freg[arg2]);
+	      }
+	    else if(arg1 == 2)
+	      {
+		fprintf(fp, "info\n");
+	      }
+	    else if(arg1 == 3)
+	      {
+		fprintf(fp, "info %d %d\n", arg2, reg[arg3]);
+	      }
+	    --cnt;
+#endif
+	    break;
+	  case INFO2:
+	    if(arg1 == 0)
+	      {
+		transcount[arg2]++;
+	      }
+	    else if(arg1 == 1)
+	      {
+		fptblcount++;
+	      }
+	    --cnt;
+	    break;
+#endif
+	  }
       }
-    }
-    else if (iname == 29) {
-      if (regist[ist.name[1]] > regist[ist.name[2]]) {
-	nextpc = pc + ist.name[3] - 1;
-      }
-    }
+#ifdef OUTINST
+    print_label_from_index(prog, pc);
+    print_instruction(prog->insts[pc]);
+#endif
+#ifdef OUTREGS
+    print_register();
+#endif
 
-    else if (iname == 30) {
-      if (regist[ist.name[1]] < regist[ist.name[2]]) {
-	nextpc = pc + ist.name[3] - 1;
-      }
-    }
-
-    else if (iname == 31) {
-      if (regist[ist.name[1]] >= regist[ist.name[2]]) {
-	nextpc = pc + ist.name[3] - 1;
-      }
-    }
-
-    else if (iname == 32) {
-      if (regist[ist.name[1]] <= regist[ist.name[2]]) {
-	nextpc = pc + ist.name[3] - 1;
-      }
-
-    } else if (iname == 33) {
-      if (freg[ist.name[1]] == freg[ist.name[2]]) {
-	nextpc = pc + ist.name[3] - 1;
-      }
-    }
-
-    else if (iname == 34) {
-      if (freg[ist.name[1]] != freg[ist.name[2]]) {
-	nextpc = pc + ist.name[3] - 1;
-      }
-    }
-
-    else if (iname == 35) {
-      if (freg[ist.name[1]] > freg[ist.name[2]]) {
-	nextpc = pc + ist.name[3] - 1;
-      }
-    }
-
-    else if (iname == 36) {
-      if (freg[ist.name[1]] < freg[ist.name[2]]) {
-	nextpc = pc + ist.name[3] - 1;
-      }
-    }
-
-    else if (iname == 37) {
-      if (freg[ist.name[1]] >= freg[ist.name[2]]) {
-	nextpc = pc + ist.name[3] - 1;
-      }
-    }
-
-    else if (iname == 38) {
-      if (freg[ist.name[1]] <= freg[ist.name[2]]) {
-	nextpc = pc + ist.name[3] - 1;
-      }
-    }
-
-
-    /*JUMP命令 */
-    else if (iname == 39) {
-	  nextpc = ist.name[1] - 1;
-    }
-    else if (iname == 40) {
-      nextpc = ist.name[1] - 1;
-      push(&call_stack, (pc + 1));
-    }
-    else if (iname == RDI) {
-      regist[ist.name[1]] = read_int();
-      //fscanf(input_fp,"%X",&regist[ist.name[1]]);
-    }
-    else if (iname == RDF) {
-      freg[ist.name[1]] = read_float();
-      //fscanf(input_fp,"%X",&buffer.i);
-      //freg[ist.name[1]] = buffer.d;
-    }
-    else if (iname == PTC) {
-      fprintf(out_fp,"%c",regist[ist.name[1]]);
-    }
-    else if (iname == PTF) {
-      marume = (int) (freg[ist.name[1]] + 0.5);
-      if(marume > 255){
-        fprintf(out_fp,"%d",255);
-      }else if (marume < 0){
-        fprintf(out_fp,"%d",0);
-      }else{
-        fprintf(out_fp,"%d",marume);
-      }
-    }
-    else {//if (iname == 41) {
-      nextpc = pop(&call_stack) - 1;
-    }
-    /*
-      else if (iname = 42) {
-      print_register();
-      print_memory();
-      }
-    */
-    //命令が存在しなかった場合error parseでやっているのでいらない。
-    //printf("ist = %d\n",iname);
-
-    nextpc++;
-
+    ++nextpc;
 
     /*命令がラストの行まで行けば処理を終了する */
-    if (nextpc >= program2->inst_count) {
+    if (nextpc >= prog2->inst_count) {
       break;
     }
   }
+
+#ifndef FAST
+  int i, j, k;
+  char *p;
+  char q[1000];
+  
+  for(i = 0; i < ICOUNT; ++i)
+    {
+      printf("%s\t\t%d\n", instnames[i], icount[i]);
+    }
+
+  printf("funcweight\n");
+  for(i = 0; i < 50000; ++i)
+    {
+      if(funcsize[i] != 0)
+	{
+	  if((p = get_label_from_index(prog, i)) != NULL)
+	    {
+	      j = strlen(p);
+	      printf("%s", p);
+	      for(k = 0; k < 40 - j; ++k)
+		{
+		  printf(" ");
+		}
+	      printf("\t%d\n", funcsize[i]);
+	    }
+	}
+    }
+
+  printf("callcount\n");
+  for(i = 0; i < 50000; ++i)
+    {
+      if(callcount[i] != 0)
+	{
+	  if((p = get_label_from_index(prog, i)) != NULL)
+	    {
+	      j = strlen(p);
+	      printf("%s", p);
+	      for(k = 0; k < 40 - j; ++k)
+		{
+		  printf(" ");
+		}
+	      printf("\t%d\n", callcount[i]);
+	    }
+	}
+    }
+
+  printf("trans counts: call set %lld, jump %lld, return %lld, call get %lld\n",
+	 transcount[0], transcount[1], transcount[2], transcount[3]);
+
+  printf("fptable use: %lld\n", fptblcount);
+
+  printf("stack use: %lld\n", stack_use);
+  printf("max stack top: %d\n", max_sttop);
+  
+#ifdef OUTICS
+  FILE *ics_fp = fopen("ics", "w");
+  
+  for(i = 0; i < prog2->inst_count; ++i)
+    {
+      fprint_label_from_index(ics_fp, prog, i);
+      sprint_instruction(q, prog->insts[i]);
+      j = strlen(q);
+      fprintf(ics_fp, "%s", q);
+      for(k = 0; k < 50 - j; ++k)
+	{
+	  fprintf(ics_fp, " ");
+	}
+      fprintf(ics_fp, "%lld\n", instcounts[i]);
+    }
+
+  fclose(ics_fp);
+#endif
+#endif
+
+#ifdef OUTDEB
+  fclose(fp);
+#endif
 
   return 0;
 }
@@ -914,19 +1121,22 @@ int main(int argc, char *argv[])
 {
   FILE *fp, *fp2;
   char buf[100000][100];	/*命令 読み込み用バッファ */
-  char fpt[FPT_MAX_COUNT][20] = { 0 };
+  char fpt[FPT_MAX_COUNT][20];
   char ofname[1000] = "result";
-  int i = 0, j, k;
+  char ansname[1000] = "res/s_contest_latest";
+  char tmpname[1000] = "tmp";
+  char asmname[1000] = "a.s";
+  char fptname[1000] = "fp.s";
+  char sldname[1000] = "sld/contest.sld";
+  int i = 0, j;
   //メモリ上の浮動小数点テーブルの位置
   int fpmemoffset = 0;
   int result;
   bool doprintregs = false, doprintmem = false;
-  program *answer;
-  program2 *answer2;
   double t2, t1;
-  int ll = 0;
+  union umemory t;
 
-  while ((result = getopt(argc, argv, "rmo:")) != -1) {
+  while ((result = getopt(argc, argv, "rmo:t:s:a:")) != -1) {
     switch (result) {
 
       /* 値をとらないオプション */
@@ -942,38 +1152,76 @@ int main(int argc, char *argv[])
       /* 値を取る引数の場合は外部変数optargにその値を格納する. */
       strcpy(ofname, optarg);
       break;
+    case 't':
+      strcpy(tmpname, optarg);
+      break;
+    case 's':
+      strcpy(sldname, optarg);
+      break;
+    case 'a':
+      strcpy(ansname, optarg);
+      break;
     }
   }
   argc -= optind;
   argv += optind;
 
+  for(j = 0; j < REG_COUNT; ++j)
+    {
+      reg[j] = rand() * rand();
+    }
+  for(j = 0; j < FREG_COUNT; ++j)
+    {
+      t.i = rand() * rand();
+      freg[j] = t.d;
+    }
+  reg[0] = 0;
+  freg[0] = 0.0;
 
-  /*assembler-file open and read */
-  fp = fopen(argv[0], "r");
-  if (fp == NULL) {
-    printf("%sが開けませんaa\n", argv[0]);
+  for(j = 0; j < MEMORY_SIZE; ++j)
+    {
+      memory[j].i = rand() * rand();
+      memoryf[j] = false;
+    }
+
+  if(argc > 0) {
+    strcpy(asmname, argv[0]);
+    if(argc > 1) {
+      strcpy(fptname, argv[1]);
+    }
+  }
+  
+  fp = fopen(asmname, "r");
+  if(fp == NULL) {
+    printf("%sが開けません\n", asmname);
     return 1;
   }
 
-  if (argc > 1) {
-    fp2 = fopen(argv[1], "r");
-    if (fp2 == NULL) {
-      printf("%sが開けません\n", argv[1]);
-      return 1;
-    }
-    for (i = 0; i < FPT_MAX_COUNT; ++i) {
-      if (fgets(fpt[i], 20, fp2) == NULL) {	/* １行読み込み */
-	break;		/* 末尾まで完了したか、エラー発生で終了 */
-      }
-    }
-
-    for (j = 0; j < i; ++j) {
-      //エラーが起こっても関係ない
-      //printf("%s\n", fpt[j]);
-      memory[j + fpmemoffset].i = (int) strtoll(fpt[j], NULL, 16);
-    }
-    //print_memory();
+  fp2 = fopen(fptname, "r");
+  if(fp2 == NULL) {
+    printf("%sが開けません\n", fptname);
+    return 1;
   }
+
+  sld_fp = fopen(sldname, "r");
+  if(fp2 == NULL) {
+    printf("Cannot open sld file: %s\n", sldname);
+    return 1;
+  }
+  
+  for (i = 0; i < FPT_MAX_COUNT; ++i) {
+    if (fgets(fpt[i], 20, fp2) == NULL) {	/* １行読み込み */
+      break;		/* 末尾まで完了したか、エラー発生で終了 */
+    }
+  }
+
+  for (j = 0; j < i; ++j) {
+    //エラーが起こっても関係ない
+    //printf("%s\n", fpt[j]);
+    memoryf[j + fpmemoffset] = true;
+    memory[j + fpmemoffset].i = (int) strtoll(fpt[j], NULL, 16);
+  }
+  //print_memory();
 
   i = 0;
   while (1) {
@@ -985,17 +1233,20 @@ int main(int argc, char *argv[])
 
   out_fp = fopen(ofname, "w");
 
-  answer = parse_all(buf, i);
-  answer2 = parse_all2(parse_all(buf, i));
-  
-  //print_program(answer);
+  prog = parse_all(buf, i);
+  prog2 = parse_all2(parse_all(buf, i));
+
+#ifdef OUTPROG
+  print_program(prog);
+#endif
 
   t1 = gettimeofday_sec();
-  do_assemble2(answer, answer2);
+  do_assemble2(tmpname);
   t2 = gettimeofday_sec();
   
-  printf("%lf\n", t2 - t1);
-  printf("%lld\n", cnt);
+  printf("elapsed time: %f\n", t2 - t1);
+  printf("instruction count: %lld\n", cnt);
+  printf("MIPS: %f\n", (double)cnt / 1000000.0 / (t2 - t1));
 
   if (doprintregs)
     print_register();
@@ -1005,6 +1256,12 @@ int main(int argc, char *argv[])
   fclose(fp);
   fclose(fp2);
   fclose(out_fp);
+  
+  //resultがあっているかどうかを確認する。
+  printf("diff %s %s:\n", ofname, ansname);
+  fflush(stdout);
+  execl("/usr/bin/diff", "diff", ofname, ansname, NULL);
+  printf("diffのexecに失敗しました\n");
     
   return 0;
 }

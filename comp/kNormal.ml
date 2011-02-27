@@ -1,6 +1,7 @@
 (* give names to intermediate values (K-normalization) *)
 
 open Printf
+open List
 
 type t = (* K正規化後の式 (caml2html: knormal_t) *)
   | Unit
@@ -13,6 +14,7 @@ type t = (* K正規化後の式 (caml2html: knormal_t) *)
   | Sub of Id.t * Id.t
   | Mul of Id.t * Id.t
   | Div of Id.t * Id.t
+  | Xor of Id.t * Id.t
   | FNeg of Id.t
   | FAdd of Id.t * Id.t
   | FSub of Id.t * Id.t
@@ -20,14 +22,9 @@ type t = (* K正規化後の式 (caml2html: knormal_t) *)
   | FDiv of Id.t * Id.t
   | Floor of Id.t
   | Float_of_int of Id.t
+  | FSqrt of Id.t
   | IfEq of Id.t * Id.t * t * t 
   | IfLE of Id.t * Id.t * t * t
-  | IfIEqz of Id.t * t * t
-  | IfFEqz of Id.t * t * t
-  | IfILEz of Id.t * t * t
-  | IfFLEz of Id.t * t * t
-  | IfIGEz of Id.t * t * t
-  | IfFGEz of Id.t * t * t
   | Let of (Id.t * Type.t) * t * t
   | Var of Id.t
   | LetRec of fundef * t
@@ -43,15 +40,20 @@ type t = (* K正規化後の式 (caml2html: knormal_t) *)
   | ExtFunApp of Id.t * Id.t list
 and fundef = { name : Id.t * Type.t; args : (Id.t * Type.t) list; body : t }
 
+let rec effect = function (* 副作用の有無 (caml2html: elim_effect) *)
+  | Let(_, e1, e2) | IfEq(_, _, e1, e2) | IfLE(_, _, e1, e2) ->
+      effect e1 || effect e2
+  | LetRec(_, e) | LetTuple(_, _, e) -> effect e
+      (*明らかに副作用の無いAppはfalseにできるが、あんまり効果ないと思われる*)
+  | App _ | Put _ | Puti _ | ExtFunApp _ -> true
+  | _ -> false
+
 let rec fv = function (* 式に出現する（自由な）変数 (caml2html: knormal_fv) *)
   | Unit | Int(_) | Float(_) | ExtArray(_) | ExtTuple(_) | Addzi(_) -> S.empty
-  | Geti(x, _)
+  | Geti(x, _) | FSqrt(x)
   | Addi(x, _) | Neg(x) | FNeg(x) | Floor(x) | Float_of_int(x) -> S.singleton x
-  | Add(x, y) | Sub(x, y) | Mul(x, y) | Div(x, y) | Puti(x, _, y)
+  | Add(x, y) | Sub(x, y) | Mul(x, y) | Div(x, y) | Xor(x, y) | Puti(x, _, y)
   | FAdd(x, y) | FSub(x, y) | FMul(x, y) | FDiv(x, y) | Get(x, y) -> S.of_list [x; y]
-  | IfFLEz(x, e1, e2) | IfILEz(x, e1, e2)
-  | IfFGEz(x, e1, e2) | IfIGEz(x, e1, e2)
-  | IfFEqz(x, e1, e2) | IfIEqz(x, e1, e2) -> S.add x (S.union (fv e1) (fv e2))
   | IfEq(x, y, e1, e2) | IfLE(x, y, e1, e2) -> S.add x (S.add y (S.union (fv e1) (fv e2)))
   | Let((x, t), e1, e2) -> S.union (fv e1) (S.remove x (fv e2))
   | Var(x) -> S.singleton x
@@ -75,7 +77,6 @@ exception Exit10
 
 let rec g env = function (* K正規化ルーチン本体 (caml2html: knormal_g) *)
   | Syntax.Info(_, x) -> raise Exit10
-      (*タイリングアルゴリズムが効果的*)
   | Syntax.Add(Syntax.Int(0), Syntax.Int(i))
   | Syntax.Add(Syntax.Int(i), Syntax.Int(0)) -> Int(i), Type.Int
   | Syntax.Add(Syntax.Int(0), e) | Syntax.Add(e, Syntax.Int(0)) -> g env e
@@ -140,14 +141,14 @@ let rec g env = function (* K正規化ルーチン本体 (caml2html: knormal_g) *)
 	(fun y ->
 	   let e3', t3 = g env e3 in
 	   let e4', t4 = g env e4 in
-	     IfFEqz(y, e3', e4'), t3)
+	     IfEq(y, Optt.fzreg, e3', e4'), t3)
   | Syntax.If(Syntax.Eq(e1, Syntax.Int(0)), e3, e4) 
   | Syntax.If(Syntax.Eq(Syntax.Int(0), e1), e3, e4) ->
       insert_let (g env e1)
 	(fun y ->
 	   let e3', t3 = g env e3 in
 	   let e4', t4 = g env e4 in
-	     IfIEqz(y, e3', e4'), t3)
+	     IfEq(y, Optt.zreg, e3', e4'), t3)
   | Syntax.If(Syntax.Eq(e1, e2), e3, e4) ->
       insert_let (g env e1)
 	(fun x -> insert_let (g env e2)
@@ -155,30 +156,6 @@ let rec g env = function (* K正規化ルーチン本体 (caml2html: knormal_g) *)
 	      let e3', t3 = g env e3 in
 	      let e4', t4 = g env e4 in
 		IfEq(x, y, e3', e4'), t3))
-(*  | Syntax.If(Syntax.LE(e1, Syntax.Float(0.0)), e3, e4) ->
-      insert_let (g env e1)
-	(fun y ->
-	   let e3', t3 = g env e3 in
-	   let e4', t4 = g env e4 in
-	     IfFLEz(y, e3', e4'), t3)
-  | Syntax.If(Syntax.LE(Syntax.Float(0.0), e1), e3, e4) ->
-      insert_let (g env e1)
-	(fun y ->
-	   let e3', t3 = g env e3 in
-	   let e4', t4 = g env e4 in
-	     IfFGEz(y, e3', e4'), t3)
-  | Syntax.If(Syntax.LE(e1, Syntax.Int(0)), e3, e4) ->
-      insert_let (g env e1)
-	(fun y ->
-	   let e3', t3 = g env e3 in
-	   let e4', t4 = g env e4 in
-	     IfILEz(y, e3', e4'), t3)
-  | Syntax.If(Syntax.LE(Syntax.Int(0), e1), e3, e4) ->
-      insert_let (g env e1)
-	(fun y ->
-	   let e3', t3 = g env e3 in
-	   let e4', t4 = g env e4 in
-	     IfIGEz(y, e3', e4'), t3)*)
   | Syntax.If(Syntax.LE(e1, e2), e3, e4) ->
       insert_let (g env e1)
 	(fun x -> insert_let (g env e2)
@@ -203,15 +180,30 @@ let rec g env = function (* K正規化ルーチン本体 (caml2html: knormal_g) *)
       let e1', t1 = g (M.add_list yts env') e1 in
 	LetRec({ name = (x, t); args = yts; body = e1' }, e2'), t2
   | Syntax.App(Syntax.Var(f), e2s) when not (M.mem f env) -> (* 外部関数の呼び出し (caml2html: knormal_extfunapp) *)
-      (match M.find f !Typing.extenv with
-	 | Type.Fun(_, t) ->
-	     let rec bind xs = function (* "xs" are identifiers for the arguments *)
-	       | [] -> ExtFunApp(f, xs), t
-	       | e2 :: e2s ->
-		   insert_let (g env e2)
-		     (fun x -> bind (xs @ [x]) e2s) in
-	       bind [] e2s (* left-to-right evaluation *)
-	 | _ -> assert false)
+      (match f with
+	 | "sqrt" ->
+	     insert_let (g env (hd e2s))
+	       (fun y -> FSqrt y, Type.Float)
+	 | "float_of_int" ->
+	     insert_let (g env (hd e2s))
+	       (fun y -> Float_of_int y, Type.Float)
+	 | "floor" ->
+	     insert_let (g env (hd e2s))
+	       (fun y -> Floor y, Type.Float)
+	 | "xor" ->
+	     insert_let (g env (hd e2s))
+	       (fun x -> insert_let (g env (nth e2s 1))
+		  (fun y -> Xor(x, y), Type.Int))
+	 | _ ->
+	     (match M.find f !Typing.extenv with
+		| Type.Fun(_, t) ->
+		    let rec bind xs = function (* "xs" are identifiers for the arguments *)
+		      | [] -> ExtFunApp(f, xs), t
+		      | e2 :: e2s ->
+			  insert_let (g env e2)
+			    (fun x -> bind (xs @ [x]) e2s) in
+		      bind [] e2s (* left-to-right evaluation *)
+		| _ -> assert false))
   | Syntax.App(e1, e2s) ->
       (match g env e1 with
 	 | _, Type.Fun(_, t) as g_e1 ->
@@ -251,8 +243,8 @@ let rec g env = function (* K正規化ルーチン本体 (caml2html: knormal_g) *)
   | Syntax.Get(e1, Syntax.Int(i)) ->
       (match g env e1 with
 	 | _, Type.Array(t) as g_e1 ->
-		  insert_let g_e1
-		    (fun y -> Geti(y, i), t)
+	     insert_let g_e1
+	       (fun y -> Geti(y, i), t)
 	 | _ -> assert false)
   | Syntax.Get(e1, e2) ->
       (match g env e1 with
@@ -270,6 +262,7 @@ let rec g env = function (* K正規化ルーチン本体 (caml2html: knormal_g) *)
 	(fun x -> insert_let (g env e2)
 	   (fun y -> insert_let (g env e3)
 	      (fun z -> Put(x, y, z), Type.Unit)))
+	(*TODO:Putzは効果あると思う*)
 
 let rec bf e =
   match e with
@@ -307,7 +300,7 @@ let rec bf e =
 
 let f e =
   fst (g M.empty (bf e))
-  
+    
     
 let ltostr (Id.L x) = x
 
@@ -320,13 +313,11 @@ let rec sop level e =
   let psol l s = sprintf "%s%s" (String.make l ' ') s in
   let sol = psol level in
   let tostr = function
-    | IfFLEz _ -> "IfFLEz" | IfILEz _ -> "IfILEz"
-    | IfFGEz _ -> "IfFGEz" | IfIGEz _ -> "IfIGEz"
-    | IfFEqz _ -> "IfFEqz" | IfIEqz _ -> "IfIEqz"
-    | Geti _ -> "Geti" | Puti _ -> "Puti"
+    | FSqrt _ -> "FSqrt"
+    | Geti _ -> "Geti" | Puti _ -> "Puti" 
     | Unit -> "Unit" | Int _ -> "Int" | Float _ -> "Float" | Addi _ -> "Addi"
     | Neg _ -> "Neg" | Add _ -> "Add" | Sub _ -> "Sub" | FNeg _ -> "FNeg"
-    | Mul _ -> "Mul" | Div _ -> "Div" | Floor _ -> "Floor"
+    | Mul _ -> "Mul" | Div _ -> "Div" | Floor _ -> "Floor" | Xor _ -> "Xor"
     | Float_of_int _ -> "Float_of_int" | Addzi _ -> "Addzi"
     | FAdd _ -> "FAdd" | FSub _ -> "FSub" | FMul _ -> "FMul" | FDiv _ -> "FDiv"
     | IfEq _ -> "IfEq" | IfLE _ -> "IfLE" | Let _ -> "Let" | Var _ -> "Var"
@@ -339,31 +330,27 @@ let rec sop level e =
       | Int x | Addzi x -> sol (sprintf "%s(%d)\n" str x)
       | Float x -> sol (sprintf "%s(%f)\n" str x)
       | Neg x | FNeg x | Var x | ExtArray x | ExtTuple x | Floor x
-      | Float_of_int x ->
+      | Float_of_int x | FSqrt x ->
 	  sol (sprintf "%s(%s)\n" str x)
       | Addi (x, i) -> sol (sprintf "%s(%s, %d)\n" str x i)
       | Add (x, y) | Sub (x, y) | FAdd (x, y) | FSub (x, y) | Mul (x, y) | Div (x, y)
-      | FMul (x, y) | FDiv (x, y) | Get (x, y) ->
+      | Xor (x, y) | FMul (x, y) | FDiv (x, y) | Get (x, y) ->
 	  sol (sprintf "%s(%s, %s)\n" str x y)
       | Geti (x, y) ->
 	  sol (sprintf "%s(%s, %d)\n" str x y)
       | Puti (x, y, z) -> sol (sprintf "%s(%s, %d, %s)\n" str x y z)
       | Put (x, y, z) -> sol (sprintf "%s(%s, %s, %s)\n" str x y z)
-      | IfFLEz (x, z, w) | IfILEz (x, z, w) 
-      | IfFGEz (x, z, w) | IfIGEz (x, z, w) 
-      | IfFEqz (x, z, w) | IfIEqz (x, z, w) ->
-	  sol (sprintf "%s(%s)\n%s%s\n%s" str x (nsop z) (sol "Else") (nsop w))
       | IfEq (x, y, z, w) | IfLE (x, y, z, w) ->
 	  sol (sprintf "%s(%s, %s)\n%s%s\n%s" str x y (nsop z) (sol "Else") (nsop w))
       | Let ((x, y), z, w) ->
 	  sol (sprintf "%s(%s : %s)\n%s%s\n%s"
-		 str x (Type.string_of_t y) (nsop z) (sol "In") (nsop w))
+		 str x (Type.string_of_t y) (nsop z) (sol "In") (sop level w))
       | LetRec ({ name = (x, y); args = z; body = w}, u) ->
 	  sol (sprintf "%s(%s : %s, (%s))\n%s%s\n%s"
 		 str x (Type.string_of_t y)
 		 (String.concat ", "
 		    (List.map (fun (a, b) -> sprintf "%s : %s" a (Type.string_of_t b)) z))
-		 (nsop w) (sol "In") (nsop u))
+		 (nsop w) (sol "In") (sop level u))
       | Tuple x ->
 	  sol (sprintf "%s(%s)\n" str (String.concat ", " x))
       | LetTuple (x, y, z) ->
@@ -376,7 +363,7 @@ let rec sop level e =
 	    
 let print_prog outchan e =
   num := 0;
-  output_string outchan (sop 0 e);
-  output_string outchan (sprintf "%d\n" !num)
+  fprintf outchan "%s" (sop 0 e);
+  fprintf outchan "%s" (sprintf "%d\n" !num)
 
     

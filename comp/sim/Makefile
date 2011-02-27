@@ -1,7 +1,7 @@
 #Makefile
 
-assemble-simulation: sim.c
-	gcc -lm -O3 -o sim sim.c
+all: fastsim.c
+	gcc -Wall -lm -O3 -DFAST -funroll-all-loops -fschedule-insns -finline-limit-100000 fastsim.c
 
 clean:
 	-rm sim

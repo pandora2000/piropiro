@@ -7,12 +7,11 @@ let rec pp_list = function
   | x :: xs -> x ^ " " ^ pp_list xs
 
 let counter = ref 0
+  (*TODO:idに.を入れとかないとおかしいことになる可能性あり*)
+let prefix = "L_"
 let genid s =
   incr counter;
-  Printf.sprintf "L_%s_%d" s !counter
-let genid2 s =
-  incr counter;
-  Printf.sprintf "P_%s_%d" s !counter
+  Printf.sprintf "%s%s.%d" prefix s !counter
 
 let rec id_of_typ = function
   | Type.Unit -> "u"

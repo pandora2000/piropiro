@@ -13,6 +13,7 @@ let rec g env = function (* β簡約ルーチン本体 (caml2html: beta_g) *)
   | Sub(x, y) -> Sub(find x env, find y env)
   | Mul(x, y) -> Mul(find x env, find y env)
   | Div(x, y) -> Div(find x env, find y env)
+  | Xor(x, y) -> Xor(find x env, find y env)
   | FNeg(x) -> FNeg(find x env)
   | Floor(x) -> Floor(find x env)
   | Float_of_int(x) -> Float_of_int(find x env)
@@ -20,18 +21,13 @@ let rec g env = function (* β簡約ルーチン本体 (caml2html: beta_g) *)
   | FSub(x, y) -> FSub(find x env, find y env)
   | FMul(x, y) -> FMul(find x env, find y env)
   | FDiv(x, y) -> FDiv(find x env, find y env)
-  | IfFLEz(x, e1, e2) -> IfFLEz(find x env, g env e1, g env e2)
-  | IfILEz(x, e1, e2) -> IfILEz(find x env, g env e1, g env e2)
-  | IfFGEz(x, e1, e2) -> IfFGEz(find x env, g env e1, g env e2)
-  | IfIGEz(x, e1, e2) -> IfIGEz(find x env, g env e1, g env e2)
-  | IfFEqz(x, e1, e2) -> IfFEqz(find x env, g env e1, g env e2)
-  | IfIEqz(x, e1, e2) -> IfIEqz(find x env, g env e1, g env e2)
+  | FSqrt(x) -> FSqrt(find x env)
   | IfEq(x, y, e1, e2) -> IfEq(find x env, find y env, g env e1, g env e2)
   | IfLE(x, y, e1, e2) -> IfLE(find x env, find y env, g env e1, g env e2)
   | Let((x, t), e1, e2) -> (* letのβ簡約 (caml2html: beta_let) *)
       (match g env e1 with
       | Var(y) ->
-	  Format.eprintf "beta-reducing %s = %s@." x y;
+	  (*Format.eprintf "beta-reducing %s = %s@." x y;*)
 	  g (M.add x y env) e2
       | e1' ->
 	  let e2' = g env e2 in

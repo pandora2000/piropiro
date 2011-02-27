@@ -17,6 +17,7 @@ type t =
   | FDiv of Id.t * Id.t
   | Floor of Id.t
   | Float_of_int of Id.t
+  | FSqrt of Id.t
   | IfFEqz of Id.t * t * t
   | IfIEqz of Id.t * t * t
   | IfFLEz of Id.t * t * t
@@ -30,12 +31,15 @@ type t =
   | MakeCls of (Id.t * Type.t) * closure * t
   | AppCls of Id.t * Id.t list
   | AppDir of Id.l * Id.t list
+  | TailAppDir of Id.l * Id.t list
   | Tuple of Id.t list
   | LetTuple of (Id.t * Type.t) list * Id.t * t
   | Get of Id.t * Id.t
   | Put of Id.t * Id.t * Id.t
   | Geti of Id.t * int
   | Puti of Id.t * int * Id.t
+  | Getzi of int
+  | Putzi of int * Id.t
   | ExtTuple of Id.t
   | ExtArray of Id.l
 type fundef = { name : Id.l * Type.t;

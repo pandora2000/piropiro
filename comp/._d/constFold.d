@@ -1,2 +1,2 @@
-constFold.cmo: m.cmo kNormal.cmi constFold.cmi 
-constFold.cmx: m.cmx kNormal.cmx constFold.cmi 
+constFold.cmo: s.cmo optt.cmo listEx.cmo kNormal.cmi alpha.cmi constFold.cmi 
+constFold.cmx: s.cmx optt.cmx listEx.cmx kNormal.cmx alpha.cmx constFold.cmi 

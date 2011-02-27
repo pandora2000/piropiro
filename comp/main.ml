@@ -1,156 +1,77 @@
 open Printf
 
 let limit = ref 1000
-let istest = ref false
+let run = ref false
+let only = ref false
+  (*let outmode = ref 0*)
 
 let rec iter n e = (* 最適化処理をくりかえす (caml2html: main_iter) *)
-  Format.eprintf "iteration %d@." n;
+  (*Format.eprintf "iteration %d@." n;*)
   if n = 0 then e else
-    let e' = Elim.f (ConstFold.f (Inline.f (Assoc.f (Beta.f e)))) in
+    let e' = EasyLoop.f (Elim.f (ConstFold.f (Inline.f (Assoc.f (Beta.f e))))) in
       if e = e' then e else
 	iter (n - 1) e'
 
-let prep s =
-  let r = ref "" in
-    for i = 0 to String.length s - 1 do
-      if s.[i] = '%' then () else r := !r ^ (String.make 1 s.[i])
-    done; !r
-
-      
-let memhp = 170000
-let memsp = 100
-let memext = 4096
-let memin = 6144
-let memout = 8192(*memoutの値はmemout+1で初期化*)
-let floffset = 0
-
-let extlist =
-  [
-    (*記述がなければすべて0で初期化*)
-    "screen", 0;(*3*)
-    "screenz_dir", 3;(*3*)
-    "screenx_dir", 6;(*3*)
-    "screeny_dir", 9;(*3*)
-    "viewpoint", 12;(*3*)
-    "light", 15;(*3*)
-    "intersection_point", 18;(*3*)
-    "intersected_object_id", 21;(*1*)
-    "nvector", 22;(*3*)
-    "texture_color", 25;(*3*)
-    "diffuse_ray", 28;(*3*)
-    "rgb", 31;(*3*)
-    "image_size", 34;(*2*)
-    "image_center", 36;(*2*)
-    "scan_pitch", 38;(*1*)
-    "startp", 39;(*3*)
-    "startp_fast", 42;(*3*)
-    "ptrace_dirvec", 45;(*3*)
-    "n_objects", 48;(*1*)
-    "solver_dist", 49;(*1*)
-    "intsec_rectside", 50;(*1*)
-    "n_reflections", 51;(*1*)
-    "dirvecs", 52;(*多分なんで初期化してもOK*)(*5*)
-    "beam", 57;(*255.0*)(*1*)
-    "tmin", 58;(*1000000000.0*)(*1*)
-    "and_net", 59;(*長さ1のint配列,その配列は-1で初期化*)(*中身は直後で-1に*)(*50*)
-    "or_net", 159;(*長さ1のint配列,その配列は-1で初期化*)(*中身は直後でand_net.(0)に*)
-    "reflections", 161;(*長さ3のタプル*)
-    "light_dirvec", 881;(*全体がタプル,第1要素は長さ3の配列(0),第2要素は長さ60の配列*)
-    (*dummyはfloat配列(0, 0, 0, 0, dummy, dummy, false, dummy, dummy, dummy, dummy)*)
-    "objects", 946;
-  ]
-
-let lexbuf outchan foutchan boutchan a = (* バッファをコンパイルしてチャンネルへ出力する (caml2html: main_lexbuf) *)
+let lexbuf outchan foutchan pkoutchan a = 
   Id.counter := 0;
   Typing.extenv := M.empty;
-  let al = (List.map (fun (x, y) -> ("min_caml_" ^ x, y)) extlist) in
-    (*    Syntax.print_prog stdout a;*)
+  let al = (List.map (fun (x, y) -> ("min_caml_" ^ x, y)) Optt.extlist) in
+    (*Syntax.print_prog stdout a;*)
   let b = Typing.f al a in
   let c = KNormal.f b in
   let d = Alpha.f c in
   let e = iter !limit d in
+  let () = KNormal.print_prog pkoutchan e in
   let f = Closure.f e in
-(*  let outchan2 = open_out "b.s" in*)
-(*  let pp = Opt.f outchan foutchan f in*)
-  let g = Virtual.f memin memout memext al f in
-  let h = RegAlloc.f g in
-(*  let goc = open_out "graph.dot" in
+    (*Closure.print_prog stdout f;*)
+  let goc = open_out "graph.dot" in
     Graph.f goc f;
-    close_out goc;*)
-    (*
-      Closure.print_prog stdout f;
-      KNormal.print_prog stdout e;
-      Asm.print_prog stdout g;
-      Asm.print_prog stdout h;
-    *)
-    Emit.f outchan foutchan !istest memext memin memout memsp memhp floffset h;
-(*    close_out outchan2;*)
-    (*
-      let dvir = open_out "dvir" in
-      let dbcls = open_out "dbcls" in
-      let dacls = open_out "dacls" in
-      ignore (Opt.f dvir f);
-      Closure.print_prog dbcls f;
-      Closure.print_prog dacls pp;
-      close_out dvir;
-      close_out dbcls;
-      close_out dacls;
-    *)
-    
-    (*    
-	  output_string outchan (prep (Emit.string_of_alist i));
-
-	  output_string foutchan (Emit.string_of_flist i);
-    *)
-    (*
-      output_string boutchan (Emit.string_of_binary i);
-    *)
-    
-    (*    
-	  output_string stdout j;
-    *)
-    (*
-      print_newline ();
-      output_string stdout (sprintf "%d\n"
-    *)
+    close_out goc;
+    Opt.f outchan foutchan f;
     ()
-      (*
-	let string s = lexbuf stdout (Lexing.from_string s) (* 文字列をコンパイルして標準出力に表示する (caml2html: main_string) *)
-      *)
-      (*
-	let file f = (* ファイルをコンパイルしてファイルに出力する (caml2html: main_file) *)
-	let inchan = open_in f in
-	let outchan = stdout in
-	try
-	lexbuf outchan (Lexing.from_channel inchan);
-	close_in inchan;
-	close_out outchan;
-	with e -> (close_in inchan; close_out outchan; raise e)
-      *)
 
-
+let run_sim () =
+  if !run then
+    (printf "simulation start\n%!";
+     Unix.execv "sim/a.out" [||])
       
 let () = (* ここからコンパイラの実行が開始される (caml2html: main_entry) *)
+  let nofile = ref true in
   let files = ref [] in
+  let ofile = ref "a.s" in
+  let fofile = ref "fp.s" in
+  let pkfile = ref "pk" in
+  let t = Time.get_time () in
     Arg.parse
-      [("-inline", Arg.Int(fun i -> Inline.threshold := i), "maximum size of functions inlined");
+      [("-i", Arg.Int(fun i -> Inline.threshold := i), "maximum size of functions inlined");
+       ("-ni", Arg.Unit(fun _ -> Inline.optnoinline := true), "not inline functions");
        ("-iter", Arg.Int(fun i -> limit := i), "maximum number of optimizations iterated");
-       ("-test", Arg.Unit(fun () -> istest := true), "")]
-      (fun s -> files := !files @ [s])
-      ("Mitou Min-Caml Compiler (C) Eijiro Sumii\n" ^
-	 Printf.sprintf
-	 "usage: %s [-inline m] [-iter n] ...filenames without \".ml\"..." Sys.argv.(0));
-    let p = List.map (fun x -> 
-			let inchan = open_in (x ^ ".ml") in
-			let a = Parser.exp Lexer.token (Lexing.from_channel inchan) in
-			  close_in inchan; a) !files in
-    let q = List.fold_right (fun b a ->
-			       if a = Syntax.Unit then b
-			       else Syntax.addexp b a) p Syntax.Unit in
-    let ofile = open_out "a.s" in
-    let fofile = open_out "fp.s" in
-    let bofile = open_out "bi" in
-      lexbuf ofile fofile bofile q;
-      close_out ofile;
-      close_out fofile
-	
+       ("-ur", Arg.Unit(fun _ -> Optt.use_regdisp := true), "use register displacement");
+       ("-r", Arg.Unit(fun _ -> run := true), "run simulator after compile");
+       ("-or", Arg.Unit(fun _ -> run := true; only := true), "run simulator without compile");
+       ("-pk", Arg.String(fun s -> pkfile := s), "specify output intermediate code file name");
+       (*("-e", Arg.Int(fun i -> outmode := i), "select emit mode, 0 means native");*)
+       ("-o", Arg.String(fun s -> ofile := s), "specify output binary file name");
+       ("-fo", Arg.String(fun s -> fofile := s), "specify output fp table file name")]
+      (fun s -> nofile := false; files := !files @ [s])
+      "My Min-Caml Compiler";
+    if !only then run_sim () else
+      (
+	files := if !nofile then ["rth"; "rt"] else !files;
+	let p = List.map (fun x -> 
+			    let inchan = open_in (x ^ ".ml") in
+			    let a = Parser.exp Lexer.token (Lexing.from_channel inchan) in
+			      close_in inchan; a) !files in
+	let q = List.fold_right (fun b a ->
+				   if a = Syntax.Unit then b
+				   else Syntax.addexp b a) p Syntax.Unit in
+	let ofile = open_out !ofile in
+	let fofile = open_out !fofile in
+	let pkfile = open_out !pkfile in
+	  lexbuf ofile fofile pkfile q;
+	  close_out ofile;
+	  close_out fofile;
+	  close_out pkfile;
+	  printf "elapsed time: %s\n" (Time.string_of_elapsed_secs t);
+	  run_sim ()	
+      )

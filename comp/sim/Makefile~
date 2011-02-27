@@ -1,7 +1,7 @@
 #Makefile
 
-assemble-simulation: assemble-simulation.c
-	gcc -lm -o assemble-simulation assemble-simulation.c
+all: fastsim.c
+	gcc -lm -O3 fastsim.c
 
 clean:
-	-rm assemble-simulation
+	-rm sim

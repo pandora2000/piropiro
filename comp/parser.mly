@@ -40,8 +40,6 @@
 %token   LPAREN
 %token   RPAREN
 %token  EOF
-%token FLOAT_OF_INT
-%token FLOOR
 %token SLASH
   
   
@@ -189,8 +187,6 @@
 		Info({ln = p.pos_lnum; cn=p.pos_cnum - p.pos_bol}, Put($1, $4, $7)) }
 | exp SEMICOLON
 		{ $1 }
-| exp SEMICOLON exp SEMICOLON
-		{ Let((Id.gentmp Type.Unit, Type.Unit), $1, $3) }
 | exp SEMICOLON exp 
 		    { Let((Id.gentmp Type.Unit, Type.Unit), $1, $3) }
 | ARRAY_CREATE simple_exp simple_exp
@@ -198,16 +194,6 @@
 {
   let p = Parsing.rhs_start_pos 1 in
     Info({ln = p.pos_lnum; cn=p.pos_cnum - p.pos_bol}, Array($2, $3)) }
-| FLOAT_OF_INT exp
-%prec prec_app
-{
-  let p = Parsing.rhs_start_pos 1 in
-    Info({ln = p.pos_lnum; cn=p.pos_cnum - p.pos_bol}, Float_of_int($2)) }
-| FLOOR exp
-%prec prec_app
-{
-  let p = Parsing.rhs_start_pos 1 in
-    Info({ln = p.pos_lnum; cn=p.pos_cnum - p.pos_bol}, Floor($2)) }
 | error
     {
       failwith

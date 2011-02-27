@@ -31,8 +31,6 @@ type token =
   | LPAREN
   | RPAREN
   | EOF
-  | FLOAT_OF_INT
-  | FLOOR
   | SLASH
 
 val exp :

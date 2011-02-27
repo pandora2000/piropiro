@@ -141,10 +141,10 @@ let rec g al info env e = (* 型推論ルーチン (caml2html: typing_g) *)
     | Var(x) when M.mem x env -> M.find x env (* 変数の型推論 (caml2html: typing_var) *)
     | Var(x) when M.mem x !extenv -> M.find x !extenv
     | Var(x) -> (* 外部変数の型推論 (caml2html: typing_extvar) *)
-	if List.mem_assoc ("min_caml_" ^ x) al then
+	(*if List.mem_assoc ("min_caml_" ^ x) al then
 	  Format.eprintf "free variable %s assumed as external array@." x
 	else 
-	  Format.eprintf "free variable %s assumed as external function@." x;
+	  Format.eprintf "free variable %s assumed as external function@." x;*)
 	let t = Type.gentyp () in
 	extenv := M.add x t !extenv;
 	t

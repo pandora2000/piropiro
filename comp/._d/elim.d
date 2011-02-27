@@ -1,2 +1,2 @@
-elim.cmo: s.cmo kNormal.cmi id.cmo 
-elim.cmx: s.cmx kNormal.cmx id.cmx 
+elim.cmo: s.cmo kNormal.cmi 
+elim.cmx: s.cmx kNormal.cmx 

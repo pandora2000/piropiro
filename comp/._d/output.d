@@ -1,2 +1,2 @@
-output.cmo: optt.cmo listSet.cmo 
-output.cmx: optt.cmx listSet.cmx 
+output.cmo: optt.cmo listEx.cmo alloc.cmo 
+output.cmx: optt.cmx listEx.cmx alloc.cmx 
