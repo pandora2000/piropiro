@@ -666,18 +666,61 @@ program2 *parse_all2(program * program)
 
 //ストールを調べる為のメモリー
 long long stall_buf[64][2] = {0};
-
-
-
 long long  stall_buf_all[RANK_MAX][2] = {0};
+long long stall_branch_buf[2] = {0};
+long long branch_count[RANK_MAX] = {0};
+
+
+//アクセス回数を調べる
+static long long memory_count[MEMORY_SIZE];
 
 #define PRINT_STALL_SUB(INST,INSTNUM) \
   printf("%s:\t%20lld%20lld\t%f%%\n",INST,stall_buf_all[INSTNUM][0],stall_buf_all[INSTNUM][1], ((double)stall_buf_all[INSTNUM][0])*100/icount[INSTNUM]); \
   sum = sum  + stall_buf_all[INSTNUM][0]; \
   sum2 = sum2  + stall_buf_all[INSTNUM][1];
 
-void print_stall(int *icount){
+//chacheのhit率を調べる
+int cache[1024] = {0};
+int cache_cnt[1024][2] = {0};
+
+
+int cache_read(int mem,int next2inst){
+  int num = mem%1024;
+
+  cache_cnt[num][0]++;
+  if(cache[num] == mem){
+    cache_cnt[num][1]++;
+    return 1;
+  }else{
+    if(next2inst != STI && next2inst != FSTI){
+      cache[num] = mem;
+    }
+    return -1;
+  }
+}
+
+void cache_write(int mem){
+  int num = mem%1024;
+  cache[num] = mem;
+}
+
+void cache_hit_print(){
+  int sum = 0;
+  int hit_sum = 0;
   int i;
+  for(i=0;i<1024;i++){
+    sum = sum + cache_cnt[i][0];
+    hit_sum = hit_sum + cache_cnt[i][1];
+  }
+
+  printf("hit = %d ,sum = %d\n",hit_sum,sum);
+  printf("cashe hit = %f\n",((double) hit_sum) * 100 /sum);
+  return;
+}
+
+
+
+void print_stall(int *icount){
   long long sum=0,sum2=0;
   printf("stall した回数(stall回数、stall clock数、stall割合)\n");
   PRINT_STALL_SUB("FADD",FADD);
@@ -696,7 +739,24 @@ void print_stall(int *icount){
 
   printf("stall sum:\t%20lld%20lld\n",sum,sum2);
   printf("cnt:      \t%20lld\n",cnt);
-  printf("sum + cnt:\t%20lld\n",cnt + sum2);
+  printf("inst:     \t%20lld\n",cnt - sum2);
+  return;
+}
+
+#define PRINT_BRANCH_SUB(INST,INSTNUM) \
+  printf("%s:\t%20d%20lld\t%f%%\n",INST,icount[INSTNUM],branch_count[INSTNUM], ((double)branch_count[INSTNUM])*100/icount[INSTNUM]); \
+  sum = sum  + icount[INSTNUM]; \
+  sum2 = sum2  + branch_count[INSTNUM];
+
+void print_branch(int *icount){
+  long long sum=0,sum2=0;
+  printf("branch した回数(呼ばれた回数、branch数、branch割合)\n");
+  PRINT_BRANCH_SUB("BNE",BNE);
+  PRINT_BRANCH_SUB("BGT",BGT);
+  PRINT_BRANCH_SUB("FBNE",FBNE);
+  PRINT_BRANCH_SUB("FBGT",FBGT);
+  printf("%s:\t%20lld%20lld\t%f%%\n","SUM",sum,sum2, ((double)sum2)*100/sum); \
+
   return;
 }
 
@@ -708,42 +768,92 @@ void print_stall_buf(void){
   return;
 }
 
-void stall_check(int inst,int dst,int s1,int s2,long long cnt,int n_ist){
-  int i,j;
-  //stallのチェック
-  if(s1 != -1){
-    if((i = stall_buf[s1][1] - cnt + 1) > 0){
-      stall_buf_all[stall_buf[s1][0]][0]++;
-      stall_buf_all[stall_buf[s1][0]][1] = stall_buf_all[stall_buf[s1][0]][1] + i;
-      stall_buf[s1][1] = 0; 
+void print_memory_count(){
+  int i;
+  long long memory_count2[1024] = {0};
+  long long sum=0;
+  printf("memory のアクセス回数\n");
+  for (i = 0; i < MEMORY_SIZE; i++) {
+      memory_count2[i%1024] = memory_count2[i%1024] + memory_count[i];
+      sum = sum + memory_count[i];
+    if(memory_count[i] > 100){
+    printf("%d %10lld\n",i,memory_count[i]);
     }
   }
 
+  printf("mod1024のアクセス回数\n");
+  for(i = 0;i<1024;i++){
+    printf("%d %10lld  %f\n",i,memory_count2[i],(double)memory_count2[i] * 100 /sum);
+  }
+  return;
+
+}
+
+void stall_check(int inst,int dst,int s1,int s2,int n_ist){
+  long long  i=0,j=0;
+
+
+
+  //stallのチェック
+  if(s1 != -1){
+    i = stall_buf[s1][1] - cnt + 1;
+  }
+
   if(s2 != -1 && s2 != s1){
-    if((i = stall_buf[s2][1] - cnt + 1) > 0){
+    j = stall_buf[s2][1] - cnt + 1;
+  }
+
+  
+  if(i>0){
+    if(i>=j){
+      stall_buf_all[stall_buf[s1][0]][0]++;
+      stall_buf_all[stall_buf[s1][0]][1] = stall_buf_all[stall_buf[s1][0]][1] + i;
+      cnt = cnt + i;
+    } 
+    else{
       stall_buf_all[stall_buf[s2][0]][0]++;
-      stall_buf_all[stall_buf[s2][0]][1] = stall_buf_all[stall_buf[s2][0]][1] + i;
-      stall_buf[s2][1] = 0; 
+      stall_buf_all[stall_buf[s2][0]][1] = stall_buf_all[stall_buf[s2][0]][1] + j;
+      cnt = cnt + j;
+    }
+  }else if(j>0){
+      stall_buf_all[stall_buf[s2][0]][0]++;
+      stall_buf_all[stall_buf[s2][0]][1] = stall_buf_all[stall_buf[s2][0]][1] + j;
+      cnt = cnt + j;
+  }
+
+  //dstの挿入
+  if(inst == LDI || inst == FLDI){
+    //casheがhitしたらstallしない。
+    if(s2 == 1){
+      return;
     }
   }
-  
-  //dstの挿入
   if(dst != -1){
     stall_buf[dst][0] = inst;
     stall_buf[dst][1] = cnt + n_ist;
   }
-
+  
   return;
 }
 
+
+#define BRANCH_STALL \
+  /*分岐した際*/ \
+        stall_buf_all[iname][0]++; \
+        stall_buf_all[iname][1] = stall_buf_all[iname][1] + 2; \
+        cnt = cnt +2; \
+        branch_count[iname]++;
+
+#define BRANCH_STALL_INSERT \
+  stall_branch_buf[0] = iname;                  \
+  stall_branch_buf[1] = cnt + 2;
+
+
 #define BRANCH_STALL_CHECK \
-  if(prog2->insts[pc+1].name[0] == RETURN || prog2->insts[pc+1].name[0] == CALL){ \
-        stall_buf_all[iname][0]++; \
-        stall_buf_all[iname][1] = stall_buf_all[iname][1] + 2;              \
-  }else if(prog2->insts[pc+2].name[0] == RETURN || prog2->insts[pc+2].name[0] == CALL){ \
-        stall_buf_all[iname][0]++; \
-        stall_buf_all[iname][1] = stall_buf_all[iname][1] + 1; \
-      }
+  if((branch_i = stall_branch_buf[1] - cnt + 1) > 0){ \
+  stall_buf_all[stall_branch_buf[0]][0]++; \
+  stall_buf_all[stall_branch_buf[0]][1] = stall_buf_all[stall_branch_buf[0]][1] + branch_i; \
+  cnt = cnt + branch_i; }
 
 int do_assemble2(char *tmp)
 {
@@ -759,6 +869,7 @@ int do_assemble2(char *tmp)
   long long stack_use = 0;
   int max_sttop = 0;
   int sttop = 256;
+  long long branch_i;
 #endif
 #ifdef OUTDEB
   long long cc = 0, targetcc = 435322;
@@ -808,12 +919,16 @@ int do_assemble2(char *tmp)
 	  printf("Access uninitialized memory: %d\n", reg[arg2] + arg3);
 	  exit(1);
 	}
-      stall_check(FLDI,arg1+32,arg2,-1,cnt,2);      
+      stall_check(FLDI,arg1+32,arg2,cache_read(reg[arg2] + arg3,prog2->insts[pc+2].name[0]),2);    
+      memory_count[reg[arg2] + arg3]++;
 #endif
       freg[arg1] = memory[reg[arg2] + arg3].d;
     }
     else if(iname == ADDI) {
       reg[arg1] = reg[arg2] + arg3;
+#ifndef FAST
+      stall_check(-1,-1,arg2,-1,0);      
+#endif
     }
     else if(iname == LDI) {
 #ifndef FAST
@@ -826,52 +941,60 @@ int do_assemble2(char *tmp)
 	  printf("Access uninitialized memory: %d\n", reg[arg2] + arg3);
 	  exit(1);
 	}
-      stall_check(LDI,arg1,arg2,-1,cnt,2);      
+      stall_check(LDI,arg1,arg2,cache_read(reg[arg2] + arg3,prog2->insts[pc+2].name[0]),2); 
+      memory_count[reg[arg2] + arg3]++;
 #endif
       reg[arg1] = memory[reg[arg2] + arg3].i;
     }
     else if(iname == FMUL) {
       freg[arg1] = freg[arg2] * freg[arg3];
 #ifndef FAST
-      stall_check(FMUL,arg1+32,arg2+32,arg3+32,cnt,1);      
+      stall_check(FMUL,arg1+32,arg2+32,arg3+32,1);      
 #endif
     }
     else if(iname == BNE) {
+#ifndef FAST
+      stall_check(-1,-1,arg1,arg2,-1);      
+     BRANCH_STALL_INSERT
+#endif
       if (reg[arg1] != reg[arg2]) {
+#ifndef FAST
+        //分岐する時は2ストールする。
+        BRANCH_STALL
+#endif
 	nextpc = pc + arg3 - 1;
       }
-#ifndef FAST
-      //制御stallのチェック
-      BRANCH_STALL_CHECK
-      stall_check(-1,-1,arg1,arg2,cnt,-1);      
-#endif
     }
     else if(iname == ADD) {
       reg[arg1] = reg[arg2] + reg[arg3];
 #ifndef FAST
-      stall_check(-1,-1,arg2,arg3,cnt,-1);      
+      stall_check(-1,-1,arg2,arg3,-1);      
 #endif
     }
     else if(iname == FADD) {
       freg[arg1] = freg[arg2] + freg[arg3];
 #ifndef FAST
-      stall_check(FADD,arg1+32,arg2+32,arg3+32,cnt,1);      
+      stall_check(FADD,arg1+32,arg2+32,arg3+32,1);      
 #endif
     }
     else if(iname == FBGT) {
+#ifndef FAST
+      stall_check(-1,-1,arg1+32,arg2+32,-1);
+     BRANCH_STALL_INSERT      
+      //制御stallのチェック
+#endif
       if (freg[arg1] > freg[arg2]) {
+#ifndef FAST
+        //分岐する時は2ストールする。
+        BRANCH_STALL
+#endif
 	nextpc = pc + arg3 - 1;
       }
-#ifndef FAST
-      stall_check(-1,-1,arg1,arg2,cnt,-1);      
-      //制御stallのチェック
-      BRANCH_STALL_CHECK
-#endif
     }
     else if(iname == FSUB) {
       freg[arg1] = freg[arg2] - freg[arg3];
 #ifndef FAST
-      stall_check(FSUB,arg1+32,arg2+32,arg3+32,cnt,1);      
+      stall_check(FSUB,arg1+32,arg2+32,arg3+32,1);      
 #endif
     }
     else if(iname == JUMP) {
@@ -922,57 +1045,59 @@ int do_assemble2(char *tmp)
       push(&cistack, callpc);
       callpc = nextpc + 1;
       ++callcount[callpc];
+     BRANCH_STALL_CHECK
 #endif
       push(&call_stack, (pc + 1));
     }
     else if(iname == RETURN) {
 #ifndef FAST
       sttop = pop(&sustack);
-      callpc = pop(&cistack);
+      callpc = pop(&cistack); 
+     BRANCH_STALL_CHECK
 #endif
-      nextpc = pop(&call_stack) - 1;
+      nextpc = pop(&call_stack) - 1;      
     }
     else if(iname == FDIV) {
       freg[arg1] = freg[arg2] / freg[arg3];
 #ifndef FAST
-      stall_check(FDIV,arg1+32,arg2+32,arg3+32,cnt,7);      
+      stall_check(FDIV,arg1+32,arg2+32,arg3+32,7);      
 #endif
     }
     //ここから順番適当
     else if(iname == FSQRT) {
       freg[arg1] = sqrt(freg[arg2]);
 #ifndef FAST
-      stall_check(FSQRT,arg1+32,arg2+32,arg3+32,cnt,12);      
+      stall_check(FSQRT,arg1+32,arg2+32,arg3+32,12);      
 #endif
     }
     else if(iname == SUB) {
       reg[arg1] = reg[arg2] - reg[arg3];
 #ifndef FAST
-      stall_check(-1,-1,arg2,arg3,cnt,-1);      
+      stall_check(-1,-1,arg2,arg3,-1);      
 #endif      
     }
     else if(iname == MUL) {
       reg[arg1] = reg[arg2] * reg[arg3];
 #ifndef FAST
-      stall_check(-1,-1,arg2,arg3,cnt,-1);      
+      stall_check(-1,-1,arg2,arg3,-1);      
 #endif      
     }
     else if(iname == XOR) {
       reg[arg1] = reg[arg2] ^ reg[arg3];
 #ifndef FAST
-      stall_check(-1,-1,arg2,arg3,cnt,-1);      
+      stall_check(-1,-1,arg2,arg3,-1);      
 #endif      
     }
     else if(iname == FLR) {
       freg[arg1] = floor(freg[arg2]);
 #ifndef FAST
-      stall_check(FLR,arg1+32,arg2+32,-1,cnt,1);      
+      stall_check(FLR,arg1+32,arg2+32,-1,1);      
 #endif
     }
     else if(iname == FOI) {
       freg[arg1] = (float)reg[arg2];
 #ifndef FAST
-      stall_check(FOI,arg1+32,arg2,-1,cnt,1);      
+      stall_check(FOI,arg1+32,arg2,-1,1);      
 #endif
     }
     else if(iname == STI) {
@@ -982,7 +1107,8 @@ int do_assemble2(char *tmp)
 	exit(1);
       }
       memoryf[reg[arg2] + arg3] = true;
-      stall_check(-1,-1,arg1,arg2,cnt,-1);      
+      stall_check(-1,-1,arg1,arg2,-1);      
+      cache_write(reg[arg2] + arg3);
 #endif
       memory[reg[arg2] + arg3].i = reg[arg1];
     }
@@ -993,29 +1119,38 @@ int do_assemble2(char *tmp)
 	exit(1);
       }
       memoryf[reg[arg2] + arg3] = true;
-      stall_check(-1,-1,arg1+32,arg2,cnt,-1);      
+      stall_check(-1,-1,arg1+32,arg2,-1);
+      cache_write(reg[arg2] + arg3);      
 #endif
       memory[reg[arg2] + arg3].d = freg[arg1];
     }
-    else if(iname == BGT) {
+    else if(iname == BGT){
+#ifndef FAST
+     stall_check(-1,-1,arg1,arg2,-1);
+     BRANCH_STALL_INSERT      
+      //制御stallのチェック
+#endif
       if (reg[arg1] > reg[arg2]) {
 	nextpc = pc + arg3 - 1;
-      }
 #ifndef FAST
-      stall_check(-1,-1,arg1,arg2,cnt,1);      
-      //制御stallのチェック
-      BRANCH_STALL_CHECK
+        //分岐する時は2ストールする。
+        BRANCH_STALL
 #endif
+          }
     }
     else if(iname == FBNE) {
+#ifndef FAST
+      //制御stallのチェック
+      stall_check(-1,-1,arg1+32,arg2+32,1);
+     BRANCH_STALL_INSERT            
+#endif
       if (freg[arg1] != freg[arg2]) {
+#ifndef FAST
+        //分岐する時は2ストールする。
+        BRANCH_STALL
+#endif
 	nextpc = pc + arg3 - 1;
       }
-#ifndef FAST
-      stall_check(-1,-1,arg1+32,arg2+32,cnt,1);      
-      //制御stallのチェック
-      BRANCH_STALL_CHECK
-#endif
     }
     else if (iname == RDI) {
 #ifdef OUTDEB
@@ -1037,7 +1172,7 @@ int do_assemble2(char *tmp)
     }
     else if (iname == PTC) {
 #ifndef FAST
-      stall_check(-1,-1,arg1,-1,cnt,1);      
+      stall_check(-1,-1,arg1,-1,1);      
 #endif
       /*最初のOXAAは無視する*/
       if(firstflag == 1) {
@@ -1052,7 +1187,7 @@ int do_assemble2(char *tmp)
     }
     else if (iname == PTF) {
 #ifndef FAST
-      stall_check(-1,-1,arg1+32,-1,cnt,1);      
+      stall_check(-1,-1,arg1+32,-1,1);      
 #endif
       round = (int)(freg[arg1] + 0.5);
       if(round > 255) {
@@ -1197,6 +1332,9 @@ int do_assemble2(char *tmp)
   
   //stall 回数の表示
   print_stall(icount);
+  print_branch(icount);
+  //  print_memory_count();
+  cache_hit_print();
 
 #ifdef OUTICS
   FILE *ics_fp = fopen("ics", "w");

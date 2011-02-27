@@ -1,16 +1,17 @@
 	nop
 	nop
-	addi	r6 r0 170
-    fdiv    f1 f2 f3
-	addi	r4 r0 1
+    fdiv    f3 f4 f5
+    nop
+    nop
+    nop
+    fdiv    f12 f4 f5
+    addi    r1 r0 1
+    bne     r0 r0 hei
+    fadd    f1 f2 f5
+    call    hei
+    fadd    f1 f2 f3
     fadd    f2 f3 f1
-    fadd    f2 f3 f1
-    bne     r0 r0 10
-    bne     r0 r0 10 
-    call    hei 
-    addi	r5 r0 -1
-	addi	r2 r0 256
-hei :    
-	addi	r3 r0 1024
-	addi	r6 r0 1006
-	addi	r7 r0 0
+    fadd    f5 f2 f7
+hei :
+    call hoi
+hoi :

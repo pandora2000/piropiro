@@ -14,7 +14,7 @@ outputfileがアセンブリとして出力される*/
 #include <sys/time.h>
 
 #define NAME_MAX_COUNT 4
-#define NAME_SIZE 40
+#define NAME_SIZE 100
 
 #define INST_MAX_COUNT 100000
 
