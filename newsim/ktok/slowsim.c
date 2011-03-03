@@ -718,6 +718,7 @@ void cache_hit_print(){
   return;
 }
 
+long long int inst_sum;
 
 
 void print_stall(int *icount){
@@ -740,6 +741,7 @@ void print_stall(int *icount){
   printf("stall sum:\t%20lld%20lld\n",sum,sum2);
   printf("cnt:      \t%20lld\n",cnt);
   printf("inst:     \t%20lld\n",cnt - sum2);
+  inst_sum = cnt - sum2;
   return;
 }
 
@@ -1500,8 +1502,8 @@ int main(int argc, char *argv[])
   t2 = gettimeofday_sec();
   
   printf("elapsed time: %f\n", t2 - t1);
-  printf("instruction count: %lld\n", cnt);
-  printf("MIPS: %f\n", (double)cnt / 1000000.0 / (t2 - t1));
+  printf("instruction count: %lld\n", inst_sum);
+  printf("MIPS: %f\n", (double)inst_sum  / 1000000.0 / (t2 - t1));
 
   if (doprintregs)
     print_register();

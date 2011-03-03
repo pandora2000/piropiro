@@ -1,0 +1,198 @@
+結果
+yuto@UoT-IST-Ub:~/piropiro/newsim/ktok$ ./slowsim ./../a.s ./../fp.s -s ./../../comp/sld/contest.sld 
+nop		2
+add		85787649
+sub		5778964
+mul		29929
+addi		121162357
+xor		2052623
+fadd		61044629
+fsub		72474084
+fmul		117264040
+fdiv		1520977
+fsqrt		2174576
+flr		181580
+foi		16623
+ldi		274433378
+sti		1947178
+fldi		272044253
+fsti		20633384
+bne		148641648
+bgt		2671290
+fbne		11112702
+fbgt		75323696
+jump		72230078
+call		16026731
+return		16026731
+rdi		113
+rdf		212
+ptc		16
+ptf		49152
+bp		0
+deb		0
+debf		0
+info		0
+info2		0
+funcweight
+min_caml_create_array                   	26384
+min_caml_init_array                     	127411
+min_caml_create_float_array             	133007
+min_caml_init_float_array               	437397
+min_caml_read_int                       	226
+min_caml_read_float                     	424
+min_caml_print_char                     	22
+L_psin_1874                             	8294
+L_pcos_1876                             	18616
+L_sin_1878                              	148031
+L_cos_1880                              	35742
+L_atan_1882                             	35000
+L_pow10_1887                            	852
+L_divpow10_1893                         	335
+L_print_int_1900                        	345
+L_read_screen_settings_2029             	60
+L_read_light_2031                       	25
+L_read_nth_object_2036                  	1733
+L_read_object_2038                      	87
+L_read_net_item_2042                    	631
+L_read_or_network_2044                  	49
+L_read_and_network_2046                 	45
+L_setup_rect_table_2134                 	193260
+L_setup_surface_table_2137              	35533
+L_setup_second_table_2140               	270900
+L_iter_setup_dirvec_constants_2143      	110481
+L_setup_startp_constants_2148           	26261136
+L_check_all_inside_2173                 	1919100
+L_shadow_check_and_group_2179           	332042993
+L_shadow_check_one_or_group_2182        	209955
+L_shadow_check_one_or_matrix_2185       	61052741
+L_solve_each_element_2188               	17793631
+L_trace_or_matrix_2196                  	4471942
+L_solve_each_element_fast_2202          	630671752
+L_solve_one_or_network_fast_2206        	6869120
+L_trace_or_matrix_fast_2210             	112682173
+L_utexture_2225                         	13751130
+L_trace_reflections_2232                	1935624
+L_trace_ray_2237                        	5787871
+L_trace_diffuse_ray_2243                	55140535
+L_iter_trace_diffuse_rays_2246          	102458163
+L_calc_diffuse_using_1point_2259        	181888
+L_do_without_neighbors_2268             	119389
+L_try_exploit_neighbors_2284            	1201281
+L_write_ppm_header_2291                 	20
+L_write_rgb_element_2293                	147456
+L_pretrace_diffuse_rays_2297            	207671
+L_pretrace_pixels_2300                  	2477297
+L_scan_pixel_2311                       	1530329
+L_scan_line_2317                        	11332
+L_create_float5x3array_2323             	41472
+L_create_pixel_2325                     	13056
+L_create_pixelline_2330                 	2031
+L_tan_2332                              	7000
+L_adjust_position_2334                  	11000
+L_calc_dirvec_2337                      	11900
+L_calc_dirvecs_2345                     	1403
+L_calc_dirvec_rows_2350                 	298
+L_create_dirvec_2354                    	7212
+L_create_dirvec_elements_2356           	2950
+L_create_dirvecs_2359                   	217
+L_init_dirvec_constants_2361            	19930
+L_init_vecset_constants_2364            	192
+min_caml_start                          	498
+callcount
+min_caml_create_array                   	3298
+min_caml_init_array                     	3313
+min_caml_create_float_array             	19001
+min_caml_init_float_array               	19001
+min_caml_read_int                       	113
+min_caml_read_float                     	212
+min_caml_print_char                     	11
+L_psin_1874                             	319
+L_pcos_1876                             	716
+L_sin_1878                              	3826
+L_cos_1880                              	1004
+L_atan_1882                             	1000
+L_pow10_1887                            	33
+L_divpow10_1893                         	27
+L_print_int_1900                        	3
+L_read_screen_settings_2029             	1
+L_read_light_2031                       	1
+L_read_nth_object_2036                  	18
+L_read_object_2038                      	1
+L_read_net_item_2042                    	43
+L_read_or_network_2044                  	3
+L_read_and_network_2046                 	1
+L_setup_rect_table_2134                 	3612
+L_setup_surface_table_2137              	1204
+L_setup_second_table_2140               	5418
+L_iter_setup_dirvec_constants_2143      	602
+L_setup_startp_constants_2148           	37092
+L_check_all_inside_2173                 	383820
+L_shadow_check_and_group_2179           	3256392
+L_shadow_check_one_or_group_2182        	41991
+L_shadow_check_one_or_matrix_2185       	617251
+L_solve_each_element_2188               	135680
+L_trace_or_matrix_2196                  	23756
+L_solve_each_element_fast_2202          	8633332
+L_solve_one_or_network_fast_2206        	343456
+L_trace_or_matrix_fast_2210             	1134256
+L_utexture_2225                         	657814
+L_trace_reflections_2232                	18496
+L_trace_ray_2237                        	16384
+L_trace_diffuse_ray_2243                	557880
+L_iter_trace_diffuse_rays_2246          	18596
+L_calc_diffuse_using_1point_2259        	928
+L_do_without_neighbors_2268             	1275
+L_try_exploit_neighbors_2284            	15109
+L_write_ppm_header_2291                 	1
+L_write_rgb_element_2293                	49152
+L_pretrace_diffuse_rays_2297            	16384
+L_pretrace_pixels_2300                  	128
+L_scan_pixel_2311                       	128
+L_scan_line_2317                        	1
+L_create_float5x3array_2323             	1536
+L_create_pixel_2325                     	384
+L_create_pixelline_2330                 	3
+L_tan_2332                              	1000
+L_adjust_position_2334                  	1000
+L_calc_dirvec_2337                      	100
+L_calc_dirvecs_2345                     	10
+L_calc_dirvec_rows_2350                 	1
+L_create_dirvec_2354                    	601
+L_create_dirvec_elements_2356           	5
+L_create_dirvecs_2359                   	1
+L_init_dirvec_constants_2361            	5
+L_init_vecset_constants_2364            	1
+min_caml_start                          	1
+trans counts: 0 0 0 0
+stack use: 716396
+max stack top: 273
+stall した回数(stall回数、stall clock数、stall割合)
+FADD:	            27256131            27256131	44.649515%
+FSUB:	            10779071            10779071	14.873001%
+FMUL:	            62378402            62378402	53.194826%
+FDIV:	              403918             2174997	26.556483%
+FOI:	               16512               16512	99.332250%
+FLR:	                   0                   0	0.000000%
+FSQRT:	             2174576            26062768	100.000000%
+BNE:	            89994114           175699984	60.544346%
+LDI:	            28460893            55230605	10.370784%
+FLDI:	            84633082           164077545	31.110042%
+BGT:	              555773             1111546	20.805416%
+FBNE:	            11112700            22225400	99.999982%
+FBGT:	            39356313            78711810	52.249578%
+stall sum:	           357121485           625724771
+cnt:      	          2006353366
+inst:     	          1380628595
+branch した回数(呼ばれた回数、branch数、branch割合)
+BNE:	           148641648            75159596	50.564291%
+BGT:	             2671290              554703	20.765361%
+FBNE:	            11112702            11112700	99.999982%
+FBGT:	            75323696            39352221	52.244145%
+SUM:	           237749336           126179220	53.072375%
+hit = 398197246 ,sum = 546477631
+cashe hit = 72.866157
+elapsed time: 76.323433
+instruction count: 1380628595
+MIPS: 18.089184
+>>> diff result ./../res/s_contest_latest
+
