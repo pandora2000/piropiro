@@ -6,47 +6,53 @@
 	addi	r5 r0 -1
 	addi	r2 r0 256
 	addi	r3 r0 1024
-	addi	r6 r0 1006
+	addi	r6 r0 1555
 	addi	r7 r0 0
 	call	min_caml_create_array
-	addi	r6 r0 1907
-	sti	r6 r0 1905
-	addi	r6 r0 1910
-	sti	r6 r0 1906
+	addi	r6 r0 1856
+	sti	r6 r0 1854
+	addi	r6 r0 1859
+	sti	r6 r0 1855
 	jump	min_caml_end
 min_caml_create_array : 
-	add	r9 r0 r3
+	add	r10 r0 r3
 	add	r3 r6 r3
 	sub	r6 r3 r6
 	add	r8 r0 r7
 	sub	r7 r3 r6
-	call	min_caml_init_array
-	add	r6 r0 r9
+	add	r9 r0 r4
+	call	min_caml_init_arrayt
+	add	r6 r0 r10
 	return
 min_caml_init_array : 
-	bne	r0 r7 L_else.26975
+	add	r6 r6 r10
+min_caml_init_arrayt : 
+	bne	r0 r7 L_else.22707
 	return
-L_else.26975 : 
+L_else.22707 : 
 	sti	r8 r6 0
 	addi	r7 r7 -1
-	addi	r6 r6 1
-	jump	min_caml_init_array
+	add	r6 r6 r9
+	jump	min_caml_init_arrayt
 min_caml_create_float_array : 
 	add	r9 r0 r3
 	add	r3 r6 r3
 	sub	r6 r3 r6
 	sub	r7 r3 r6
-	call	min_caml_init_float_array
+	add	r8 r0 r4
+	call	min_caml_init_float_arrayt
 	add	r6 r0 r9
 	return
 min_caml_init_float_array : 
-	bne	r0 r7 L_else.26976
+	add	r6 r6 r9
+min_caml_init_float_arrayt : 
+	bne	r0 r7 L_else.22708
 	return
-L_else.26976 : 
+L_else.22708 : 
 	fsti	f2 r6 0
 	addi	r7 r7 -1
-	addi	r6 r6 1
-	jump	min_caml_init_float_array
+	addi	r6 r6 r8
+	jump	min_caml_init_float_arrayt
 min_caml_read_int : 
 	rdi	r6
 	return
@@ -59,7 +65,7 @@ min_caml_print_char :
 min_caml_print_float : 
 	ptf	f2
 	return
-L_psin.1874 : 
+L_psin.1938 : 
 	fmul	f3 f2 f2
 	fmul	f9 f2 f3
 	fmul	f7 f9 f3
@@ -86,7 +92,7 @@ L_psin.1874 :
 	fsub	f3 f4 f3
 	fadd	f2 f3 f2
 	return
-L_pcos.1876 : 
+L_pcos.1940 : 
 	fmul	f7 f2 f2
 	fmul	f8 f7 f7
 	fmul	f5 f8 f7
@@ -113,91 +119,91 @@ L_pcos.1876 :
 	fldi	f3 r0 12
 	fadd	f2 f2 f3
 	return
-L_sin.1878 : 
+L_sin.1942 : 
 	fldi	f4 r0 13
 	fldi	f6 r0 14
-	fbgt	f2 f6 L_else.23826
+	fbgt	f2 f6 L_else.21044
 	fldi	f3 r0 15
-	fbgt	f3 f2 L_else.23828
+	fbgt	f3 f2 L_else.21046
 	fldi	f5 r0 16
 	fldi	f4 r0 17
 	fldi	f3 r0 18
-	fbgt	f2 f0 L_else.23830
+	fbgt	f2 f0 L_else.21048
 	fldi	f3 r0 19
-	fbgt	f3 f2 L_else.23832
-	jump	L_psin.1874
-L_else.23832 : 
+	fbgt	f3 f2 L_else.21050
+	jump	L_psin.1938
+L_else.21050 : 
 	fldi	f3 r0 20
-	fbgt	f3 f2 L_else.23834
+	fbgt	f3 f2 L_else.21052
 	fadd	f2 f4 f2
-	call	L_pcos.1876
+	call	L_pcos.1940
 	fsub	f2 f0 f2
 	return
-L_else.23834 : 
+L_else.21052 : 
 	fadd	f2 f6 f2
-	call	L_psin.1874
+	call	L_psin.1938
 	fsub	f2 f0 f2
 	return
-L_else.23830 : 
-	fbgt	f2 f5 L_else.23836
-	jump	L_psin.1874
-L_else.23836 : 
-	fbgt	f2 f3 L_else.23838
+L_else.21048 : 
+	fbgt	f2 f5 L_else.21054
+	jump	L_psin.1938
+L_else.21054 : 
+	fbgt	f2 f3 L_else.21056
 	fsub	f2 f2 f4
-	jump	L_pcos.1876
-L_else.23838 : 
+	jump	L_pcos.1940
+L_else.21056 : 
 	fsub	f2 f6 f2
-	jump	L_psin.1874
-L_else.23828 : 
+	jump	L_psin.1938
+L_else.21046 : 
 	fadd	f2 f2 f4
-	jump	L_sin.1878
-L_else.23826 : 
+	jump	L_sin.1942
+L_else.21044 : 
 	fsub	f2 f2 f4
-	jump	L_sin.1878
-L_cos.1880 : 
+	jump	L_sin.1942
+L_cos.1944 : 
 	fldi	f4 r0 13
 	fldi	f6 r0 14
-	fbgt	f2 f6 L_else.23841
+	fbgt	f2 f6 L_else.21059
 	fldi	f3 r0 15
-	fbgt	f3 f2 L_else.23843
+	fbgt	f3 f2 L_else.21061
 	fldi	f5 r0 16
 	fldi	f4 r0 17
 	fldi	f3 r0 18
-	fbgt	f2 f0 L_else.23845
+	fbgt	f2 f0 L_else.21063
 	fldi	f3 r0 19
-	fbgt	f3 f2 L_else.23847
-	jump	L_pcos.1876
-L_else.23847 : 
+	fbgt	f3 f2 L_else.21065
+	jump	L_pcos.1940
+L_else.21065 : 
 	fldi	f3 r0 20
-	fbgt	f3 f2 L_else.23849
+	fbgt	f3 f2 L_else.21067
 	fadd	f2 f2 f4
-	jump	L_psin.1874
-L_else.23849 : 
+	jump	L_psin.1938
+L_else.21067 : 
 	fadd	f2 f6 f2
-	call	L_pcos.1876
+	call	L_pcos.1940
 	fsub	f2 f0 f2
 	return
-L_else.23845 : 
-	fbgt	f2 f5 L_else.23851
-	jump	L_pcos.1876
-L_else.23851 : 
-	fbgt	f2 f3 L_else.23853
+L_else.21063 : 
+	fbgt	f2 f5 L_else.21069
+	jump	L_pcos.1940
+L_else.21069 : 
+	fbgt	f2 f3 L_else.21071
 	fsub	f2 f2 f4
-	call	L_psin.1874
+	call	L_psin.1938
 	fsub	f2 f0 f2
 	return
-L_else.23853 : 
+L_else.21071 : 
 	fsub	f2 f6 f2
-	call	L_pcos.1876
+	call	L_pcos.1940
 	fsub	f2 f0 f2
 	return
-L_else.23843 : 
+L_else.21061 : 
 	fadd	f2 f2 f4
-	jump	L_cos.1880
-L_else.23841 : 
+	jump	L_cos.1944
+L_else.21059 : 
 	fsub	f2 f2 f4
-	jump	L_cos.1880
-L_atan.1882 : 
+	jump	L_cos.1944
+L_atan.1946 : 
 	fmul	f3 f2 f2
 	fldi	f4 r0 12
 	fadd	f14 f4 f3
@@ -233,75 +239,75 @@ L_atan.1882 :
 	fdiv	f2 f2 f14
 	fadd	f2 f3 f2
 	return
-L_spow10.1884 : 
-	bne	r6 r0 L_else.23857
+L_spow10.1948 : 
+	bne	r6 r0 L_else.21075
 	add	r6 r0 r7
 	return
-L_else.23857 : 
-	addi	r8 r6 -1
-	addi	r6 r0 10
-	mul	r7 r7 r6
-	add	r6 r0 r8
-	jump	L_spow10.1884
-L_pow10.1887 : 
+L_else.21075 : 
+	addi	r6 r6 -1
+	muli	r7 r7 10
+	jump	L_spow10.1948
+L_pow10.1951 : 
 	addi	r7 r0 1
-	jump	L_spow10.1884
-L_sdivn.1889 : 
+	jump	L_spow10.1948
+L_sdivn.1953 : 
 	sub	r6 r6 r7
-	bgt	r0 r6 L_else.23861
+	bgt	r0 r6 L_else.21079
 	addi	r8 r8 1
-	jump	L_sdivn.1889
-L_else.23861 : 
+	jump	L_sdivn.1953
+L_else.21079 : 
 	add	r6 r0 r8
 	return
-L_divpow10.1893 : 
-	call	L_pow10.1887
-	addi	r8 r0 0
-	add	r7 r0 r6
-	add	r6 r0 r9
-	jump	L_sdivn.1889
-L_sprint_int.1896 : 
-	bne	r11 r0 L_else.23865
-	addi	r6 r10 48
+L_divpow10.1957 : 
+	call	L_pow10.1951
+	addi	r7 r0 0
+	add	r1 r0 r6
+	add	r6 r0 r8
+	add	r8 r0 r7
+	add	r7 r0 r1
+	jump	L_sdivn.1953
+L_sprint_int.1960 : 
+	bne	r10 r0 L_else.21083
+	addi	r6 r9 48
 	jump	min_caml_print_char
-L_else.23865 : 
-	bne	r12 r0 L_else.23867
-	add	r9 r0 r10
-	add	r6 r0 r11
-	call	L_divpow10.1893
-	add	r9 r0 r6
-	addi	r6 r9 48
+L_else.21083 : 
+	bne	r11 r0 L_else.21085
+	add	r8 r0 r9
+	add	r6 r0 r10
+	call	L_divpow10.1957
+	add	r8 r0 r6
+	addi	r6 r8 48
 	call	min_caml_print_char
-	add	r6 r0 r11
-	call	L_pow10.1887
-	mul	r6 r9 r6
-	sub	r10 r10 r6
-	addi	r11 r11 -1
-	addi	r12 r0 0
-	jump	L_sprint_int.1896
-L_else.23867 : 
-	add	r9 r0 r10
-	add	r6 r0 r11
-	call	L_divpow10.1893
-	add	r9 r0 r6
-	bne	r9 r0 L_else.23869
-	addi	r11 r11 -1
-	jump	L_sprint_int.1896
-L_else.23869 : 
-	addi	r6 r9 48
+	add	r6 r0 r10
+	call	L_pow10.1951
+	mul	r6 r8 r6
+	sub	r9 r9 r6
+	addi	r10 r10 -1
+	addi	r11 r0 0
+	jump	L_sprint_int.1960
+L_else.21085 : 
+	add	r8 r0 r9
+	add	r6 r0 r10
+	call	L_divpow10.1957
+	add	r8 r0 r6
+	bne	r8 r0 L_else.21087
+	addi	r10 r10 -1
+	jump	L_sprint_int.1960
+L_else.21087 : 
+	addi	r6 r8 48
 	call	min_caml_print_char
-	add	r6 r0 r11
-	call	L_pow10.1887
-	mul	r6 r9 r6
-	sub	r10 r10 r6
-	addi	r11 r11 -1
-	addi	r12 r0 0
-	jump	L_sprint_int.1896
-L_print_int.1900 : 
-	addi	r11 r0 9
-	addi	r12 r0 1
-	jump	L_sprint_int.1896
-L_read_screen_settings.2029 : 
+	add	r6 r0 r10
+	call	L_pow10.1951
+	mul	r6 r8 r6
+	sub	r9 r9 r6
+	addi	r10 r10 -1
+	addi	r11 r0 0
+	jump	L_sprint_int.1960
+L_print_int.1964 : 
+	addi	r10 r0 9
+	addi	r11 r0 1
+	jump	L_sprint_int.1960
+L_read_screen_settings.2093 : 
 	call	min_caml_read_float
 	fsti	f2 r0 1024
 	call	min_caml_read_float
@@ -312,19 +318,19 @@ L_read_screen_settings.2029 :
 	fldi	f3 r0 26
 	fmul	f11 f2 f3
 	fadd	f2 f0 f11
-	call	L_cos.1880
+	call	L_cos.1944
 	fadd	f10 f0 f2
 	fadd	f2 f0 f11
-	call	L_sin.1878
+	call	L_sin.1942
 	fadd	f11 f0 f2
 	call	min_caml_read_float
 	fldi	f3 r0 26
 	fmul	f13 f2 f3
 	fadd	f2 f0 f13
-	call	L_cos.1880
+	call	L_cos.1944
 	fadd	f12 f0 f2
 	fadd	f2 f0 f13
-	call	L_sin.1878
+	call	L_sin.1942
 	fmul	f4 f10 f2
 	fldi	f3 r0 27
 	fmul	f3 f4 f3
@@ -337,8 +343,7 @@ L_read_screen_settings.2029 :
 	fmul	f3 f4 f3
 	fsti	f3 r0 1029
 	fsti	f12 r0 1030
-	fldi	f3 r0 29
-	fsti	f3 r0 1031
+	fsti	f0 r0 1031
 	fsub	f3 f0 f2
 	fsti	f3 r0 1032
 	fsub	f3 f0 f11
@@ -352,59 +357,59 @@ L_read_screen_settings.2029 :
 	fldi	f2 r0 1027
 	fsub	f2 f3 f2
 	fsti	f2 r0 1036
-	fldi	f2 r0 1025
-	fldi	f3 r0 1028
-	fsub	f2 f2 f3
+	fldi	f3 r0 1025
+	fldi	f2 r0 1028
+	fsub	f2 f3 f2
 	fsti	f2 r0 1037
 	fldi	f3 r0 1026
 	fldi	f2 r0 1029
 	fsub	f2 f3 f2
 	fsti	f2 r0 1038
 	return
-L_read_light.2031 : 
+L_read_light.2095 : 
 	call	min_caml_read_int
 	call	min_caml_read_float
 	fldi	f3 r0 26
 	fmul	f10 f2 f3
 	fadd	f2 f0 f10
-	call	L_sin.1878
+	call	L_sin.1942
 	fsub	f2 f0 f2
 	fsti	f2 r0 1040
 	call	min_caml_read_float
 	fldi	f3 r0 26
 	fmul	f11 f2 f3
 	fadd	f2 f0 f10
-	call	L_cos.1880
+	call	L_cos.1944
 	fadd	f10 f0 f2
 	fadd	f2 f0 f11
-	call	L_sin.1878
+	call	L_sin.1942
 	fmul	f2 f10 f2
 	fsti	f2 r0 1039
 	fadd	f2 f0 f11
-	call	L_cos.1880
+	call	L_cos.1944
 	fmul	f2 f10 f2
 	fsti	f2 r0 1041
 	call	min_caml_read_float
 	fsti	f2 r0 1081
 	return
-L_rotate_quadratic_matrix.2033 : 
+L_rotate_quadratic_matrix.2097 : 
 	fldi	f2 r7 0
-	call	L_cos.1880
+	call	L_cos.1944
 	fadd	f10 f0 f2
 	fldi	f2 r7 0
-	call	L_sin.1878
+	call	L_sin.1942
 	fadd	f11 f0 f2
 	fldi	f2 r7 1
-	call	L_cos.1880
+	call	L_cos.1944
 	fadd	f12 f0 f2
 	fldi	f2 r7 1
-	call	L_sin.1878
+	call	L_sin.1942
 	fadd	f13 f0 f2
 	fldi	f2 r7 2
-	call	L_cos.1880
+	call	L_cos.1944
 	fadd	f14 f0 f2
 	fldi	f2 r7 2
-	call	L_sin.1878
+	call	L_sin.1942
 	fmul	f5 f12 f14
 	fmul	f8 f11 f13
 	fmul	f4 f8 f14
@@ -454,7 +459,7 @@ L_rotate_quadratic_matrix.2033 :
 	fmul	f2 f12 f2
 	fadd	f2 f3 f2
 	fsti	f2 r6 2
-	fldi	f4 r0 30
+	fldi	f4 r0 29
 	fmul	f2 f7 f9
 	fmul	f3 f2 f6
 	fmul	f2 f16 f8
@@ -465,7 +470,7 @@ L_rotate_quadratic_matrix.2033 :
 	fadd	f2 f3 f2
 	fmul	f2 f4 f2
 	fsti	f2 r7 0
-	fldi	f4 r0 30
+	fldi	f4 r0 29
 	fmul	f7 f7 f5
 	fmul	f3 f7 f6
 	fmul	f6 f16 f15
@@ -476,7 +481,7 @@ L_rotate_quadratic_matrix.2033 :
 	fadd	f2 f3 f2
 	fmul	f2 f4 f2
 	fsti	f2 r7 1
-	fldi	f4 r0 30
+	fldi	f4 r0 29
 	fmul	f3 f7 f9
 	fmul	f2 f6 f8
 	fadd	f3 f3 f2
@@ -485,31 +490,21 @@ L_rotate_quadratic_matrix.2033 :
 	fmul	f2 f4 f2
 	fsti	f2 r7 2
 	return
-L_read_nth_object.2036 : 
-	call	min_caml_read_int
-	add	r10 r0 r6
-	bne	r10 r5 L_else.23876
-	addi	r6 r0 0
-	return
-L_else.23876 : 
+L_read_nth_object.2100 : 
 	call	min_caml_read_int
 	add	r11 r0 r6
+	bne	r11 r5 L_else.21094
+	addi	r6 r0 0
+	return
+L_else.21094 : 
 	call	min_caml_read_int
 	add	r12 r0 r6
 	call	min_caml_read_int
 	add	r13 r0 r6
-	addi	r6 r0 3
-	fldi	f2 r0 29
-	call	min_caml_create_float_array
+	call	min_caml_read_int
 	add	r14 r0 r6
-	call	min_caml_read_float
-	fsti	f2 r14 0
-	call	min_caml_read_float
-	fsti	f2 r14 1
-	call	min_caml_read_float
-	fsti	f2 r14 2
 	addi	r6 r0 3
-	fldi	f2 r0 29
+	fldi	f2 r0 30
 	call	min_caml_create_float_array
 	add	r15 r0 r6
 	call	min_caml_read_float
@@ -518,7145 +513,4249 @@ L_else.23876 :
 	fsti	f2 r15 1
 	call	min_caml_read_float
 	fsti	f2 r15 2
-	call	min_caml_read_float
-	fbgt	f0 f2 L_else.23879
-	addi	r16 r0 0
-	jump	L_cont.23877
-L_else.23879 : 
-	addi	r16 r0 1
-L_cont.23877 : 
-	addi	r6 r0 2
-	fldi	f2 r0 29
-	call	min_caml_create_float_array
-	add	r17 r0 r6
-	call	min_caml_read_float
-	fsti	f2 r17 0
-	call	min_caml_read_float
-	fsti	f2 r17 1
 	addi	r6 r0 3
-	fldi	f2 r0 29
+	fldi	f2 r0 30
+	call	min_caml_create_float_array
+	add	r16 r0 r6
+	call	min_caml_read_float
+	fsti	f2 r16 0
+	call	min_caml_read_float
+	fsti	f2 r16 1
+	call	min_caml_read_float
+	fsti	f2 r16 2
+	call	min_caml_read_float
+	fbgt	f0 f2 L_else.21097
+	addi	r17 r0 0
+	jump	L_cont.21095
+L_else.21097 : 
+	addi	r17 r0 1
+L_cont.21095 : 
+	addi	r6 r0 2
+	fldi	f2 r0 30
 	call	min_caml_create_float_array
 	add	r18 r0 r6
 	call	min_caml_read_float
 	fsti	f2 r18 0
 	call	min_caml_read_float
 	fsti	f2 r18 1
-	call	min_caml_read_float
-	fsti	f2 r18 2
 	addi	r6 r0 3
-	fldi	f2 r0 29
+	fldi	f2 r0 30
 	call	min_caml_create_float_array
 	add	r19 r0 r6
-	bne	r13 r0 L_else.23882
-	jump	L_cont.23880
-L_else.23882 : 
 	call	min_caml_read_float
-	fldi	f3 r0 26
-	fmul	f2 f2 f3
 	fsti	f2 r19 0
 	call	min_caml_read_float
-	fldi	f3 r0 26
-	fmul	f2 f2 f3
 	fsti	f2 r19 1
+	call	min_caml_read_float
+	fsti	f2 r19 2
+	addi	r6 r0 3
+	fldi	f2 r0 30
+	call	min_caml_create_float_array
+	add	r20 r0 r6
+	bne	r14 r0 L_else.21100
+	jump	L_cont.21098
+L_else.21100 : 
 	call	min_caml_read_float
 	fldi	f3 r0 26
 	fmul	f2 f2 f3
-	fsti	f2 r19 2
-L_cont.23880 : 
+	fsti	f2 r20 0
+	call	min_caml_read_float
+	fldi	f3 r0 26
+	fmul	f2 f2 f3
+	fsti	f2 r20 1
+	call	min_caml_read_float
+	fldi	f3 r0 26
+	fmul	f2 f2 f3
+	fsti	f2 r20 2
+L_cont.21098 : 
 	addi	r6 r0 2
-	bne	r11 r6 L_else.23885
-	addi	r20 r0 1
-	jump	L_cont.23883
-L_else.23885 : 
-	add	r20 r0 r16
-L_cont.23883 : 
+	bne	r12 r6 L_else.21103
+	addi	r21 r0 1
+	jump	L_cont.21101
+L_else.21103 : 
+	add	r21 r0 r17
+L_cont.21101 : 
 	addi	r6 r0 4
-	fldi	f2 r0 29
+	fldi	f2 r0 30
 	call	min_caml_create_float_array
-	sti	r10 r3 0
-	sti	r11 r3 1
-	sti	r12 r3 2
-	sti	r13 r3 3
-	sti	r14 r3 4
-	sti	r15 r3 5
-	sti	r20 r3 6
-	sti	r17 r3 7
-	sti	r18 r3 8
-	sti	r19 r3 9
-	sti	r6 r3 10
-	add	r7 r0 r3
-	addi	r3 r3 11
-	addi	r6 r0 1970
-	add	r1 r6 r8
+	add	r22 r0 r11
+	add	r9 r0 r12
+	add	r11 r0 r14
+	add	r8 r0 r15
+	add	r7 r0 r20
+	addi	r23 r0 1919
+	muli	r10 r10 11
+	addi	r24 r10 10
+	add	r1 r23 r24
+	sti	r6 r1 0
+	addi	r6 r10 9
+	add	r1 r23 r6
 	sti	r7 r1 0
+	addi	r6 r10 8
+	add	r1 r23 r6
+	sti	r19 r1 0
+	addi	r6 r10 7
+	add	r1 r23 r6
+	sti	r18 r1 0
+	addi	r6 r10 6
+	add	r1 r23 r6
+	sti	r21 r1 0
+	addi	r6 r10 5
+	add	r1 r23 r6
+	sti	r16 r1 0
+	addi	r6 r10 4
+	add	r1 r23 r6
+	sti	r8 r1 0
+	addi	r6 r10 3
+	add	r1 r23 r6
+	sti	r11 r1 0
+	addi	r6 r10 2
+	add	r1 r23 r6
+	sti	r13 r1 0
+	addi	r6 r10 1
+	add	r1 r23 r6
+	sti	r9 r1 0
+	add	r1 r23 r10
+	sti	r22 r1 0
 	addi	r6 r0 3
-	bne	r11 r6 L_else.23888
-	fldi	f3 r14 0
-	fbne	f3 f0 L_else.23894
-	fldi	f2 r0 29
-	jump	L_cont.23892
-L_else.23894 : 
-	fbne	f3 f0 L_else.23913
-	fldi	f2 r0 29
-	jump	L_cont.23911
-L_else.23913 : 
-	fbgt	f3 f0 L_else.23915
+	bne	r12 r6 L_else.21106
+	fldi	f3 r15 0
+	fbne	f3 f0 L_else.21112
+	fldi	f2 r0 30
+	jump	L_cont.21110
+L_else.21112 : 
+	fbne	f3 f0 L_else.21131
+	fldi	f2 r0 30
+	jump	L_cont.21129
+L_else.21131 : 
+	fbgt	f3 f0 L_else.21133
 	fldi	f2 r0 31
-	jump	L_cont.23911
-L_else.23915 : 
+	jump	L_cont.21129
+L_else.21133 : 
 	fldi	f2 r0 12
-L_cont.23911 : 
+L_cont.21129 : 
 	fmul	f3 f3 f3
 	fdiv	f2 f2 f3
-L_cont.23892 : 
-	fsti	f2 r14 0
-	fldi	f2 r14 1
-	fbne	f2 f0 L_else.23897
-	fldi	f2 r0 29
-	jump	L_cont.23895
-L_else.23897 : 
-	fbne	f2 f0 L_else.23908
-	fldi	f3 r0 29
-	jump	L_cont.23906
-L_else.23908 : 
-	fbgt	f2 f0 L_else.23910
-	fldi	f3 r0 31
-	jump	L_cont.23906
-L_else.23910 : 
-	fldi	f3 r0 12
-L_cont.23906 : 
-	fmul	f2 f2 f2
-	fdiv	f2 f3 f2
-L_cont.23895 : 
-	fsti	f2 r14 1
-	fldi	f3 r14 2
-	fbne	f3 f0 L_else.23900
-	fldi	f2 r0 29
-	jump	L_cont.23898
-L_else.23900 : 
-	fbne	f3 f0 L_else.23903
-	fldi	f2 r0 29
-	jump	L_cont.23901
-L_else.23903 : 
-	fbgt	f3 f0 L_else.23905
+L_cont.21110 : 
+	fsti	f2 r15 0
+	fldi	f3 r15 1
+	fbne	f3 f0 L_else.21115
+	fldi	f2 r0 30
+	jump	L_cont.21113
+L_else.21115 : 
+	fbne	f3 f0 L_else.21126
+	fldi	f2 r0 30
+	jump	L_cont.21124
+L_else.21126 : 
+	fbgt	f3 f0 L_else.21128
 	fldi	f2 r0 31
-	jump	L_cont.23901
-L_else.23905 : 
+	jump	L_cont.21124
+L_else.21128 : 
 	fldi	f2 r0 12
-L_cont.23901 : 
+L_cont.21124 : 
 	fmul	f3 f3 f3
 	fdiv	f2 f2 f3
-L_cont.23898 : 
-	fsti	f2 r14 2
-	jump	L_cont.23886
-L_else.23888 : 
+L_cont.21113 : 
+	fsti	f2 r15 1
+	fldi	f3 r15 2
+	fbne	f3 f0 L_else.21118
+	fldi	f2 r0 30
+	jump	L_cont.21116
+L_else.21118 : 
+	fbne	f3 f0 L_else.21121
+	fldi	f2 r0 30
+	jump	L_cont.21119
+L_else.21121 : 
+	fbgt	f3 f0 L_else.21123
+	fldi	f2 r0 31
+	jump	L_cont.21119
+L_else.21123 : 
+	fldi	f2 r0 12
+L_cont.21119 : 
+	fmul	f3 f3 f3
+	fdiv	f2 f2 f3
+L_cont.21116 : 
+	fsti	f2 r15 2
+	jump	L_cont.21104
+L_else.21106 : 
 	addi	r6 r0 2
-	bne	r11 r6 L_else.23917
-	sub	r6 r4 r16
-	fldi	f2 r14 0
+	bne	r12 r6 L_else.21135
+	sub	r6 r4 r17
+	fldi	f2 r15 0
 	fmul	f3 f2 f2
-	fldi	f2 r14 1
+	fldi	f2 r15 1
 	fmul	f2 f2 f2
 	fadd	f3 f3 f2
-	fldi	f2 r14 2
+	fldi	f2 r15 2
 	fmul	f2 f2 f2
 	fadd	f2 f3 f2
 	fsqrt	f3 f2
-	fbne	f3 f0 L_else.23920
+	fbne	f3 f0 L_else.21138
 	fldi	f3 r0 12
-	jump	L_cont.23918
-L_else.23920 : 
-	bne	r6 r0 L_else.23922
+	jump	L_cont.21136
+L_else.21138 : 
+	bne	r6 r0 L_else.21140
 	fldi	f2 r0 12
 	fdiv	f3 f2 f3
-	jump	L_cont.23918
-L_else.23922 : 
+	jump	L_cont.21136
+L_else.21140 : 
 	fldi	f2 r0 31
 	fdiv	f3 f2 f3
-L_cont.23918 : 
-	fldi	f2 r14 0
+L_cont.21136 : 
+	fldi	f2 r15 0
 	fmul	f2 f2 f3
-	fsti	f2 r14 0
-	fldi	f2 r14 1
+	fsti	f2 r15 0
+	fldi	f2 r15 1
 	fmul	f2 f2 f3
-	fsti	f2 r14 1
-	fldi	f2 r14 2
+	fsti	f2 r15 1
+	fldi	f2 r15 2
 	fmul	f2 f2 f3
-	fsti	f2 r14 2
-	jump	L_cont.23886
-L_else.23917 : 
-L_cont.23886 : 
-	bne	r13 r0 L_else.23891
-	jump	L_cont.23889
-L_else.23891 : 
-	add	r6 r0 r14
-	add	r7 r0 r19
-	call	L_rotate_quadratic_matrix.2033
-L_cont.23889 : 
+	fsti	f2 r15 2
+	jump	L_cont.21104
+L_else.21135 : 
+L_cont.21104 : 
+	bne	r14 r0 L_else.21109
+	jump	L_cont.21107
+L_else.21109 : 
+	add	r6 r0 r15
+	add	r7 r0 r20
+	call	L_rotate_quadratic_matrix.2097
+L_cont.21107 : 
 	addi	r6 r0 1
 	return
-L_read_object.2038 : 
+L_read_object.2102 : 
 	addi	r6 r0 60
-	bgt	r6 r21 L_else.23925
+	bgt	r6 r25 L_else.21143
 	return
-L_else.23925 : 
-	add	r8 r0 r21
-	call	L_read_nth_object.2036
-	bne	r6 r0 L_else.23927
-	sti	r21 r0 1072
+L_else.21143 : 
+	add	r10 r0 r25
+	call	L_read_nth_object.2100
+	bne	r6 r0 L_else.21145
+	sti	r25 r0 1072
 	return
-L_else.23927 : 
-	addi	r21 r21 1
+L_else.21145 : 
+	addi	r25 r25 1
 	addi	r6 r0 60
-	bgt	r6 r21 L_else.23929
+	bgt	r6 r25 L_else.21147
 	return
-L_else.23929 : 
-	add	r8 r0 r21
-	call	L_read_nth_object.2036
-	bne	r6 r0 L_else.23931
-	sti	r21 r0 1072
+L_else.21147 : 
+	add	r10 r0 r25
+	call	L_read_nth_object.2100
+	bne	r6 r0 L_else.21149
+	sti	r25 r0 1072
 	return
-L_else.23931 : 
-	addi	r21 r21 1
+L_else.21149 : 
+	addi	r25 r25 1
 	addi	r6 r0 60
-	bgt	r6 r21 L_else.23933
+	bgt	r6 r25 L_else.21151
 	return
-L_else.23933 : 
-	add	r8 r0 r21
-	call	L_read_nth_object.2036
-	bne	r6 r0 L_else.23935
-	sti	r21 r0 1072
+L_else.21151 : 
+	add	r10 r0 r25
+	call	L_read_nth_object.2100
+	bne	r6 r0 L_else.21153
+	sti	r25 r0 1072
 	return
-L_else.23935 : 
-	addi	r21 r21 1
+L_else.21153 : 
+	addi	r25 r25 1
 	addi	r6 r0 60
-	bgt	r6 r21 L_else.23937
+	bgt	r6 r25 L_else.21155
 	return
-L_else.23937 : 
-	add	r8 r0 r21
-	call	L_read_nth_object.2036
-	bne	r6 r0 L_else.23939
-	sti	r21 r0 1072
+L_else.21155 : 
+	add	r10 r0 r25
+	call	L_read_nth_object.2100
+	bne	r6 r0 L_else.21157
+	sti	r25 r0 1072
 	return
-L_else.23939 : 
-	addi	r21 r21 1
+L_else.21157 : 
+	addi	r25 r25 1
 	addi	r6 r0 60
-	bgt	r6 r21 L_else.23941
+	bgt	r6 r25 L_else.21159
 	return
-L_else.23941 : 
-	add	r8 r0 r21
-	call	L_read_nth_object.2036
-	bne	r6 r0 L_else.23943
-	sti	r21 r0 1072
+L_else.21159 : 
+	add	r10 r0 r25
+	call	L_read_nth_object.2100
+	bne	r6 r0 L_else.21161
+	sti	r25 r0 1072
 	return
-L_else.23943 : 
-	addi	r21 r21 1
+L_else.21161 : 
+	addi	r25 r25 1
 	addi	r6 r0 60
-	bgt	r6 r21 L_else.23945
+	bgt	r6 r25 L_else.21163
 	return
-L_else.23945 : 
-	add	r8 r0 r21
-	call	L_read_nth_object.2036
-	bne	r6 r0 L_else.23947
-	sti	r21 r0 1072
+L_else.21163 : 
+	add	r10 r0 r25
+	call	L_read_nth_object.2100
+	bne	r6 r0 L_else.21165
+	sti	r25 r0 1072
 	return
-L_else.23947 : 
-	addi	r21 r21 1
+L_else.21165 : 
+	addi	r25 r25 1
 	addi	r6 r0 60
-	bgt	r6 r21 L_else.23949
+	bgt	r6 r25 L_else.21167
 	return
-L_else.23949 : 
-	add	r8 r0 r21
-	call	L_read_nth_object.2036
-	bne	r6 r0 L_else.23951
-	sti	r21 r0 1072
+L_else.21167 : 
+	add	r10 r0 r25
+	call	L_read_nth_object.2100
+	bne	r6 r0 L_else.21169
+	sti	r25 r0 1072
 	return
-L_else.23951 : 
-	addi	r21 r21 1
+L_else.21169 : 
+	addi	r25 r25 1
 	addi	r6 r0 60
-	bgt	r6 r21 L_else.23953
+	bgt	r6 r25 L_else.21171
 	return
-L_else.23953 : 
-	add	r8 r0 r21
-	call	L_read_nth_object.2036
-	bne	r6 r0 L_else.23955
-	sti	r21 r0 1072
+L_else.21171 : 
+	add	r10 r0 r25
+	call	L_read_nth_object.2100
+	bne	r6 r0 L_else.21173
+	sti	r25 r0 1072
 	return
-L_else.23955 : 
-	addi	r21 r21 1
-	jump	L_read_object.2038
-L_read_net_item.2042 : 
+L_else.21173 : 
+	addi	r25 r25 1
+	jump	L_read_object.2102
+L_read_net_item.2106 : 
 	call	min_caml_read_int
 	add	r8 r0 r6
-	bne	r8 r5 L_else.23958
-	addi	r6 r7 1
-	addi	r7 r0 -1
-	jump	min_caml_create_array
-L_else.23958 : 
+	bne	r8 r5 L_else.21176
+	addi	r13 r7 1
+	addi	r14 r0 -1
+	addi	r12 r0 1
+	addi	r7 r0 0
+	add	r6 r0 r13
+	call	min_caml_create_array
+	add	r11 r0 r6
+	addi	r10 r0 0
+	add	r6 r0 r11
+	add	r7 r0 r13
+	add	r8 r0 r14
+	add	r9 r0 r12
+	call	min_caml_init_array
+	add	r6 r0 r11
+	return
+L_else.21176 : 
 	addi	r6 r7 1
 	sti	r8 r2 0
 	sti	r7 r2 1
 	add	r7 r0 r6
 	addi	r2 r2 2
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	addi	r2 r2 -2
 	ldi	r8 r2 0
 	ldi	r7 r2 1
 	add	r1 r6 r7
 	sti	r8 r1 0
 	return
-L_read_or_network.2044 : 
+L_read_or_network.2108 : 
 	addi	r7 r0 0
-	call	L_read_net_item.2042
-	add	r7 r0 r6
-	ldi	r6 r7 0
-	bne	r6 r5 L_else.23961
-	addi	r6 r10 1
-	jump	min_caml_create_array
-L_else.23961 : 
-	addi	r6 r10 1
-	sti	r7 r2 0
-	sti	r10 r2 1
-	add	r10 r0 r6
+	call	L_read_net_item.2106
+	add	r12 r0 r6
+	ldi	r6 r12 0
+	bne	r6 r5 L_else.21179
+	addi	r13 r15 1
+	addi	r14 r0 1
+	addi	r7 r0 0
+	add	r6 r0 r13
+	call	min_caml_create_array
+	add	r11 r0 r6
+	addi	r10 r0 0
+	add	r6 r0 r11
+	add	r7 r0 r13
+	add	r8 r0 r12
+	add	r9 r0 r14
+	call	min_caml_init_array
+	add	r6 r0 r11
+	return
+L_else.21179 : 
+	addi	r6 r15 1
+	sti	r12 r2 0
+	sti	r15 r2 1
+	add	r15 r0 r6
 	addi	r2 r2 2
-	call	L_read_or_network.2044
+	call	L_read_or_network.2108
 	addi	r2 r2 -2
-	ldi	r7 r2 0
-	ldi	r10 r2 1
-	add	r1 r6 r10
-	sti	r7 r1 0
+	ldi	r12 r2 0
+	ldi	r15 r2 1
+	add	r1 r6 r15
+	sti	r12 r1 0
 	return
-L_read_and_network.2046 : 
+L_read_and_network.2110 : 
 	addi	r7 r0 0
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	ldi	r7 r6 0
-	bne	r7 r5 L_else.23964
+	bne	r7 r5 L_else.21182
 	return
-L_else.23964 : 
-	addi	r11 r0 1083
-	add	r1 r11 r10
+L_else.21182 : 
+	addi	r16 r0 1083
+	add	r1 r16 r15
 	sti	r6 r1 0
-	addi	r10 r10 1
+	addi	r15 r15 1
 	addi	r7 r0 0
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	ldi	r7 r6 0
-	bne	r7 r5 L_else.23966
+	bne	r7 r5 L_else.21184
 	return
-L_else.23966 : 
-	add	r1 r11 r10
+L_else.21184 : 
+	add	r1 r16 r15
 	sti	r6 r1 0
-	addi	r10 r10 1
+	addi	r15 r15 1
 	addi	r7 r0 0
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	ldi	r7 r6 0
-	bne	r7 r5 L_else.23968
+	bne	r7 r5 L_else.21186
 	return
-L_else.23968 : 
-	add	r1 r11 r10
+L_else.21186 : 
+	add	r1 r16 r15
 	sti	r6 r1 0
-	addi	r10 r10 1
+	addi	r15 r15 1
 	addi	r7 r0 0
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	ldi	r7 r6 0
-	bne	r7 r5 L_else.23970
+	bne	r7 r5 L_else.21188
 	return
-L_else.23970 : 
-	add	r1 r11 r10
+L_else.21188 : 
+	add	r1 r16 r15
 	sti	r6 r1 0
-	addi	r10 r10 1
+	addi	r15 r15 1
 	addi	r7 r0 0
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	ldi	r7 r6 0
-	bne	r7 r5 L_else.23972
+	bne	r7 r5 L_else.21190
 	return
-L_else.23972 : 
-	add	r1 r11 r10
+L_else.21190 : 
+	add	r1 r16 r15
 	sti	r6 r1 0
-	addi	r10 r10 1
+	addi	r15 r15 1
 	addi	r7 r0 0
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	ldi	r7 r6 0
-	bne	r7 r5 L_else.23974
+	bne	r7 r5 L_else.21192
 	return
-L_else.23974 : 
-	add	r1 r11 r10
+L_else.21192 : 
+	add	r1 r16 r15
 	sti	r6 r1 0
-	addi	r10 r10 1
+	addi	r15 r15 1
 	addi	r7 r0 0
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	ldi	r7 r6 0
-	bne	r7 r5 L_else.23976
+	bne	r7 r5 L_else.21194
 	return
-L_else.23976 : 
-	add	r1 r11 r10
+L_else.21194 : 
+	add	r1 r16 r15
 	sti	r6 r1 0
-	addi	r10 r10 1
+	addi	r15 r15 1
 	addi	r7 r0 0
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	ldi	r7 r6 0
-	bne	r7 r5 L_else.23978
+	bne	r7 r5 L_else.21196
 	return
-L_else.23978 : 
-	add	r1 r11 r10
+L_else.21196 : 
+	add	r1 r16 r15
 	sti	r6 r1 0
-	addi	r10 r10 1
-	jump	L_read_and_network.2046
-L_setup_rect_table.2134 : 
+	addi	r15 r15 1
+	jump	L_read_and_network.2110
+L_setup_rect_table.2198 : 
 	addi	r6 r0 6
-	fldi	f2 r0 29
+	fldi	f2 r0 30
 	call	min_caml_create_float_array
-	fldi	f2 r8 0
-	fbne	f2 f0 L_else.23982
-	fldi	f2 r0 29
-	fsti	f2 r6 1
-	jump	L_cont.23980
-L_else.23982 : 
-	ldi	r9 r10 6
-	fldi	f2 r8 0
-	fbgt	f0 f2 L_else.24003
+	fldi	f2 r10 0
+	fbne	f2 f0 L_else.21200
+	fsti	f0 r6 1
+	jump	L_cont.21198
+L_else.21200 : 
+	fldi	f2 r10 0
+	fbgt	f0 f2 L_else.21221
 	addi	r7 r0 0
-	jump	L_cont.24001
-L_else.24003 : 
+	jump	L_cont.21219
+L_else.21221 : 
 	addi	r7 r0 1
-L_cont.24001 : 
-	xor	r9 r9 r7
-	ldi	r7 r10 4
-	fldi	f2 r7 0
-	bne	r9 r0 L_else.24006
+L_cont.21219 : 
+	xor	r7 r12 r7
+	fldi	f2 r11 0
+	bne	r7 r0 L_else.21224
 	fsub	f2 f0 f2
-	jump	L_cont.24004
-L_else.24006 : 
-L_cont.24004 : 
+	jump	L_cont.21222
+L_else.21224 : 
+L_cont.21222 : 
 	fsti	f2 r6 0
-	fldi	f3 r0 12
-	fldi	f2 r8 0
-	fdiv	f2 f3 f2
-	fsti	f2 r6 1
-L_cont.23980 : 
-	fldi	f2 r8 1
-	fbne	f2 f0 L_else.23985
-	fldi	f2 r0 29
-	fsti	f2 r6 3
-	jump	L_cont.23983
-L_else.23985 : 
-	ldi	r7 r10 6
-	fldi	f2 r8 1
-	fbgt	f0 f2 L_else.23997
-	addi	r9 r0 0
-	jump	L_cont.23995
-L_else.23997 : 
-	addi	r9 r0 1
-L_cont.23995 : 
-	xor	r7 r7 r9
-	ldi	r9 r10 4
-	fldi	f2 r9 1
-	bne	r7 r0 L_else.24000
-	fsub	f2 f0 f2
-	jump	L_cont.23998
-L_else.24000 : 
-L_cont.23998 : 
-	fsti	f2 r6 2
 	fldi	f2 r0 12
-	fldi	f3 r8 1
+	fldi	f3 r10 0
 	fdiv	f2 f2 f3
-	fsti	f2 r6 3
-L_cont.23983 : 
-	fldi	f2 r8 2
-	fbne	f2 f0 L_else.23988
-	fldi	f2 r0 29
-	fsti	f2 r6 5
-	jump	L_cont.23986
-L_else.23988 : 
-	ldi	r9 r10 6
-	fldi	f2 r8 2
-	fbgt	f0 f2 L_else.23991
+	fsti	f2 r6 1
+L_cont.21198 : 
+	fldi	f2 r10 1
+	fbne	f2 f0 L_else.21203
+	fsti	f0 r6 3
+	jump	L_cont.21201
+L_else.21203 : 
+	fldi	f2 r10 1
+	fbgt	f0 f2 L_else.21215
 	addi	r7 r0 0
-	jump	L_cont.23989
-L_else.23991 : 
+	jump	L_cont.21213
+L_else.21215 : 
 	addi	r7 r0 1
-L_cont.23989 : 
-	xor	r9 r9 r7
-	ldi	r7 r10 4
-	fldi	f2 r7 2
-	bne	r9 r0 L_else.23994
+L_cont.21213 : 
+	xor	r7 r12 r7
+	fldi	f2 r11 1
+	bne	r7 r0 L_else.21218
 	fsub	f2 f0 f2
-	jump	L_cont.23992
-L_else.23994 : 
-L_cont.23992 : 
+	jump	L_cont.21216
+L_else.21218 : 
+L_cont.21216 : 
+	fsti	f2 r6 2
+	fldi	f3 r0 12
+	fldi	f2 r10 1
+	fdiv	f2 f3 f2
+	fsti	f2 r6 3
+L_cont.21201 : 
+	fldi	f2 r10 2
+	fbne	f2 f0 L_else.21206
+	fsti	f0 r6 5
+	jump	L_cont.21204
+L_else.21206 : 
+	fldi	f2 r10 2
+	fbgt	f0 f2 L_else.21209
+	addi	r7 r0 0
+	jump	L_cont.21207
+L_else.21209 : 
+	addi	r7 r0 1
+L_cont.21207 : 
+	xor	r7 r12 r7
+	fldi	f2 r11 2
+	bne	r7 r0 L_else.21212
+	fsub	f2 f0 f2
+	jump	L_cont.21210
+L_else.21212 : 
+L_cont.21210 : 
 	fsti	f2 r6 4
 	fldi	f2 r0 12
-	fldi	f3 r8 2
+	fldi	f3 r10 2
 	fdiv	f2 f2 f3
 	fsti	f2 r6 5
-L_cont.23986 : 
+L_cont.21204 : 
 	return
-L_setup_surface_table.2137 : 
+L_setup_surface_table.2201 : 
 	addi	r6 r0 4
-	fldi	f2 r0 29
+	fldi	f2 r0 30
 	call	min_caml_create_float_array
-	fldi	f3 r8 0
-	ldi	r7 r10 4
-	fldi	f2 r7 0
+	fldi	f3 r10 0
+	fldi	f2 r11 0
 	fmul	f4 f3 f2
-	fldi	f3 r8 1
-	ldi	r7 r10 4
-	fldi	f2 r7 1
+	fldi	f3 r10 1
+	fldi	f2 r11 1
+	fmul	f2 f3 f2
+	fadd	f4 f4 f2
+	fldi	f3 r10 2
+	fldi	f2 r11 2
 	fmul	f2 f3 f2
 	fadd	f3 f4 f2
-	fldi	f4 r8 2
-	ldi	r7 r10 4
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fbgt	f3 f0 L_else.24010
-	fldi	f2 r0 29
-	fsti	f2 r6 0
-	jump	L_cont.24008
-L_else.24010 : 
+	fbgt	f3 f0 L_else.21228
+	fsti	f0 r6 0
+	jump	L_cont.21226
+L_else.21228 : 
 	fldi	f2 r0 31
 	fdiv	f2 f2 f3
 	fsti	f2 r6 0
-	ldi	r7 r10 4
-	fldi	f2 r7 0
+	fldi	f2 r11 0
 	fdiv	f2 f2 f3
 	fsub	f2 f0 f2
 	fsti	f2 r6 1
-	ldi	r7 r10 4
-	fldi	f2 r7 1
+	fldi	f2 r11 1
 	fdiv	f2 f2 f3
 	fsub	f2 f0 f2
 	fsti	f2 r6 2
-	ldi	r7 r10 4
-	fldi	f2 r7 2
+	fldi	f2 r11 2
 	fdiv	f2 f2 f3
 	fsub	f2 f0 f2
 	fsti	f2 r6 3
-L_cont.24008 : 
+L_cont.21226 : 
 	return
-L_setup_second_table.2140 : 
+L_setup_second_table.2204 : 
 	addi	r6 r0 5
-	fldi	f2 r0 29
+	fldi	f2 r0 30
 	call	min_caml_create_float_array
-	fldi	f7 r8 0
-	fldi	f6 r8 1
-	fldi	f5 r8 2
-	fmul	f3 f7 f7
-	ldi	r7 r10 4
-	fldi	f2 r7 0
-	fmul	f4 f3 f2
-	fmul	f3 f6 f6
-	ldi	r7 r10 4
-	fldi	f2 r7 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f5 f5
-	ldi	r7 r10 4
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
+	fldi	f8 r10 0
+	fldi	f10 r10 1
+	fldi	f9 r10 2
+	fmul	f2 f8 f8
+	fldi	f7 r12 0
+	fmul	f3 f2 f7
+	fmul	f2 f10 f10
+	fldi	f6 r12 1
+	fmul	f2 f2 f6
+	fadd	f3 f3 f2
+	fmul	f2 f9 f9
+	fldi	f5 r12 2
+	fmul	f2 f2 f5
 	fadd	f2 f3 f2
-	ldi	r7 r10 3
-	bne	r7 r0 L_else.24014
-	jump	L_cont.24012
-L_else.24014 : 
-	fmul	f4 f6 f5
-	ldi	r7 r10 9
-	fldi	f3 r7 0
-	fmul	f3 f4 f3
+	bne	r11 r0 L_else.21232
+	jump	L_cont.21230
+L_else.21232 : 
+	fmul	f3 f10 f9
+	fldi	f4 r13 0
+	fmul	f3 f3 f4
 	fadd	f4 f2 f3
-	fmul	f3 f5 f7
-	ldi	r7 r10 9
-	fldi	f2 r7 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f7 f6
-	ldi	r7 r10 9
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-L_cont.24012 : 
-	fldi	f4 r8 0
-	ldi	r7 r10 4
-	fldi	f3 r7 0
-	fmul	f3 f4 f3
+	fmul	f2 f9 f8
+	fldi	f3 r13 1
+	fmul	f2 f2 f3
+	fadd	f4 f4 f2
+	fmul	f2 f8 f10
+	fldi	f3 r13 2
+	fmul	f2 f2 f3
+	fadd	f2 f4 f2
+L_cont.21230 : 
+	fmul	f3 f8 f7
 	fsub	f8 f0 f3
-	fldi	f4 r8 1
-	ldi	r7 r10 4
-	fldi	f3 r7 1
-	fmul	f3 f4 f3
+	fmul	f3 f10 f6
 	fsub	f7 f0 f3
-	fldi	f4 r8 2
-	ldi	r7 r10 4
-	fldi	f3 r7 2
-	fmul	f3 f4 f3
+	fmul	f3 f9 f5
 	fsub	f6 f0 f3
 	fsti	f2 r6 0
-	ldi	r7 r10 3
-	bne	r7 r0 L_else.24017
+	bne	r11 r0 L_else.21235
 	fsti	f8 r6 1
 	fsti	f7 r6 2
 	fsti	f6 r6 3
-	jump	L_cont.24015
-L_else.24017 : 
-	fldi	f4 r8 2
-	ldi	r7 r10 9
-	fldi	f3 r7 1
-	fmul	f5 f4 f3
-	fldi	f4 r8 1
-	ldi	r7 r10 9
-	fldi	f3 r7 2
-	fmul	f3 f4 f3
-	fadd	f3 f5 f3
-	fldi	f4 r0 30
+	jump	L_cont.21233
+L_else.21235 : 
+	fldi	f3 r10 2
+	fldi	f4 r13 1
+	fmul	f4 f3 f4
+	fldi	f5 r10 1
+	fldi	f3 r13 2
+	fmul	f3 f5 f3
+	fadd	f3 f4 f3
+	fldi	f4 r0 29
 	fdiv	f3 f3 f4
 	fsub	f3 f8 f3
 	fsti	f3 r6 1
-	fldi	f4 r8 2
-	ldi	r7 r10 9
-	fldi	f3 r7 0
-	fmul	f4 f4 f3
-	fldi	f5 r8 0
-	ldi	r7 r10 9
-	fldi	f3 r7 2
-	fmul	f3 f5 f3
-	fadd	f4 f4 f3
-	fldi	f3 r0 30
+	fldi	f4 r10 2
+	fldi	f3 r13 0
+	fmul	f5 f4 f3
+	fldi	f3 r10 0
+	fldi	f4 r13 2
+	fmul	f3 f3 f4
+	fadd	f4 f5 f3
+	fldi	f3 r0 29
 	fdiv	f3 f4 f3
 	fsub	f3 f7 f3
 	fsti	f3 r6 2
-	fldi	f4 r8 1
-	ldi	r7 r10 9
-	fldi	f3 r7 0
-	fmul	f5 f4 f3
-	fldi	f4 r8 0
-	ldi	r7 r10 9
-	fldi	f3 r7 1
-	fmul	f3 f4 f3
-	fadd	f3 f5 f3
-	fldi	f4 r0 30
+	fldi	f3 r10 1
+	fldi	f4 r13 0
+	fmul	f4 f3 f4
+	fldi	f5 r10 0
+	fldi	f3 r13 1
+	fmul	f3 f5 f3
+	fadd	f3 f4 f3
+	fldi	f4 r0 29
 	fdiv	f3 f3 f4
 	fsub	f3 f6 f3
 	fsti	f3 r6 3
-L_cont.24015 : 
-	fbne	f2 f0 L_else.24020
-	jump	L_cont.24018
-L_else.24020 : 
+L_cont.21233 : 
+	fbne	f2 f0 L_else.21238
+	jump	L_cont.21236
+L_else.21238 : 
 	fldi	f3 r0 12
 	fdiv	f2 f3 f2
 	fsti	f2 r6 4
-L_cont.24018 : 
+L_cont.21236 : 
 	return
-L_iter_setup_dirvec_constants.2143 : 
-	bgt	r0 r12 L_else.24023
-	ldi	r10 r12 1970
-	ldi	r13 r11 1
-	ldi	r8 r11 0
-	ldi	r6 r10 1
-	bne	r6 r4 L_else.24026
-	call	L_setup_rect_table.2134
-	add	r1 r13 r12
+L_iter_setup_dirvec_constants.2207 : 
+	bgt	r0 r16 L_else.21241
+	muli	r7 r16 11
+	ldi	r13 r7 1928
+	ldi	r12 r7 1925
+	ldi	r11 r7 1923
+	ldi	r6 r7 1922
+	ldi	r7 r7 1920
+	bne	r7 r4 L_else.21244
+	add	r10 r0 r14
+	call	L_setup_rect_table.2198
+	add	r1 r15 r16
 	sti	r6 r1 0
-	jump	L_cont.24024
-L_else.24026 : 
-	addi	r7 r0 2
-	bne	r6 r7 L_else.24049
-	call	L_setup_surface_table.2137
-	add	r1 r13 r12
-	sti	r6 r1 0
-	jump	L_cont.24024
-L_else.24049 : 
-	call	L_setup_second_table.2140
-	add	r1 r13 r12
-	sti	r6 r1 0
-L_cont.24024 : 
-	addi	r13 r12 -1
-	bgt	r0 r13 L_else.24028
-	ldi	r10 r13 1970
-	ldi	r12 r11 1
-	ldi	r8 r11 0
-	ldi	r7 r10 1
-	bne	r7 r4 L_else.24031
-	call	L_setup_rect_table.2134
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.24029
-L_else.24031 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.24047
-	call	L_setup_surface_table.2137
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.24029
-L_else.24047 : 
-	call	L_setup_second_table.2140
-	add	r1 r12 r13
-	sti	r6 r1 0
-L_cont.24029 : 
-	addi	r13 r13 -1
-	bgt	r0 r13 L_else.24033
-	ldi	r10 r13 1970
-	ldi	r12 r11 1
-	ldi	r8 r11 0
-	ldi	r6 r10 1
-	bne	r6 r4 L_else.24036
-	call	L_setup_rect_table.2134
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.24034
-L_else.24036 : 
-	addi	r7 r0 2
-	bne	r6 r7 L_else.24045
-	call	L_setup_surface_table.2137
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.24034
-L_else.24045 : 
-	call	L_setup_second_table.2140
-	add	r1 r12 r13
-	sti	r6 r1 0
-L_cont.24034 : 
-	addi	r13 r13 -1
-	bgt	r0 r13 L_else.24038
-	ldi	r10 r13 1970
-	ldi	r12 r11 1
-	ldi	r8 r11 0
-	ldi	r7 r10 1
-	bne	r7 r4 L_else.24041
-	call	L_setup_rect_table.2134
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.24039
-L_else.24041 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.24043
-	call	L_setup_surface_table.2137
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.24039
-L_else.24043 : 
-	call	L_setup_second_table.2140
-	add	r1 r12 r13
-	sti	r6 r1 0
-L_cont.24039 : 
-	addi	r12 r13 -1
-	jump	L_iter_setup_dirvec_constants.2143
-L_else.24038 : 
-	return
-L_else.24033 : 
-	return
-L_else.24028 : 
-	return
-L_else.24023 : 
-	return
-L_setup_dirvec_constants.2146 : 
-	ldi	r6 r0 1072
-	addi	r13 r6 -1
-	bgt	r0 r13 L_else.24052
-	ldi	r10 r13 1970
-	ldi	r12 r11 1
-	ldi	r8 r11 0
-	ldi	r7 r10 1
-	bne	r7 r4 L_else.24055
-	call	L_setup_rect_table.2134
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.24053
-L_else.24055 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.24071
-	call	L_setup_surface_table.2137
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.24053
-L_else.24071 : 
-	call	L_setup_second_table.2140
-	add	r1 r12 r13
-	sti	r6 r1 0
-L_cont.24053 : 
-	addi	r13 r13 -1
-	bgt	r0 r13 L_else.24057
-	ldi	r10 r13 1970
-	ldi	r12 r11 1
-	ldi	r8 r11 0
-	ldi	r6 r10 1
-	bne	r6 r4 L_else.24060
-	call	L_setup_rect_table.2134
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.24058
-L_else.24060 : 
-	addi	r7 r0 2
-	bne	r6 r7 L_else.24069
-	call	L_setup_surface_table.2137
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.24058
-L_else.24069 : 
-	call	L_setup_second_table.2140
-	add	r1 r12 r13
-	sti	r6 r1 0
-L_cont.24058 : 
-	addi	r12 r13 -1
-	bgt	r0 r12 L_else.24062
-	ldi	r10 r12 1970
-	ldi	r13 r11 1
-	ldi	r8 r11 0
-	ldi	r7 r10 1
-	bne	r7 r4 L_else.24065
-	call	L_setup_rect_table.2134
-	add	r1 r13 r12
-	sti	r6 r1 0
-	jump	L_cont.24063
-L_else.24065 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.24067
-	call	L_setup_surface_table.2137
-	add	r1 r13 r12
-	sti	r6 r1 0
-	jump	L_cont.24063
-L_else.24067 : 
-	call	L_setup_second_table.2140
-	add	r1 r13 r12
-	sti	r6 r1 0
-L_cont.24063 : 
-	addi	r12 r12 -1
-	jump	L_iter_setup_dirvec_constants.2143
-L_else.24062 : 
-	return
-L_else.24057 : 
-	return
-L_else.24052 : 
-	return
-L_setup_startp_constants.2148 : 
-	bgt	r0 r7 L_else.24074
-	ldi	r11 r7 1970
-	ldi	r10 r11 10
-	ldi	r9 r11 1
-	fldi	f3 r6 0
-	ldi	r8 r11 5
-	fldi	f2 r8 0
-	fsub	f2 f3 f2
-	fsti	f2 r10 0
-	fldi	f3 r6 1
-	ldi	r8 r11 5
-	fldi	f2 r8 1
-	fsub	f2 f3 f2
-	fsti	f2 r10 1
-	fldi	f3 r6 2
-	ldi	r8 r11 5
-	fldi	f2 r8 2
-	fsub	f2 f3 f2
-	fsti	f2 r10 2
+	jump	L_cont.21242
+L_else.21244 : 
 	addi	r8 r0 2
-	bne	r9 r8 L_else.24077
-	ldi	r8 r11 4
+	bne	r7 r8 L_else.21253
+	add	r10 r0 r14
+	call	L_setup_surface_table.2201
+	add	r1 r15 r16
+	sti	r6 r1 0
+	jump	L_cont.21242
+L_else.21253 : 
+	add	r10 r0 r14
+	add	r12 r0 r11
+	add	r11 r0 r6
+	call	L_setup_second_table.2204
+	add	r1 r15 r16
+	sti	r6 r1 0
+L_cont.21242 : 
+	addi	r16 r16 -1
+	bgt	r0 r16 L_else.21246
+	muli	r6 r16 11
+	ldi	r13 r6 1928
+	ldi	r12 r6 1925
+	ldi	r11 r6 1923
+	ldi	r8 r6 1922
+	ldi	r6 r6 1920
+	add	r7 r0 r6
+	add	r6 r0 r8
+	bne	r7 r4 L_else.21249
+	add	r10 r0 r14
+	call	L_setup_rect_table.2198
+	add	r1 r15 r16
+	sti	r6 r1 0
+	jump	L_cont.21247
+L_else.21249 : 
+	addi	r8 r0 2
+	bne	r7 r8 L_else.21251
+	add	r10 r0 r14
+	call	L_setup_surface_table.2201
+	add	r1 r15 r16
+	sti	r6 r1 0
+	jump	L_cont.21247
+L_else.21251 : 
+	add	r10 r0 r14
+	add	r12 r0 r11
+	add	r11 r0 r6
+	call	L_setup_second_table.2204
+	add	r1 r15 r16
+	sti	r6 r1 0
+L_cont.21247 : 
+	addi	r16 r16 -1
+	jump	L_iter_setup_dirvec_constants.2207
+L_else.21246 : 
+	return
+L_else.21241 : 
+	return
+L_setup_startp_constants.2212 : 
+	bgt	r0 r7 L_else.21256
+	muli	r13 r7 11
+	ldi	r8 r13 1929
+	ldi	r9 r13 1928
+	ldi	r10 r13 1924
+	ldi	r11 r13 1923
+	ldi	r12 r13 1922
+	ldi	r13 r13 1920
+	fldi	f2 r6 0
 	fldi	f3 r10 0
-	fldi	f5 r10 1
-	fldi	f4 r10 2
+	fsub	f2 f2 f3
+	fsti	f2 r8 0
+	fldi	f3 r6 1
+	fldi	f2 r10 1
+	fsub	f2 f3 f2
+	fsti	f2 r8 1
+	fldi	f2 r6 2
+	fldi	f3 r10 2
+	fsub	f2 f2 f3
+	fsti	f2 r8 2
+	addi	r10 r0 2
+	bne	r13 r10 L_else.21259
 	fldi	f2 r8 0
-	fmul	f3 f2 f3
-	fldi	f2 r8 1
+	fldi	f5 r8 1
+	fldi	f4 r8 2
+	fldi	f3 r11 0
+	fmul	f3 f3 f2
+	fldi	f2 r11 1
 	fmul	f2 f2 f5
 	fadd	f3 f3 f2
-	fldi	f2 r8 2
+	fldi	f2 r11 2
 	fmul	f2 f2 f4
 	fadd	f2 f3 f2
-	fsti	f2 r10 3
-	jump	L_cont.24075
-L_else.24077 : 
-	addi	r8 r0 2
-	bgt	r9 r8 L_else.24079
-	jump	L_cont.24075
-L_else.24079 : 
-	fldi	f7 r10 0
-	fldi	f5 r10 1
-	fldi	f6 r10 2
-	fmul	f3 f7 f7
-	ldi	r8 r11 4
-	fldi	f2 r8 0
-	fmul	f4 f3 f2
-	fmul	f3 f5 f5
-	ldi	r8 r11 4
-	fldi	f2 r8 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
+	fsti	f2 r8 3
+	jump	L_cont.21257
+L_else.21259 : 
+	addi	r10 r0 2
+	bgt	r13 r10 L_else.21261
+	jump	L_cont.21257
+L_else.21261 : 
+	fldi	f7 r8 0
+	fldi	f5 r8 1
+	fldi	f6 r8 2
+	fmul	f2 f7 f7
+	fldi	f3 r11 0
+	fmul	f3 f2 f3
+	fmul	f4 f5 f5
+	fldi	f2 r11 1
+	fmul	f2 f4 f2
+	fadd	f3 f3 f2
 	fmul	f4 f6 f6
-	ldi	r8 r11 4
-	fldi	f2 r8 2
+	fldi	f2 r11 2
 	fmul	f2 f4 f2
 	fadd	f2 f3 f2
-	ldi	r8 r11 3
-	bne	r8 r0 L_else.24082
-	jump	L_cont.24080
-L_else.24082 : 
+	bne	r12 r0 L_else.21264
+	jump	L_cont.21262
+L_else.21264 : 
 	fmul	f4 f5 f6
-	ldi	r8 r11 9
-	fldi	f3 r8 0
+	fldi	f3 r9 0
 	fmul	f3 f4 f3
 	fadd	f3 f2 f3
 	fmul	f4 f6 f7
-	ldi	r8 r11 9
-	fldi	f2 r8 1
+	fldi	f2 r9 1
 	fmul	f2 f4 f2
-	fadd	f4 f3 f2
-	fmul	f2 f7 f5
-	ldi	r8 r11 9
-	fldi	f3 r8 2
-	fmul	f2 f2 f3
-	fadd	f2 f4 f2
-L_cont.24080 : 
-	addi	r8 r0 3
-	bne	r9 r8 L_else.24085
+	fadd	f3 f3 f2
+	fmul	f4 f7 f5
+	fldi	f2 r9 2
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
+L_cont.21262 : 
+	addi	r9 r0 3
+	bne	r13 r9 L_else.21267
 	fldi	f3 r0 12
 	fsub	f2 f2 f3
-	jump	L_cont.24083
-L_else.24085 : 
-L_cont.24083 : 
-	fsti	f2 r10 3
-L_cont.24075 : 
+	jump	L_cont.21265
+L_else.21267 : 
+L_cont.21265 : 
+	fsti	f2 r8 3
+L_cont.21257 : 
 	addi	r7 r7 -1
-	jump	L_setup_startp_constants.2148
-L_else.24074 : 
+	jump	L_setup_startp_constants.2212
+L_else.21256 : 
 	return
-L_check_all_inside.2173 : 
-	add	r1 r7 r6
-	ldi	r8 r1 0
-	bne	r8 r5 L_else.24088
+L_check_all_inside.2237 : 
+	ldi	r8 r6 0
+	bne	r8 r5 L_else.21270
 	addi	r6 r0 1
 	return
-L_else.24088 : 
-	ldi	r10 r8 1970
-	ldi	r8 r10 5
-	fldi	f5 r8 0
+L_else.21270 : 
+	muli	r13 r8 11
+	ldi	r9 r13 1928
+	ldi	r8 r13 1925
+	ldi	r10 r13 1924
+	ldi	r11 r13 1923
+	ldi	r12 r13 1922
+	ldi	r13 r13 1920
+	fldi	f5 r10 0
 	fsub	f8 f2 f5
-	ldi	r8 r10 5
-	fldi	f5 r8 1
-	fsub	f7 f3 f5
-	ldi	r8 r10 5
-	fldi	f5 r8 2
-	fsub	f6 f4 f5
-	ldi	r9 r10 1
-	bne	r9 r4 L_else.24091
-	fbgt	f0 f8 L_else.24213
-	fadd	f5 f0 f8
-	jump	L_cont.24211
-L_else.24213 : 
-	fsub	f5 f0 f8
-L_cont.24211 : 
-	ldi	r8 r10 4
-	fldi	f8 r8 0
-	fbgt	f8 f5 L_else.24216
-	addi	r8 r0 0
-	jump	L_cont.24214
-L_else.24216 : 
-	fbgt	f0 f7 L_else.24221
-	fadd	f5 f0 f7
-	jump	L_cont.24219
-L_else.24221 : 
-	fsub	f5 f0 f7
-L_cont.24219 : 
-	ldi	r8 r10 4
-	fldi	f7 r8 1
-	fbgt	f7 f5 L_else.24223
-	addi	r8 r0 0
-	jump	L_cont.24214
-L_else.24223 : 
-	fbgt	f0 f6 L_else.24226
-	fadd	f5 f0 f6
-	jump	L_cont.24224
-L_else.24226 : 
-	fsub	f5 f0 f6
-L_cont.24224 : 
-	ldi	r8 r10 4
-	fldi	f6 r8 2
-	fbgt	f6 f5 L_else.24228
-	addi	r8 r0 0
-	jump	L_cont.24214
-L_else.24228 : 
-	addi	r8 r0 1
-L_cont.24214 : 
-	bne	r8 r0 L_else.24218
-	ldi	r8 r10 6
-	sub	r8 r4 r8
-	jump	L_cont.24089
-L_else.24218 : 
-	ldi	r8 r10 6
-	jump	L_cont.24089
-L_else.24091 : 
-	addi	r8 r0 2
-	bne	r9 r8 L_else.24230
-	ldi	r8 r10 4
-	fldi	f5 r8 0
-	fmul	f8 f5 f8
-	fldi	f5 r8 1
-	fmul	f5 f5 f7
-	fadd	f7 f8 f5
-	fldi	f5 r8 2
-	fmul	f5 f5 f6
-	fadd	f5 f7 f5
-	ldi	r9 r10 6
-	fbgt	f0 f5 L_else.24233
-	addi	r8 r0 0
-	jump	L_cont.24231
-L_else.24233 : 
-	addi	r8 r0 1
-L_cont.24231 : 
-	xor	r8 r9 r8
-	sub	r8 r4 r8
-	jump	L_cont.24089
-L_else.24230 : 
-	fmul	f9 f8 f8
-	ldi	r8 r10 4
-	fldi	f5 r8 0
-	fmul	f10 f9 f5
-	fmul	f9 f7 f7
-	ldi	r8 r10 4
-	fldi	f5 r8 1
-	fmul	f5 f9 f5
-	fadd	f9 f10 f5
-	fmul	f10 f6 f6
-	ldi	r8 r10 4
-	fldi	f5 r8 2
-	fmul	f5 f10 f5
-	fadd	f5 f9 f5
-	ldi	r8 r10 3
-	bne	r8 r0 L_else.24236
-	jump	L_cont.24234
-L_else.24236 : 
-	fmul	f10 f7 f6
-	ldi	r8 r10 9
-	fldi	f9 r8 0
-	fmul	f9 f10 f9
-	fadd	f9 f5 f9
-	fmul	f6 f6 f8
-	ldi	r8 r10 9
-	fldi	f5 r8 1
-	fmul	f5 f6 f5
-	fadd	f6 f9 f5
-	fmul	f7 f8 f7
-	ldi	r8 r10 9
-	fldi	f5 r8 2
-	fmul	f5 f7 f5
-	fadd	f5 f6 f5
-L_cont.24234 : 
-	ldi	r9 r10 1
-	addi	r8 r0 3
-	bne	r9 r8 L_else.24239
-	fldi	f6 r0 12
-	fsub	f5 f5 f6
-	jump	L_cont.24237
-L_else.24239 : 
-L_cont.24237 : 
-	ldi	r9 r10 6
-	fbgt	f0 f5 L_else.24242
-	addi	r8 r0 0
-	jump	L_cont.24240
-L_else.24242 : 
-	addi	r8 r0 1
-L_cont.24240 : 
-	xor	r8 r9 r8
-	sub	r8 r4 r8
-L_cont.24089 : 
-	bne	r8 r0 L_else.24093
-	addi	r10 r6 1
-	add	r1 r7 r10
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.24095
-	addi	r6 r0 1
-	return
-L_else.24095 : 
-	ldi	r9 r6 1970
-	ldi	r6 r9 5
-	fldi	f5 r6 0
-	fsub	f7 f2 f5
-	ldi	r6 r9 5
-	fldi	f5 r6 1
-	fsub	f8 f3 f5
-	ldi	r6 r9 5
-	fldi	f5 r6 2
-	fsub	f6 f4 f5
-	ldi	r6 r9 1
-	bne	r6 r4 L_else.24098
-	fbgt	f0 f7 L_else.24181
-	fadd	f5 f0 f7
-	jump	L_cont.24179
-L_else.24181 : 
-	fsub	f5 f0 f7
-L_cont.24179 : 
-	ldi	r6 r9 4
-	fldi	f7 r6 0
-	fbgt	f7 f5 L_else.24184
-	addi	r6 r0 0
-	jump	L_cont.24182
-L_else.24184 : 
-	fbgt	f0 f8 L_else.24189
-	fadd	f5 f0 f8
-	jump	L_cont.24187
-L_else.24189 : 
-	fsub	f5 f0 f8
-L_cont.24187 : 
-	ldi	r6 r9 4
-	fldi	f7 r6 1
-	fbgt	f7 f5 L_else.24191
-	addi	r6 r0 0
-	jump	L_cont.24182
-L_else.24191 : 
-	fbgt	f0 f6 L_else.24194
-	jump	L_cont.24192
-L_else.24194 : 
-	fsub	f6 f0 f6
-L_cont.24192 : 
-	ldi	r6 r9 4
-	fldi	f5 r6 2
-	fbgt	f5 f6 L_else.24196
-	addi	r6 r0 0
-	jump	L_cont.24182
-L_else.24196 : 
-	addi	r6 r0 1
-L_cont.24182 : 
-	bne	r6 r0 L_else.24186
-	ldi	r6 r9 6
-	sub	r6 r4 r6
-	jump	L_cont.24096
-L_else.24186 : 
-	ldi	r6 r9 6
-	jump	L_cont.24096
-L_else.24098 : 
-	addi	r8 r0 2
-	bne	r6 r8 L_else.24198
-	ldi	r6 r9 4
-	fldi	f5 r6 0
-	fmul	f7 f5 f7
-	fldi	f5 r6 1
-	fmul	f5 f5 f8
-	fadd	f7 f7 f5
-	fldi	f5 r6 2
-	fmul	f5 f5 f6
-	fadd	f5 f7 f5
-	ldi	r8 r9 6
-	fbgt	f0 f5 L_else.24201
-	addi	r6 r0 0
-	jump	L_cont.24199
-L_else.24201 : 
-	addi	r6 r0 1
-L_cont.24199 : 
-	xor	r6 r8 r6
-	sub	r6 r4 r6
-	jump	L_cont.24096
-L_else.24198 : 
-	fmul	f9 f7 f7
-	ldi	r6 r9 4
-	fldi	f5 r6 0
-	fmul	f10 f9 f5
-	fmul	f9 f8 f8
-	ldi	r6 r9 4
-	fldi	f5 r6 1
-	fmul	f5 f9 f5
-	fadd	f9 f10 f5
-	fmul	f10 f6 f6
-	ldi	r6 r9 4
-	fldi	f5 r6 2
-	fmul	f5 f10 f5
-	fadd	f5 f9 f5
-	ldi	r6 r9 3
-	bne	r6 r0 L_else.24204
-	jump	L_cont.24202
-L_else.24204 : 
-	fmul	f10 f8 f6
-	ldi	r6 r9 9
-	fldi	f9 r6 0
-	fmul	f9 f10 f9
-	fadd	f9 f5 f9
-	fmul	f6 f6 f7
-	ldi	r6 r9 9
-	fldi	f5 r6 1
-	fmul	f5 f6 f5
-	fadd	f6 f9 f5
-	fmul	f7 f7 f8
-	ldi	r6 r9 9
-	fldi	f5 r6 2
-	fmul	f5 f7 f5
-	fadd	f5 f6 f5
-L_cont.24202 : 
-	ldi	r8 r9 1
-	addi	r6 r0 3
-	bne	r8 r6 L_else.24207
-	fldi	f6 r0 12
-	fsub	f5 f5 f6
-	jump	L_cont.24205
-L_else.24207 : 
-L_cont.24205 : 
-	ldi	r8 r9 6
-	fbgt	f0 f5 L_else.24210
-	addi	r6 r0 0
-	jump	L_cont.24208
-L_else.24210 : 
-	addi	r6 r0 1
-L_cont.24208 : 
-	xor	r6 r8 r6
-	sub	r6 r4 r6
-L_cont.24096 : 
-	bne	r6 r0 L_else.24100
-	addi	r10 r10 1
-	add	r1 r7 r10
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.24102
-	addi	r6 r0 1
-	return
-L_else.24102 : 
-	ldi	r8 r6 1970
-	ldi	r6 r8 5
-	fldi	f5 r6 0
-	fsub	f7 f2 f5
-	ldi	r6 r8 5
-	fldi	f5 r6 1
-	fsub	f8 f3 f5
-	ldi	r6 r8 5
-	fldi	f5 r6 2
-	fsub	f6 f4 f5
-	ldi	r6 r8 1
-	bne	r6 r4 L_else.24105
-	fbgt	f0 f7 L_else.24149
-	fadd	f5 f0 f7
-	jump	L_cont.24147
-L_else.24149 : 
-	fsub	f5 f0 f7
-L_cont.24147 : 
-	ldi	r6 r8 4
-	fldi	f7 r6 0
-	fbgt	f7 f5 L_else.24152
-	addi	r6 r0 0
-	jump	L_cont.24150
-L_else.24152 : 
-	fbgt	f0 f8 L_else.24157
-	fadd	f5 f0 f8
-	jump	L_cont.24155
-L_else.24157 : 
-	fsub	f5 f0 f8
-L_cont.24155 : 
-	ldi	r6 r8 4
-	fldi	f7 r6 1
-	fbgt	f7 f5 L_else.24159
-	addi	r6 r0 0
-	jump	L_cont.24150
-L_else.24159 : 
-	fbgt	f0 f6 L_else.24162
-	jump	L_cont.24160
-L_else.24162 : 
-	fsub	f6 f0 f6
-L_cont.24160 : 
-	ldi	r6 r8 4
-	fldi	f5 r6 2
-	fbgt	f5 f6 L_else.24164
-	addi	r6 r0 0
-	jump	L_cont.24150
-L_else.24164 : 
-	addi	r6 r0 1
-L_cont.24150 : 
-	bne	r6 r0 L_else.24154
-	ldi	r6 r8 6
-	sub	r6 r4 r6
-	jump	L_cont.24103
-L_else.24154 : 
-	ldi	r6 r8 6
-	jump	L_cont.24103
-L_else.24105 : 
-	addi	r9 r0 2
-	bne	r6 r9 L_else.24166
-	ldi	r6 r8 4
-	fldi	f5 r6 0
-	fmul	f7 f5 f7
-	fldi	f5 r6 1
-	fmul	f5 f5 f8
-	fadd	f7 f7 f5
-	fldi	f5 r6 2
-	fmul	f5 f5 f6
-	fadd	f5 f7 f5
-	ldi	r8 r8 6
-	fbgt	f0 f5 L_else.24169
-	addi	r6 r0 0
-	jump	L_cont.24167
-L_else.24169 : 
-	addi	r6 r0 1
-L_cont.24167 : 
-	xor	r6 r8 r6
-	sub	r6 r4 r6
-	jump	L_cont.24103
-L_else.24166 : 
-	fmul	f9 f7 f7
-	ldi	r6 r8 4
-	fldi	f5 r6 0
-	fmul	f10 f9 f5
-	fmul	f9 f8 f8
-	ldi	r6 r8 4
-	fldi	f5 r6 1
-	fmul	f5 f9 f5
-	fadd	f9 f10 f5
-	fmul	f10 f6 f6
-	ldi	r6 r8 4
-	fldi	f5 r6 2
-	fmul	f5 f10 f5
-	fadd	f5 f9 f5
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.24172
-	jump	L_cont.24170
-L_else.24172 : 
-	fmul	f10 f8 f6
-	ldi	r6 r8 9
-	fldi	f9 r6 0
-	fmul	f9 f10 f9
-	fadd	f9 f5 f9
-	fmul	f6 f6 f7
-	ldi	r6 r8 9
-	fldi	f5 r6 1
-	fmul	f5 f6 f5
-	fadd	f6 f9 f5
-	fmul	f7 f7 f8
-	ldi	r6 r8 9
-	fldi	f5 r6 2
-	fmul	f5 f7 f5
-	fadd	f5 f6 f5
-L_cont.24170 : 
-	ldi	r9 r8 1
-	addi	r6 r0 3
-	bne	r9 r6 L_else.24175
-	fldi	f6 r0 12
-	fsub	f5 f5 f6
-	jump	L_cont.24173
-L_else.24175 : 
-L_cont.24173 : 
-	ldi	r8 r8 6
-	fbgt	f0 f5 L_else.24178
-	addi	r6 r0 0
-	jump	L_cont.24176
-L_else.24178 : 
-	addi	r6 r0 1
-L_cont.24176 : 
-	xor	r6 r8 r6
-	sub	r6 r4 r6
-L_cont.24103 : 
-	bne	r6 r0 L_else.24107
-	addi	r10 r10 1
-	add	r1 r7 r10
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.24109
-	addi	r6 r0 1
-	return
-L_else.24109 : 
-	ldi	r8 r6 1970
-	ldi	r6 r8 5
-	fldi	f5 r6 0
-	fsub	f5 f2 f5
-	ldi	r6 r8 5
-	fldi	f6 r6 1
-	fsub	f8 f3 f6
-	ldi	r6 r8 5
-	fldi	f6 r6 2
+	fldi	f5 r10 1
+	fsub	f5 f3 f5
+	fldi	f6 r10 2
 	fsub	f6 f4 f6
-	ldi	r6 r8 1
-	bne	r6 r4 L_else.24112
-	fbgt	f0 f5 L_else.24117
-	jump	L_cont.24115
-L_else.24117 : 
+	bne	r13 r4 L_else.21273
+	fbgt	f0 f8 L_else.21278
+	jump	L_cont.21276
+L_else.21278 : 
+	fsub	f8 f0 f8
+L_cont.21276 : 
+	fldi	f7 r11 0
+	fbgt	f7 f8 L_else.21281
+	addi	r9 r0 0
+	jump	L_cont.21279
+L_else.21281 : 
+	fbgt	f0 f5 L_else.21286
+	jump	L_cont.21284
+L_else.21286 : 
 	fsub	f5 f0 f5
-L_cont.24115 : 
-	ldi	r6 r8 4
-	fldi	f7 r6 0
-	fbgt	f7 f5 L_else.24120
-	addi	r6 r0 0
-	jump	L_cont.24118
-L_else.24120 : 
-	fbgt	f0 f8 L_else.24125
-	fadd	f5 f0 f8
-	jump	L_cont.24123
-L_else.24125 : 
-	fsub	f5 f0 f8
-L_cont.24123 : 
-	ldi	r6 r8 4
-	fldi	f7 r6 1
-	fbgt	f7 f5 L_else.24127
-	addi	r6 r0 0
-	jump	L_cont.24118
-L_else.24127 : 
-	fbgt	f0 f6 L_else.24130
-	jump	L_cont.24128
-L_else.24130 : 
-	fsub	f6 f0 f6
-L_cont.24128 : 
-	ldi	r6 r8 4
-	fldi	f5 r6 2
-	fbgt	f5 f6 L_else.24132
-	addi	r6 r0 0
-	jump	L_cont.24118
-L_else.24132 : 
-	addi	r6 r0 1
-L_cont.24118 : 
-	bne	r6 r0 L_else.24122
-	ldi	r6 r8 6
-	sub	r6 r4 r6
-	jump	L_cont.24110
-L_else.24122 : 
-	ldi	r6 r8 6
-	jump	L_cont.24110
-L_else.24112 : 
-	addi	r9 r0 2
-	bne	r6 r9 L_else.24134
-	ldi	r6 r8 4
-	fldi	f7 r6 0
-	fmul	f7 f7 f5
-	fldi	f5 r6 1
-	fmul	f5 f5 f8
+L_cont.21284 : 
+	fldi	f7 r11 1
+	fbgt	f7 f5 L_else.21288
+	addi	r9 r0 0
+	jump	L_cont.21279
+L_else.21288 : 
+	fbgt	f0 f6 L_else.21291
+	fadd	f5 f0 f6
+	jump	L_cont.21289
+L_else.21291 : 
+	fsub	f5 f0 f6
+L_cont.21289 : 
+	fldi	f6 r11 2
+	fbgt	f6 f5 L_else.21293
+	addi	r9 r0 0
+	jump	L_cont.21279
+L_else.21293 : 
+	addi	r9 r0 1
+L_cont.21279 : 
+	bne	r9 r0 L_else.21283
+	sub	r8 r4 r8
+	jump	L_cont.21271
+L_else.21283 : 
+	jump	L_cont.21271
+L_else.21273 : 
+	addi	r10 r0 2
+	bne	r13 r10 L_else.21295
+	fldi	f7 r11 0
+	fmul	f7 f7 f8
+	fldi	f8 r11 1
+	fmul	f5 f8 f5
 	fadd	f7 f7 f5
-	fldi	f5 r6 2
+	fldi	f5 r11 2
 	fmul	f5 f5 f6
 	fadd	f5 f7 f5
-	ldi	r6 r8 6
-	fbgt	f0 f5 L_else.24137
-	addi	r8 r0 0
-	jump	L_cont.24135
-L_else.24137 : 
-	addi	r8 r0 1
-L_cont.24135 : 
-	xor	r6 r6 r8
-	sub	r6 r4 r6
-	jump	L_cont.24110
-L_else.24134 : 
-	fmul	f9 f5 f5
-	ldi	r6 r8 4
-	fldi	f7 r6 0
-	fmul	f10 f9 f7
-	fmul	f9 f8 f8
-	ldi	r6 r8 4
-	fldi	f7 r6 1
-	fmul	f7 f9 f7
-	fadd	f9 f10 f7
+	fbgt	f0 f5 L_else.21298
+	addi	r9 r0 0
+	jump	L_cont.21296
+L_else.21298 : 
+	addi	r9 r0 1
+L_cont.21296 : 
+	xor	r8 r8 r9
+	sub	r8 r4 r8
+	jump	L_cont.21271
+L_else.21295 : 
+	fmul	f7 f8 f8
+	fldi	f9 r11 0
+	fmul	f9 f7 f9
+	fmul	f10 f5 f5
+	fldi	f7 r11 1
+	fmul	f7 f10 f7
+	fadd	f9 f9 f7
 	fmul	f10 f6 f6
-	ldi	r6 r8 4
-	fldi	f7 r6 2
+	fldi	f7 r11 2
 	fmul	f7 f10 f7
 	fadd	f7 f9 f7
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.24140
+	bne	r12 r0 L_else.21301
 	fadd	f5 f0 f7
-	jump	L_cont.24138
-L_else.24140 : 
-	fmul	f10 f8 f6
-	ldi	r6 r8 9
-	fldi	f9 r6 0
+	jump	L_cont.21299
+L_else.21301 : 
+	fmul	f10 f5 f6
+	fldi	f9 r9 0
 	fmul	f9 f10 f9
-	fadd	f9 f7 f9
-	fmul	f6 f6 f5
-	ldi	r6 r8 9
-	fldi	f7 r6 1
-	fmul	f6 f6 f7
-	fadd	f6 f9 f6
-	fmul	f7 f5 f8
-	ldi	r6 r8 9
-	fldi	f5 r6 2
+	fadd	f7 f7 f9
+	fmul	f9 f6 f8
+	fldi	f6 r9 1
+	fmul	f6 f9 f6
+	fadd	f6 f7 f6
+	fmul	f7 f8 f5
+	fldi	f5 r9 2
 	fmul	f5 f7 f5
 	fadd	f5 f6 f5
-L_cont.24138 : 
-	ldi	r9 r8 1
-	addi	r6 r0 3
-	bne	r9 r6 L_else.24143
+L_cont.21299 : 
+	addi	r9 r0 3
+	bne	r13 r9 L_else.21304
 	fldi	f6 r0 12
 	fsub	f5 f5 f6
-	jump	L_cont.24141
-L_else.24143 : 
-L_cont.24141 : 
-	ldi	r6 r8 6
-	fbgt	f0 f5 L_else.24146
-	addi	r8 r0 0
-	jump	L_cont.24144
-L_else.24146 : 
-	addi	r8 r0 1
-L_cont.24144 : 
-	xor	r6 r6 r8
-	sub	r6 r4 r6
-L_cont.24110 : 
-	bne	r6 r0 L_else.24114
-	addi	r6 r10 1
-	jump	L_check_all_inside.2173
-L_else.24114 : 
+	jump	L_cont.21302
+L_else.21304 : 
+L_cont.21302 : 
+	fbgt	f0 f5 L_else.21307
+	addi	r9 r0 0
+	jump	L_cont.21305
+L_else.21307 : 
+	addi	r9 r0 1
+L_cont.21305 : 
+	xor	r8 r8 r9
+	sub	r8 r4 r8
+L_cont.21271 : 
+	bne	r8 r0 L_else.21275
+	addi	r6 r6 1
+	jump	L_check_all_inside.2237
+L_else.21275 : 
 	addi	r6 r0 0
 	return
-L_else.24107 : 
+L_shadow_check_and_group.2243 : 
+	ldi	r17 r14 0
+	bne	r17 r5 L_else.21310
 	addi	r6 r0 0
 	return
-L_else.24100 : 
-	addi	r6 r0 0
-	return
-L_else.24093 : 
-	addi	r6 r0 0
-	return
-L_shadow_check_and_group.2179 : 
-	ldi	r6 r11 0
-	bne	r6 r5 L_else.24245
-	addi	r6 r0 0
-	return
-L_else.24245 : 
-	ldi	r8 r11 0
-	addi	r13 r0 1905
-	ldi	r10 r8 1970
+L_else.21310 : 
+	ldi	r12 r0 1855
+	ldi	r13 r0 1854
+	muli	r16 r17 11
+	ldi	r7 r16 1928
+	ldi	r6 r16 1925
+	ldi	r9 r16 1924
+	ldi	r8 r16 1923
+	ldi	r11 r16 1922
+	ldi	r10 r16 1920
 	fldi	f3 r0 1042
-	ldi	r6 r10 5
-	fldi	f2 r6 0
-	fsub	f7 f3 f2
-	fldi	f3 r0 1043
-	ldi	r6 r10 5
-	fldi	f2 r6 1
-	fsub	f5 f3 f2
-	fldi	f3 r0 1044
-	ldi	r6 r10 5
-	fldi	f2 r6 2
-	fsub	f9 f3 f2
-	ldi	r6 r13 1
-	add	r1 r6 r8
-	ldi	r9 r1 0
-	ldi	r7 r10 1
-	bne	r7 r4 L_else.24248
-	ldi	r7 r13 0
 	fldi	f2 r9 0
-	fsub	f2 f2 f7
+	fsub	f7 f3 f2
+	fldi	f2 r0 1043
 	fldi	f3 r9 1
-	fmul	f4 f2 f3
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f5
-	fbgt	f0 f2 L_else.24379
-	jump	L_cont.24377
-L_else.24379 : 
-	fsub	f2 f0 f2
-L_cont.24377 : 
-	ldi	r6 r10 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24382
-	addi	r6 r0 0
-	jump	L_cont.24380
-L_else.24382 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.24419
-	jump	L_cont.24417
-L_else.24419 : 
-	fsub	f2 f0 f2
-L_cont.24417 : 
-	ldi	r6 r10 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24421
-	addi	r6 r0 0
-	jump	L_cont.24380
-L_else.24421 : 
-	fldi	f2 r9 1
-	fbne	f2 f0 L_else.24424
-	addi	r6 r0 1
-	jump	L_cont.24422
-L_else.24424 : 
-	addi	r6 r0 0
-L_cont.24422 : 
-	sub	r6 r4 r6
-L_cont.24380 : 
-	bne	r6 r0 L_else.24384
-	fldi	f2 r9 2
-	fsub	f3 f2 f5
-	fldi	f2 r9 3
-	fmul	f4 f3 f2
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.24387
-	jump	L_cont.24385
-L_else.24387 : 
-	fsub	f2 f0 f2
-L_cont.24385 : 
-	ldi	r6 r10 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24390
-	addi	r6 r0 0
-	jump	L_cont.24388
-L_else.24390 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.24411
-	jump	L_cont.24409
-L_else.24411 : 
-	fsub	f2 f0 f2
-L_cont.24409 : 
-	ldi	r6 r10 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24413
-	addi	r6 r0 0
-	jump	L_cont.24388
-L_else.24413 : 
-	fldi	f2 r9 3
-	fbne	f2 f0 L_else.24416
-	addi	r6 r0 1
-	jump	L_cont.24414
-L_else.24416 : 
-	addi	r6 r0 0
-L_cont.24414 : 
-	sub	r6 r4 r6
-L_cont.24388 : 
-	bne	r6 r0 L_else.24392
-	fldi	f2 r9 4
-	fsub	f2 f2 f9
-	fldi	f3 r9 5
-	fmul	f4 f2 f3
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.24395
-	jump	L_cont.24393
-L_else.24395 : 
-	fsub	f2 f0 f2
-L_cont.24393 : 
-	ldi	r6 r10 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24398
-	addi	r6 r0 0
-	jump	L_cont.24396
-L_else.24398 : 
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f5
-	fbgt	f0 f2 L_else.24403
-	jump	L_cont.24401
-L_else.24403 : 
-	fsub	f2 f0 f2
-L_cont.24401 : 
-	ldi	r6 r10 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24405
-	addi	r6 r0 0
-	jump	L_cont.24396
-L_else.24405 : 
-	fldi	f2 r9 5
-	fbne	f2 f0 L_else.24408
-	addi	r6 r0 1
-	jump	L_cont.24406
-L_else.24408 : 
-	addi	r6 r0 0
-L_cont.24406 : 
-	sub	r6 r4 r6
-L_cont.24396 : 
-	bne	r6 r0 L_else.24400
-	addi	r6 r0 0
-	jump	L_cont.24246
-L_else.24400 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 3
-	jump	L_cont.24246
-L_else.24392 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 2
-	jump	L_cont.24246
-L_else.24384 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.24246
-L_else.24248 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.24426
-	fldi	f2 r9 0
-	fbgt	f0 f2 L_else.24428
-	addi	r6 r0 0
-	jump	L_cont.24246
-L_else.24428 : 
-	fldi	f2 r9 1
-	fmul	f3 f2 f7
-	fldi	f2 r9 2
-	fmul	f2 f2 f5
-	fadd	f3 f3 f2
-	fldi	f2 r9 3
-	fmul	f2 f2 f9
-	fadd	f2 f3 f2
-	fsti	f2 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.24246
-L_else.24426 : 
-	fldi	f6 r9 0
-	fbne	f6 f0 L_else.24430
-	addi	r6 r0 0
-	jump	L_cont.24246
-L_else.24430 : 
-	fldi	f2 r9 1
-	fmul	f3 f2 f7
-	fldi	f2 r9 2
-	fmul	f2 f2 f5
-	fadd	f3 f3 f2
-	fldi	f2 r9 3
-	fmul	f2 f2 f9
-	fadd	f8 f3 f2
-	fmul	f3 f7 f7
-	ldi	r6 r10 4
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fmul	f3 f5 f5
-	ldi	r6 r10 4
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f9 f9
-	ldi	r6 r10 4
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	ldi	r6 r10 3
-	bne	r6 r0 L_else.24433
-	jump	L_cont.24431
-L_else.24433 : 
-	fmul	f4 f5 f9
-	ldi	r6 r10 9
-	fldi	f3 r6 0
-	fmul	f3 f4 f3
-	fadd	f4 f2 f3
-	fmul	f3 f9 f7
-	ldi	r6 r10 9
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f7 f5
-	ldi	r6 r10 9
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-L_cont.24431 : 
-	ldi	r7 r10 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.24436
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.24434
-L_else.24436 : 
-L_cont.24434 : 
-	fmul	f3 f8 f8
-	fmul	f2 f6 f2
-	fsub	f2 f3 f2
-	fbgt	f2 f0 L_else.24438
-	addi	r6 r0 0
-	jump	L_cont.24246
-L_else.24438 : 
-	ldi	r6 r10 6
-	bne	r6 r0 L_else.24441
-	fsqrt	f2 f2
-	fsub	f3 f8 f2
-	fldi	f2 r9 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-	jump	L_cont.24439
-L_else.24441 : 
-	fsqrt	f2 f2
-	fadd	f3 f8 f2
-	fldi	f2 r9 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-L_cont.24439 : 
-	addi	r6 r0 1
-L_cont.24246 : 
-	fldi	f2 r0 1073
-	bne	r6 r0 L_else.24250
-	ldi	r6 r8 1970
-	ldi	r6 r6 6
-	bne	r6 r0 L_else.24252
-	addi	r6 r0 0
-	return
-L_else.24252 : 
-	addi	r11 r11 1
-	jump	L_shadow_check_and_group.2179
-L_else.24250 : 
-	fldi	f3 r0 32
-	fbgt	f3 f2 L_else.24254
-	ldi	r6 r8 1970
-	ldi	r6 r6 6
-	bne	r6 r0 L_else.24256
-	addi	r6 r0 0
-	return
-L_else.24256 : 
-	addi	r11 r11 1
-	jump	L_shadow_check_and_group.2179
-L_else.24254 : 
-	fldi	f3 r0 33
-	fadd	f3 f2 f3
-	fldi	f2 r0 1039
-	fmul	f2 f2 f3
-	fldi	f4 r0 1042
-	fadd	f6 f2 f4
-	fldi	f2 r0 1040
-	fmul	f2 f2 f3
-	fldi	f4 r0 1043
-	fadd	f7 f2 f4
-	fldi	f2 r0 1041
-	fmul	f2 f2 f3
+	fsub	f6 f2 f3
 	fldi	f3 r0 1044
-	fadd	f8 f2 f3
-	ldi	r6 r12 0
-	bne	r6 r5 L_else.24259
-	addi	r6 r0 1
-	jump	L_cont.24257
-L_else.24259 : 
-	ldi	r8 r6 1970
-	ldi	r6 r8 5
-	fldi	f2 r6 0
-	fsub	f3 f6 f2
-	ldi	r6 r8 5
-	fldi	f2 r6 1
-	fsub	f4 f7 f2
-	ldi	r6 r8 5
-	fldi	f2 r6 2
-	fsub	f5 f8 f2
-	ldi	r6 r8 1
-	bne	r6 r4 L_else.24264
-	fbgt	f0 f3 L_else.24347
-	fadd	f2 f0 f3
-	jump	L_cont.24345
-L_else.24347 : 
-	fsub	f2 f0 f3
-L_cont.24345 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24350
-	addi	r6 r0 0
-	jump	L_cont.24348
-L_else.24350 : 
-	fbgt	f0 f4 L_else.24355
-	fadd	f2 f0 f4
-	jump	L_cont.24353
-L_else.24355 : 
-	fsub	f2 f0 f4
-L_cont.24353 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24357
-	addi	r6 r0 0
-	jump	L_cont.24348
-L_else.24357 : 
-	fbgt	f0 f5 L_else.24360
-	fadd	f2 f0 f5
-	jump	L_cont.24358
-L_else.24360 : 
-	fsub	f2 f0 f5
-L_cont.24358 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24362
-	addi	r6 r0 0
-	jump	L_cont.24348
-L_else.24362 : 
-	addi	r6 r0 1
-L_cont.24348 : 
-	bne	r6 r0 L_else.24352
-	ldi	r6 r8 6
-	sub	r6 r4 r6
-	jump	L_cont.24262
-L_else.24352 : 
-	ldi	r6 r8 6
-	jump	L_cont.24262
-L_else.24264 : 
-	addi	r7 r0 2
-	bne	r6 r7 L_else.24364
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f3 f2 f3
-	fldi	f2 r6 1
-	fmul	f2 f2 f4
-	fadd	f3 f3 f2
-	fldi	f2 r6 2
-	fmul	f2 f2 f5
-	fadd	f2 f3 f2
-	ldi	r7 r8 6
-	fbgt	f0 f2 L_else.24367
-	addi	r6 r0 0
-	jump	L_cont.24365
-L_else.24367 : 
-	addi	r6 r0 1
-L_cont.24365 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-	jump	L_cont.24262
-L_else.24364 : 
-	fmul	f9 f3 f3
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f10 f9 f2
-	fmul	f9 f4 f4
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f9 f2
-	fadd	f9 f10 f2
-	fmul	f10 f5 f5
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f10 f2
-	fadd	f2 f9 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.24370
-	jump	L_cont.24368
-L_else.24370 : 
-	fmul	f10 f4 f5
-	ldi	r6 r8 9
-	fldi	f9 r6 0
-	fmul	f9 f10 f9
-	fadd	f9 f2 f9
-	fmul	f5 f5 f3
-	ldi	r6 r8 9
-	fldi	f2 r6 1
-	fmul	f2 f5 f2
-	fadd	f5 f9 f2
-	fmul	f3 f3 f4
-	ldi	r6 r8 9
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f2 f5 f2
-L_cont.24368 : 
-	ldi	r7 r8 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.24373
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.24371
-L_else.24373 : 
-L_cont.24371 : 
-	ldi	r7 r8 6
-	fbgt	f0 f2 L_else.24376
-	addi	r6 r0 0
-	jump	L_cont.24374
-L_else.24376 : 
-	addi	r6 r0 1
-L_cont.24374 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-L_cont.24262 : 
-	bne	r6 r0 L_else.24266
-	ldi	r6 r12 1
-	bne	r6 r5 L_else.24268
-	addi	r6 r0 1
-	jump	L_cont.24257
-L_else.24268 : 
-	ldi	r7 r6 1970
-	ldi	r6 r7 5
-	fldi	f2 r6 0
-	fsub	f3 f6 f2
-	ldi	r6 r7 5
-	fldi	f2 r6 1
-	fsub	f4 f7 f2
-	ldi	r6 r7 5
-	fldi	f2 r6 2
-	fsub	f5 f8 f2
-	ldi	r6 r7 1
-	bne	r6 r4 L_else.24271
-	fbgt	f0 f3 L_else.24315
-	fadd	f2 f0 f3
-	jump	L_cont.24313
-L_else.24315 : 
-	fsub	f2 f0 f3
-L_cont.24313 : 
-	ldi	r6 r7 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24318
-	addi	r6 r0 0
-	jump	L_cont.24316
-L_else.24318 : 
-	fbgt	f0 f4 L_else.24323
-	fadd	f2 f0 f4
-	jump	L_cont.24321
-L_else.24323 : 
-	fsub	f2 f0 f4
-L_cont.24321 : 
-	ldi	r6 r7 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24325
-	addi	r6 r0 0
-	jump	L_cont.24316
-L_else.24325 : 
-	fbgt	f0 f5 L_else.24328
-	fadd	f2 f0 f5
-	jump	L_cont.24326
-L_else.24328 : 
-	fsub	f2 f0 f5
-L_cont.24326 : 
-	ldi	r6 r7 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24330
-	addi	r6 r0 0
-	jump	L_cont.24316
-L_else.24330 : 
-	addi	r6 r0 1
-L_cont.24316 : 
-	bne	r6 r0 L_else.24320
-	ldi	r6 r7 6
-	sub	r6 r4 r6
-	jump	L_cont.24269
-L_else.24320 : 
-	ldi	r6 r7 6
-	jump	L_cont.24269
-L_else.24271 : 
-	addi	r8 r0 2
-	bne	r6 r8 L_else.24332
-	ldi	r6 r7 4
-	fldi	f2 r6 0
-	fmul	f3 f2 f3
-	fldi	f2 r6 1
-	fmul	f2 f2 f4
-	fadd	f3 f3 f2
-	fldi	f2 r6 2
-	fmul	f2 f2 f5
-	fadd	f2 f3 f2
-	ldi	r7 r7 6
-	fbgt	f0 f2 L_else.24335
-	addi	r6 r0 0
-	jump	L_cont.24333
-L_else.24335 : 
-	addi	r6 r0 1
-L_cont.24333 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-	jump	L_cont.24269
-L_else.24332 : 
-	fmul	f9 f3 f3
-	ldi	r6 r7 4
-	fldi	f2 r6 0
-	fmul	f10 f9 f2
-	fmul	f9 f4 f4
-	ldi	r6 r7 4
-	fldi	f2 r6 1
-	fmul	f2 f9 f2
-	fadd	f9 f10 f2
-	fmul	f10 f5 f5
-	ldi	r6 r7 4
-	fldi	f2 r6 2
-	fmul	f2 f10 f2
-	fadd	f2 f9 f2
-	ldi	r6 r7 3
-	bne	r6 r0 L_else.24338
-	jump	L_cont.24336
-L_else.24338 : 
-	fmul	f10 f4 f5
-	ldi	r6 r7 9
-	fldi	f9 r6 0
-	fmul	f9 f10 f9
-	fadd	f9 f2 f9
-	fmul	f5 f5 f3
-	ldi	r6 r7 9
-	fldi	f2 r6 1
-	fmul	f2 f5 f2
-	fadd	f5 f9 f2
-	fmul	f3 f3 f4
-	ldi	r6 r7 9
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f2 f5 f2
-L_cont.24336 : 
-	ldi	r8 r7 1
-	addi	r6 r0 3
-	bne	r8 r6 L_else.24341
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.24339
-L_else.24341 : 
-L_cont.24339 : 
-	ldi	r7 r7 6
-	fbgt	f0 f2 L_else.24344
-	addi	r6 r0 0
-	jump	L_cont.24342
-L_else.24344 : 
-	addi	r6 r0 1
-L_cont.24342 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-L_cont.24269 : 
-	bne	r6 r0 L_else.24273
-	ldi	r6 r12 2
-	bne	r6 r5 L_else.24275
-	addi	r6 r0 1
-	jump	L_cont.24257
-L_else.24275 : 
-	ldi	r7 r6 1970
-	ldi	r6 r7 5
-	fldi	f2 r6 0
-	fsub	f2 f6 f2
-	ldi	r6 r7 5
-	fldi	f3 r6 1
-	fsub	f4 f7 f3
-	ldi	r6 r7 5
-	fldi	f3 r6 2
-	fsub	f5 f8 f3
-	ldi	r6 r7 1
-	bne	r6 r4 L_else.24278
-	fbgt	f0 f2 L_else.24283
-	jump	L_cont.24281
-L_else.24283 : 
-	fsub	f2 f0 f2
-L_cont.24281 : 
-	ldi	r6 r7 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24286
-	addi	r6 r0 0
-	jump	L_cont.24284
-L_else.24286 : 
-	fbgt	f0 f4 L_else.24291
-	fadd	f2 f0 f4
-	jump	L_cont.24289
-L_else.24291 : 
-	fsub	f2 f0 f4
-L_cont.24289 : 
-	ldi	r6 r7 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24293
-	addi	r6 r0 0
-	jump	L_cont.24284
-L_else.24293 : 
-	fbgt	f0 f5 L_else.24296
-	fadd	f2 f0 f5
-	jump	L_cont.24294
-L_else.24296 : 
-	fsub	f2 f0 f5
-L_cont.24294 : 
-	ldi	r6 r7 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24298
-	addi	r6 r0 0
-	jump	L_cont.24284
-L_else.24298 : 
-	addi	r6 r0 1
-L_cont.24284 : 
-	bne	r6 r0 L_else.24288
-	ldi	r6 r7 6
-	sub	r6 r4 r6
-	jump	L_cont.24276
-L_else.24288 : 
-	ldi	r6 r7 6
-	jump	L_cont.24276
-L_else.24278 : 
-	addi	r8 r0 2
-	bne	r6 r8 L_else.24300
-	ldi	r6 r7 4
-	fldi	f3 r6 0
-	fmul	f3 f3 f2
-	fldi	f2 r6 1
-	fmul	f2 f2 f4
-	fadd	f3 f3 f2
-	fldi	f2 r6 2
-	fmul	f2 f2 f5
-	fadd	f2 f3 f2
-	ldi	r6 r7 6
-	fbgt	f0 f2 L_else.24303
-	addi	r7 r0 0
-	jump	L_cont.24301
-L_else.24303 : 
-	addi	r7 r0 1
-L_cont.24301 : 
-	xor	r6 r6 r7
-	sub	r6 r4 r6
-	jump	L_cont.24276
-L_else.24300 : 
-	fmul	f9 f2 f2
-	ldi	r6 r7 4
-	fldi	f3 r6 0
-	fmul	f10 f9 f3
-	fmul	f9 f4 f4
-	ldi	r6 r7 4
-	fldi	f3 r6 1
-	fmul	f3 f9 f3
-	fadd	f3 f10 f3
-	fmul	f10 f5 f5
-	ldi	r6 r7 4
-	fldi	f9 r6 2
-	fmul	f9 f10 f9
-	fadd	f3 f3 f9
-	ldi	r6 r7 3
-	bne	r6 r0 L_else.24306
-	fadd	f2 f0 f3
-	jump	L_cont.24304
-L_else.24306 : 
-	fmul	f10 f4 f5
-	ldi	r6 r7 9
-	fldi	f9 r6 0
-	fmul	f9 f10 f9
-	fadd	f9 f3 f9
-	fmul	f3 f5 f2
-	ldi	r6 r7 9
-	fldi	f5 r6 1
-	fmul	f3 f3 f5
-	fadd	f3 f9 f3
-	fmul	f4 f2 f4
-	ldi	r6 r7 9
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-L_cont.24304 : 
-	ldi	r8 r7 1
-	addi	r6 r0 3
-	bne	r8 r6 L_else.24309
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.24307
-L_else.24309 : 
-L_cont.24307 : 
-	ldi	r6 r7 6
-	fbgt	f0 f2 L_else.24312
-	addi	r7 r0 0
-	jump	L_cont.24310
-L_else.24312 : 
-	addi	r7 r0 1
-L_cont.24310 : 
-	xor	r6 r6 r7
-	sub	r6 r4 r6
-L_cont.24276 : 
-	bne	r6 r0 L_else.24280
-	addi	r6 r0 3
-	add	r7 r0 r12
-	fadd	f2 f0 f6
-	fadd	f3 f0 f7
-	fadd	f4 f0 f8
-	call	L_check_all_inside.2173
-	jump	L_cont.24257
-L_else.24280 : 
-	addi	r6 r0 0
-	jump	L_cont.24257
-L_else.24273 : 
-	addi	r6 r0 0
-	jump	L_cont.24257
-L_else.24266 : 
-	addi	r6 r0 0
-L_cont.24257 : 
-	bne	r6 r0 L_else.24261
-	addi	r11 r11 1
-	jump	L_shadow_check_and_group.2179
-L_else.24261 : 
-	addi	r6 r0 1
-	return
-L_shadow_check_one_or_group.2182 : 
-	add	r1 r15 r14
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.24444
-	addi	r6 r0 0
-	return
-L_else.24444 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24446
-	addi	r14 r14 1
-	add	r1 r15 r14
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.24448
-	addi	r6 r0 0
-	return
-L_else.24448 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24450
-	addi	r14 r14 1
-	add	r1 r15 r14
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.24452
-	addi	r6 r0 0
-	return
-L_else.24452 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24454
-	addi	r14 r14 1
-	add	r1 r15 r14
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.24456
-	addi	r6 r0 0
-	return
-L_else.24456 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24458
-	addi	r14 r14 1
-	add	r1 r15 r14
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.24460
-	addi	r6 r0 0
-	return
-L_else.24460 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24462
-	addi	r14 r14 1
-	add	r1 r15 r14
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.24464
-	addi	r6 r0 0
-	return
-L_else.24464 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24466
-	addi	r14 r14 1
-	add	r1 r15 r14
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.24468
-	addi	r6 r0 0
-	return
-L_else.24468 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24470
-	addi	r14 r14 1
-	add	r1 r15 r14
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.24472
-	addi	r6 r0 0
-	return
-L_else.24472 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24474
-	addi	r14 r14 1
-	jump	L_shadow_check_one_or_group.2182
-L_else.24474 : 
-	addi	r6 r0 1
-	return
-L_else.24470 : 
-	addi	r6 r0 1
-	return
-L_else.24466 : 
-	addi	r6 r0 1
-	return
-L_else.24462 : 
-	addi	r6 r0 1
-	return
-L_else.24458 : 
-	addi	r6 r0 1
-	return
-L_else.24454 : 
-	addi	r6 r0 1
-	return
-L_else.24450 : 
-	addi	r6 r0 1
-	return
-L_else.24446 : 
-	addi	r6 r0 1
-	return
-L_shadow_check_one_or_matrix.2185 : 
-	add	r1 r17 r16
-	ldi	r18 r1 0
-	ldi	r7 r18 0
-	bne	r7 r5 L_else.24477
-	addi	r6 r0 0
-	return
-L_else.24477 : 
-	addi	r6 r0 99
-	bne	r7 r6 L_else.24480
-	addi	r6 r0 1
-	jump	L_cont.24478
-L_else.24480 : 
-	addi	r10 r0 1905
-	ldi	r8 r7 1970
-	fldi	f3 r0 1042
-	ldi	r6 r8 5
-	fldi	f2 r6 0
-	fsub	f7 f3 f2
-	fldi	f3 r0 1043
-	ldi	r6 r8 5
-	fldi	f2 r6 1
-	fsub	f5 f3 f2
-	fldi	f3 r0 1044
-	ldi	r6 r8 5
-	fldi	f2 r6 2
+	fldi	f2 r9 2
 	fsub	f9 f3 f2
-	ldi	r6 r10 1
-	add	r1 r6 r7
-	ldi	r9 r1 0
-	ldi	r7 r8 1
-	bne	r7 r4 L_else.24782
-	ldi	r7 r10 0
-	fldi	f2 r9 0
+	add	r1 r12 r17
+	ldi	r12 r1 0
+	bne	r10 r4 L_else.21313
+	fldi	f2 r12 0
 	fsub	f2 f2 f7
-	fldi	f3 r9 1
-	fmul	f4 f2 f3
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f5
-	fbgt	f0 f2 L_else.24820
-	jump	L_cont.24818
-L_else.24820 : 
+	fldi	f4 r12 1
+	fmul	f5 f2 f4
+	fldi	f12 r13 1
+	fmul	f2 f5 f12
+	fadd	f2 f2 f6
+	fbgt	f0 f2 L_else.21326
+	jump	L_cont.21324
+L_else.21326 : 
 	fsub	f2 f0 f2
-L_cont.24818 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24823
+L_cont.21324 : 
+	fldi	f10 r8 1
+	fbgt	f10 f2 L_else.21329
 	addi	r6 r0 0
-	jump	L_cont.24821
-L_else.24823 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
+	jump	L_cont.21327
+L_else.21329 : 
+	fldi	f2 r13 2
+	fmul	f2 f5 f2
 	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.24860
-	jump	L_cont.24858
-L_else.24860 : 
+	fbgt	f0 f2 L_else.21366
+	jump	L_cont.21364
+L_else.21366 : 
 	fsub	f2 f0 f2
-L_cont.24858 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24862
+L_cont.21364 : 
+	fldi	f3 r8 2
+	fbgt	f3 f2 L_else.21368
 	addi	r6 r0 0
-	jump	L_cont.24821
-L_else.24862 : 
-	fldi	f2 r9 1
-	fbne	f2 f0 L_else.24865
+	jump	L_cont.21327
+L_else.21368 : 
+	fbne	f4 f0 L_else.21371
 	addi	r6 r0 1
-	jump	L_cont.24863
-L_else.24865 : 
+	jump	L_cont.21369
+L_else.21371 : 
 	addi	r6 r0 0
-L_cont.24863 : 
+L_cont.21369 : 
 	sub	r6 r4 r6
-L_cont.24821 : 
-	bne	r6 r0 L_else.24825
-	fldi	f2 r9 2
-	fsub	f3 f2 f5
-	fldi	f2 r9 3
-	fmul	f4 f3 f2
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
+L_cont.21327 : 
+	bne	r6 r0 L_else.21331
+	fldi	f2 r12 2
+	fsub	f2 f2 f6
+	fldi	f4 r12 3
+	fmul	f11 f2 f4
+	fldi	f5 r13 0
+	fmul	f2 f11 f5
 	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.24828
-	jump	L_cont.24826
-L_else.24828 : 
+	fbgt	f0 f2 L_else.21334
+	jump	L_cont.21332
+L_else.21334 : 
 	fsub	f2 f0 f2
-L_cont.24826 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24831
-	addi	r6 r0 0
-	jump	L_cont.24829
-L_else.24831 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.24852
-	jump	L_cont.24850
-L_else.24852 : 
-	fsub	f2 f0 f2
-L_cont.24850 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24854
-	addi	r6 r0 0
-	jump	L_cont.24829
-L_else.24854 : 
-	fldi	f2 r9 3
-	fbne	f2 f0 L_else.24857
-	addi	r6 r0 1
-	jump	L_cont.24855
-L_else.24857 : 
-	addi	r6 r0 0
-L_cont.24855 : 
-	sub	r6 r4 r6
-L_cont.24829 : 
-	bne	r6 r0 L_else.24833
-	fldi	f2 r9 4
-	fsub	f2 f2 f9
-	fldi	f3 r9 5
-	fmul	f4 f2 f3
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.24836
-	jump	L_cont.24834
-L_else.24836 : 
-	fsub	f2 f0 f2
-L_cont.24834 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24839
-	addi	r6 r0 0
-	jump	L_cont.24837
-L_else.24839 : 
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f5
-	fbgt	f0 f2 L_else.24844
-	jump	L_cont.24842
-L_else.24844 : 
-	fsub	f2 f0 f2
-L_cont.24842 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24846
-	addi	r6 r0 0
-	jump	L_cont.24837
-L_else.24846 : 
-	fldi	f2 r9 5
-	fbne	f2 f0 L_else.24849
-	addi	r6 r0 1
-	jump	L_cont.24847
-L_else.24849 : 
-	addi	r6 r0 0
-L_cont.24847 : 
-	sub	r6 r4 r6
-L_cont.24837 : 
-	bne	r6 r0 L_else.24841
-	addi	r6 r0 0
-	jump	L_cont.24780
-L_else.24841 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 3
-	jump	L_cont.24780
-L_else.24833 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 2
-	jump	L_cont.24780
-L_else.24825 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.24780
-L_else.24782 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.24867
-	fldi	f2 r9 0
-	fbgt	f0 f2 L_else.24869
-	addi	r6 r0 0
-	jump	L_cont.24780
-L_else.24869 : 
-	fldi	f2 r9 1
-	fmul	f3 f2 f7
-	fldi	f2 r9 2
-	fmul	f2 f2 f5
-	fadd	f3 f3 f2
-	fldi	f2 r9 3
-	fmul	f2 f2 f9
-	fadd	f2 f3 f2
-	fsti	f2 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.24780
-L_else.24867 : 
-	fldi	f8 r9 0
-	fbne	f8 f0 L_else.24871
-	addi	r6 r0 0
-	jump	L_cont.24780
-L_else.24871 : 
-	fldi	f2 r9 1
-	fmul	f3 f2 f7
-	fldi	f2 r9 2
-	fmul	f2 f2 f5
-	fadd	f3 f3 f2
-	fldi	f2 r9 3
-	fmul	f2 f2 f9
-	fadd	f6 f3 f2
-	fmul	f3 f7 f7
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fmul	f3 f5 f5
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f9 f9
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.24874
-	jump	L_cont.24872
-L_else.24874 : 
-	fmul	f4 f5 f9
-	ldi	r6 r8 9
-	fldi	f3 r6 0
-	fmul	f3 f4 f3
-	fadd	f4 f2 f3
-	fmul	f3 f9 f7
-	ldi	r6 r8 9
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f7 f5
-	ldi	r6 r8 9
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-L_cont.24872 : 
-	ldi	r7 r8 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.24877
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.24875
-L_else.24877 : 
-L_cont.24875 : 
-	fmul	f3 f6 f6
-	fmul	f2 f8 f2
-	fsub	f2 f3 f2
-	fbgt	f2 f0 L_else.24879
-	addi	r6 r0 0
-	jump	L_cont.24780
-L_else.24879 : 
-	ldi	r6 r8 6
-	bne	r6 r0 L_else.24882
-	fsqrt	f2 f2
-	fsub	f3 f6 f2
-	fldi	f2 r9 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-	jump	L_cont.24880
-L_else.24882 : 
-	fsqrt	f2 f2
-	fadd	f3 f6 f2
-	fldi	f2 r9 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-L_cont.24880 : 
-	addi	r6 r0 1
-L_cont.24780 : 
-	bne	r6 r0 L_else.24784
-	addi	r6 r0 0
-	jump	L_cont.24478
-L_else.24784 : 
-	fldi	f2 r0 1073
-	fldi	f3 r0 34
-	fbgt	f3 f2 L_else.24786
-	addi	r6 r0 0
-	jump	L_cont.24478
-L_else.24786 : 
-	ldi	r6 r18 1
-	bne	r6 r5 L_else.24789
-	addi	r6 r0 0
-	jump	L_cont.24787
-L_else.24789 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24793
-	ldi	r6 r18 2
-	bne	r6 r5 L_else.24795
-	addi	r6 r0 0
-	jump	L_cont.24787
-L_else.24795 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24797
-	ldi	r6 r18 3
-	bne	r6 r5 L_else.24799
-	addi	r6 r0 0
-	jump	L_cont.24787
-L_else.24799 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24801
-	ldi	r6 r18 4
-	bne	r6 r5 L_else.24803
-	addi	r6 r0 0
-	jump	L_cont.24787
-L_else.24803 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24805
-	ldi	r6 r18 5
-	bne	r6 r5 L_else.24807
-	addi	r6 r0 0
-	jump	L_cont.24787
-L_else.24807 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24809
-	ldi	r6 r18 6
-	bne	r6 r5 L_else.24811
-	addi	r6 r0 0
-	jump	L_cont.24787
-L_else.24811 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24813
-	ldi	r6 r18 7
-	bne	r6 r5 L_else.24815
-	addi	r6 r0 0
-	jump	L_cont.24787
-L_else.24815 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24817
-	addi	r14 r0 8
-	add	r15 r0 r18
-	call	L_shadow_check_one_or_group.2182
-	jump	L_cont.24787
-L_else.24817 : 
-	addi	r6 r0 1
-	jump	L_cont.24787
-L_else.24813 : 
-	addi	r6 r0 1
-	jump	L_cont.24787
-L_else.24809 : 
-	addi	r6 r0 1
-	jump	L_cont.24787
-L_else.24805 : 
-	addi	r6 r0 1
-	jump	L_cont.24787
-L_else.24801 : 
-	addi	r6 r0 1
-	jump	L_cont.24787
-L_else.24797 : 
-	addi	r6 r0 1
-	jump	L_cont.24787
-L_else.24793 : 
-	addi	r6 r0 1
-L_cont.24787 : 
-	bne	r6 r0 L_else.24791
-	addi	r6 r0 0
-	jump	L_cont.24478
-L_else.24791 : 
-	addi	r6 r0 1
-L_cont.24478 : 
-	bne	r6 r0 L_else.24482
-	addi	r16 r16 1
-	add	r1 r17 r16
-	ldi	r18 r1 0
-	ldi	r7 r18 0
-	bne	r7 r5 L_else.24484
-	addi	r6 r0 0
-	return
-L_else.24484 : 
-	addi	r6 r0 99
-	bne	r7 r6 L_else.24487
-	addi	r6 r0 1
-	jump	L_cont.24485
-L_else.24487 : 
-	addi	r10 r0 1905
-	ldi	r9 r7 1970
-	fldi	f3 r0 1042
-	ldi	r6 r9 5
-	fldi	f2 r6 0
-	fsub	f7 f3 f2
-	fldi	f3 r0 1043
-	ldi	r6 r9 5
-	fldi	f2 r6 1
-	fsub	f5 f3 f2
-	fldi	f3 r0 1044
-	ldi	r6 r9 5
-	fldi	f2 r6 2
-	fsub	f9 f3 f2
-	ldi	r6 r10 1
-	add	r1 r6 r7
-	ldi	r8 r1 0
-	ldi	r7 r9 1
-	bne	r7 r4 L_else.24519
-	ldi	r7 r10 0
-	fldi	f2 r8 0
-	fsub	f3 f2 f7
-	fldi	f2 r8 1
-	fmul	f4 f3 f2
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f5
-	fbgt	f0 f2 L_else.24553
-	jump	L_cont.24551
-L_else.24553 : 
-	fsub	f2 f0 f2
-L_cont.24551 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24556
-	addi	r6 r0 0
-	jump	L_cont.24554
-L_else.24556 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.24593
-	jump	L_cont.24591
-L_else.24593 : 
-	fsub	f2 f0 f2
-L_cont.24591 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24595
-	addi	r6 r0 0
-	jump	L_cont.24554
-L_else.24595 : 
-	fldi	f2 r8 1
-	fbne	f2 f0 L_else.24598
-	addi	r6 r0 1
-	jump	L_cont.24596
-L_else.24598 : 
-	addi	r6 r0 0
-L_cont.24596 : 
-	sub	r6 r4 r6
-L_cont.24554 : 
-	bne	r6 r0 L_else.24558
-	fldi	f2 r8 2
-	fsub	f2 f2 f5
-	fldi	f3 r8 3
-	fmul	f4 f2 f3
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.24561
-	jump	L_cont.24559
-L_else.24561 : 
-	fsub	f2 f0 f2
-L_cont.24559 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24564
-	addi	r6 r0 0
-	jump	L_cont.24562
-L_else.24564 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.24585
-	jump	L_cont.24583
-L_else.24585 : 
-	fsub	f2 f0 f2
-L_cont.24583 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24587
-	addi	r6 r0 0
-	jump	L_cont.24562
-L_else.24587 : 
-	fldi	f2 r8 3
-	fbne	f2 f0 L_else.24590
-	addi	r6 r0 1
-	jump	L_cont.24588
-L_else.24590 : 
-	addi	r6 r0 0
-L_cont.24588 : 
-	sub	r6 r4 r6
-L_cont.24562 : 
-	bne	r6 r0 L_else.24566
-	fldi	f2 r8 4
-	fsub	f3 f2 f9
-	fldi	f2 r8 5
-	fmul	f4 f3 f2
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.24569
-	jump	L_cont.24567
-L_else.24569 : 
-	fsub	f2 f0 f2
-L_cont.24567 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24572
-	addi	r6 r0 0
-	jump	L_cont.24570
-L_else.24572 : 
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f5
-	fbgt	f0 f2 L_else.24577
-	jump	L_cont.24575
-L_else.24577 : 
-	fsub	f2 f0 f2
-L_cont.24575 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24579
-	addi	r6 r0 0
-	jump	L_cont.24570
-L_else.24579 : 
-	fldi	f2 r8 5
-	fbne	f2 f0 L_else.24582
-	addi	r6 r0 1
-	jump	L_cont.24580
-L_else.24582 : 
-	addi	r6 r0 0
-L_cont.24580 : 
-	sub	r6 r4 r6
-L_cont.24570 : 
-	bne	r6 r0 L_else.24574
-	addi	r6 r0 0
-	jump	L_cont.24517
-L_else.24574 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 3
-	jump	L_cont.24517
-L_else.24566 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 2
-	jump	L_cont.24517
-L_else.24558 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.24517
-L_else.24519 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.24600
-	fldi	f2 r8 0
-	fbgt	f0 f2 L_else.24602
-	addi	r6 r0 0
-	jump	L_cont.24517
-L_else.24602 : 
-	fldi	f2 r8 1
-	fmul	f3 f2 f7
-	fldi	f2 r8 2
-	fmul	f2 f2 f5
-	fadd	f3 f3 f2
-	fldi	f2 r8 3
-	fmul	f2 f2 f9
-	fadd	f2 f3 f2
-	fsti	f2 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.24517
-L_else.24600 : 
+L_cont.21332 : 
 	fldi	f8 r8 0
-	fbne	f8 f0 L_else.24604
+	fbgt	f8 f2 L_else.21337
 	addi	r6 r0 0
-	jump	L_cont.24517
-L_else.24604 : 
-	fldi	f2 r8 1
+	jump	L_cont.21335
+L_else.21337 : 
+	fldi	f2 r13 2
+	fmul	f2 f11 f2
+	fadd	f2 f2 f9
+	fbgt	f0 f2 L_else.21358
+	jump	L_cont.21356
+L_else.21358 : 
+	fsub	f2 f0 f2
+L_cont.21356 : 
+	fldi	f3 r8 2
+	fbgt	f3 f2 L_else.21360
+	addi	r6 r0 0
+	jump	L_cont.21335
+L_else.21360 : 
+	fbne	f4 f0 L_else.21363
+	addi	r6 r0 1
+	jump	L_cont.21361
+L_else.21363 : 
+	addi	r6 r0 0
+L_cont.21361 : 
+	sub	r6 r4 r6
+L_cont.21335 : 
+	bne	r6 r0 L_else.21339
+	fldi	f2 r12 4
+	fsub	f2 f2 f9
+	fldi	f3 r12 5
+	fmul	f4 f2 f3
+	fmul	f2 f4 f5
+	fadd	f2 f2 f7
+	fbgt	f0 f2 L_else.21342
+	jump	L_cont.21340
+L_else.21342 : 
+	fsub	f2 f0 f2
+L_cont.21340 : 
+	fbgt	f8 f2 L_else.21345
+	addi	r6 r0 0
+	jump	L_cont.21343
+L_else.21345 : 
+	fmul	f2 f4 f12
+	fadd	f2 f2 f6
+	fbgt	f0 f2 L_else.21350
+	jump	L_cont.21348
+L_else.21350 : 
+	fsub	f2 f0 f2
+L_cont.21348 : 
+	fbgt	f10 f2 L_else.21352
+	addi	r6 r0 0
+	jump	L_cont.21343
+L_else.21352 : 
+	fbne	f3 f0 L_else.21355
+	addi	r6 r0 1
+	jump	L_cont.21353
+L_else.21355 : 
+	addi	r6 r0 0
+L_cont.21353 : 
+	sub	r6 r4 r6
+L_cont.21343 : 
+	bne	r6 r0 L_else.21347
+	addi	r6 r0 0
+	jump	L_cont.21311
+L_else.21347 : 
+	fsti	f4 r0 1073
+	addi	r6 r0 3
+	jump	L_cont.21311
+L_else.21339 : 
+	fsti	f11 r0 1073
+	addi	r6 r0 2
+	jump	L_cont.21311
+L_else.21331 : 
+	fsti	f5 r0 1073
+	addi	r6 r0 1
+	jump	L_cont.21311
+L_else.21313 : 
+	addi	r9 r0 2
+	bne	r10 r9 L_else.21373
+	fldi	f2 r12 0
+	fbgt	f0 f2 L_else.21375
+	addi	r6 r0 0
+	jump	L_cont.21311
+L_else.21375 : 
+	fldi	f2 r12 1
 	fmul	f3 f2 f7
-	fldi	f2 r8 2
-	fmul	f2 f2 f5
+	fldi	f2 r12 2
+	fmul	f2 f2 f6
 	fadd	f3 f3 f2
-	fldi	f2 r8 3
+	fldi	f2 r12 3
 	fmul	f2 f2 f9
-	fadd	f6 f3 f2
-	fmul	f3 f7 f7
-	ldi	r6 r9 4
-	fldi	f2 r6 0
-	fmul	f3 f3 f2
-	fmul	f4 f5 f5
-	ldi	r6 r9 4
-	fldi	f2 r6 1
+	fadd	f2 f3 f2
+	fsti	f2 r0 1073
+	addi	r6 r0 1
+	jump	L_cont.21311
+L_else.21373 : 
+	fldi	f8 r12 0
+	fbne	f8 f0 L_else.21377
+	addi	r6 r0 0
+	jump	L_cont.21311
+L_else.21377 : 
+	fldi	f2 r12 1
+	fmul	f3 f2 f7
+	fldi	f2 r12 2
+	fmul	f2 f2 f6
+	fadd	f3 f3 f2
+	fldi	f2 r12 3
+	fmul	f2 f2 f9
+	fadd	f5 f3 f2
+	fmul	f2 f7 f7
+	fldi	f3 r8 0
+	fmul	f3 f2 f3
+	fmul	f4 f6 f6
+	fldi	f2 r8 1
 	fmul	f2 f4 f2
-	fadd	f4 f3 f2
-	fmul	f3 f9 f9
-	ldi	r6 r9 4
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f2 f4 f2
-	ldi	r6 r9 3
-	bne	r6 r0 L_else.24607
-	jump	L_cont.24605
-L_else.24607 : 
-	fmul	f4 f5 f9
-	ldi	r6 r9 9
-	fldi	f3 r6 0
+	fadd	f3 f3 f2
+	fmul	f4 f9 f9
+	fldi	f2 r8 2
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
+	bne	r11 r0 L_else.21380
+	jump	L_cont.21378
+L_else.21380 : 
+	fmul	f4 f6 f9
+	fldi	f3 r7 0
 	fmul	f3 f4 f3
 	fadd	f3 f2 f3
 	fmul	f4 f9 f7
-	ldi	r6 r9 9
-	fldi	f2 r6 1
+	fldi	f2 r7 1
 	fmul	f2 f4 f2
-	fadd	f4 f3 f2
-	fmul	f3 f7 f5
-	ldi	r6 r9 9
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f2 f4 f2
-L_cont.24605 : 
-	ldi	r7 r9 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.24610
+	fadd	f3 f3 f2
+	fmul	f4 f7 f6
+	fldi	f2 r7 2
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
+L_cont.21378 : 
+	addi	r7 r0 3
+	bne	r10 r7 L_else.21383
 	fldi	f3 r0 12
 	fsub	f2 f2 f3
-	jump	L_cont.24608
-L_else.24610 : 
-L_cont.24608 : 
-	fmul	f3 f6 f6
+	jump	L_cont.21381
+L_else.21383 : 
+L_cont.21381 : 
+	fmul	f3 f5 f5
 	fmul	f2 f8 f2
 	fsub	f2 f3 f2
-	fbgt	f2 f0 L_else.24612
+	fbgt	f2 f0 L_else.21385
 	addi	r6 r0 0
-	jump	L_cont.24517
-L_else.24612 : 
-	ldi	r6 r9 6
-	bne	r6 r0 L_else.24615
+	jump	L_cont.21311
+L_else.21385 : 
+	bne	r6 r0 L_else.21388
 	fsqrt	f2 f2
-	fsub	f2 f6 f2
-	fldi	f3 r8 4
+	fsub	f2 f5 f2
+	fldi	f3 r12 4
 	fmul	f2 f2 f3
 	fsti	f2 r0 1073
-	jump	L_cont.24613
-L_else.24615 : 
+	jump	L_cont.21386
+L_else.21388 : 
 	fsqrt	f2 f2
-	fadd	f2 f6 f2
-	fldi	f3 r8 4
+	fadd	f2 f5 f2
+	fldi	f3 r12 4
 	fmul	f2 f2 f3
 	fsti	f2 r0 1073
-L_cont.24613 : 
+L_cont.21386 : 
 	addi	r6 r0 1
-L_cont.24517 : 
-	bne	r6 r0 L_else.24521
+L_cont.21311 : 
+	fldi	f3 r0 1073
+	bne	r6 r0 L_else.21315
+	ldi	r6 r16 1925
+	bne	r6 r0 L_else.21317
 	addi	r6 r0 0
-	jump	L_cont.24485
-L_else.24521 : 
+	return
+L_else.21317 : 
+	addi	r14 r14 1
+	jump	L_shadow_check_and_group.2243
+L_else.21315 : 
+	fldi	f2 r0 32
+	fbgt	f2 f3 L_else.21319
+	ldi	r6 r16 1925
+	bne	r6 r0 L_else.21321
+	addi	r6 r0 0
+	return
+L_else.21321 : 
+	addi	r14 r14 1
+	jump	L_shadow_check_and_group.2243
+L_else.21319 : 
+	fldi	f2 r0 33
+	fadd	f5 f3 f2
+	fldi	f2 r0 1039
+	fmul	f3 f2 f5
+	fldi	f2 r0 1042
+	fadd	f2 f3 f2
+	fldi	f3 r0 1040
+	fmul	f4 f3 f5
+	fldi	f3 r0 1043
+	fadd	f3 f4 f3
+	fldi	f4 r0 1041
+	fmul	f5 f4 f5
+	fldi	f4 r0 1044
+	fadd	f4 f5 f4
+	add	r6 r0 r15
+	add	r7 r0 r15
+	call	L_check_all_inside.2237
+	bne	r6 r0 L_else.21323
+	addi	r14 r14 1
+	jump	L_shadow_check_and_group.2243
+L_else.21323 : 
+	addi	r6 r0 1
+	return
+L_shadow_check_one_or_group.2246 : 
+	add	r1 r19 r18
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21391
+	addi	r6 r0 0
+	return
+L_else.21391 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21393
+	addi	r18 r18 1
+	add	r1 r19 r18
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21395
+	addi	r6 r0 0
+	return
+L_else.21395 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21397
+	addi	r18 r18 1
+	add	r1 r19 r18
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21399
+	addi	r6 r0 0
+	return
+L_else.21399 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21401
+	addi	r18 r18 1
+	add	r1 r19 r18
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21403
+	addi	r6 r0 0
+	return
+L_else.21403 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21405
+	addi	r18 r18 1
+	add	r1 r19 r18
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21407
+	addi	r6 r0 0
+	return
+L_else.21407 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21409
+	addi	r18 r18 1
+	add	r1 r19 r18
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21411
+	addi	r6 r0 0
+	return
+L_else.21411 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21413
+	addi	r18 r18 1
+	add	r1 r19 r18
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21415
+	addi	r6 r0 0
+	return
+L_else.21415 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21417
+	addi	r18 r18 1
+	add	r1 r19 r18
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21419
+	addi	r6 r0 0
+	return
+L_else.21419 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21421
+	addi	r18 r18 1
+	jump	L_shadow_check_one_or_group.2246
+L_else.21421 : 
+	addi	r6 r0 1
+	return
+L_else.21417 : 
+	addi	r6 r0 1
+	return
+L_else.21413 : 
+	addi	r6 r0 1
+	return
+L_else.21409 : 
+	addi	r6 r0 1
+	return
+L_else.21405 : 
+	addi	r6 r0 1
+	return
+L_else.21401 : 
+	addi	r6 r0 1
+	return
+L_else.21397 : 
+	addi	r6 r0 1
+	return
+L_else.21393 : 
+	addi	r6 r0 1
+	return
+L_shadow_check_one_or_matrix.2249 : 
+	ldi	r22 r20 0
+	ldi	r14 r22 0
+	bne	r14 r5 L_else.21424
+	addi	r6 r0 0
+	return
+L_else.21424 : 
+	addi	r6 r0 99
+	bne	r14 r6 L_else.21427
+	addi	r6 r0 1
+	jump	L_cont.21425
+L_else.21427 : 
+	ldi	r12 r0 1855
+	ldi	r13 r0 1854
+	muli	r10 r14 11
+	ldi	r7 r10 1928
+	ldi	r6 r10 1925
+	ldi	r9 r10 1924
+	ldi	r8 r10 1923
+	ldi	r11 r10 1922
+	ldi	r10 r10 1920
+	fldi	f2 r0 1042
+	fldi	f3 r9 0
+	fsub	f7 f2 f3
+	fldi	f3 r0 1043
+	fldi	f2 r9 1
+	fsub	f6 f3 f2
+	fldi	f2 r0 1044
+	fldi	f3 r9 2
+	fsub	f9 f2 f3
+	add	r1 r12 r14
+	ldi	r12 r1 0
+	bne	r10 r4 L_else.21463
+	fldi	f2 r12 0
+	fsub	f2 f2 f7
+	fldi	f5 r12 1
+	fmul	f4 f2 f5
+	fldi	f12 r13 1
+	fmul	f2 f4 f12
+	fadd	f2 f2 f6
+	fbgt	f0 f2 L_else.21501
+	jump	L_cont.21499
+L_else.21501 : 
+	fsub	f2 f0 f2
+L_cont.21499 : 
+	fldi	f11 r8 1
+	fbgt	f11 f2 L_else.21504
+	addi	r6 r0 0
+	jump	L_cont.21502
+L_else.21504 : 
+	fldi	f2 r13 2
+	fmul	f2 f4 f2
+	fadd	f2 f2 f9
+	fbgt	f0 f2 L_else.21541
+	jump	L_cont.21539
+L_else.21541 : 
+	fsub	f2 f0 f2
+L_cont.21539 : 
+	fldi	f3 r8 2
+	fbgt	f3 f2 L_else.21543
+	addi	r6 r0 0
+	jump	L_cont.21502
+L_else.21543 : 
+	fbne	f5 f0 L_else.21546
+	addi	r6 r0 1
+	jump	L_cont.21544
+L_else.21546 : 
+	addi	r6 r0 0
+L_cont.21544 : 
+	sub	r6 r4 r6
+L_cont.21502 : 
+	bne	r6 r0 L_else.21506
+	fldi	f2 r12 2
+	fsub	f2 f2 f6
+	fldi	f4 r12 3
+	fmul	f10 f2 f4
+	fldi	f8 r13 0
+	fmul	f2 f10 f8
+	fadd	f2 f2 f7
+	fbgt	f0 f2 L_else.21509
+	jump	L_cont.21507
+L_else.21509 : 
+	fsub	f2 f0 f2
+L_cont.21507 : 
+	fldi	f5 r8 0
+	fbgt	f5 f2 L_else.21512
+	addi	r6 r0 0
+	jump	L_cont.21510
+L_else.21512 : 
+	fldi	f2 r13 2
+	fmul	f2 f10 f2
+	fadd	f2 f2 f9
+	fbgt	f0 f2 L_else.21533
+	jump	L_cont.21531
+L_else.21533 : 
+	fsub	f2 f0 f2
+L_cont.21531 : 
+	fldi	f3 r8 2
+	fbgt	f3 f2 L_else.21535
+	addi	r6 r0 0
+	jump	L_cont.21510
+L_else.21535 : 
+	fbne	f4 f0 L_else.21538
+	addi	r6 r0 1
+	jump	L_cont.21536
+L_else.21538 : 
+	addi	r6 r0 0
+L_cont.21536 : 
+	sub	r6 r4 r6
+L_cont.21510 : 
+	bne	r6 r0 L_else.21514
+	fldi	f2 r12 4
+	fsub	f2 f2 f9
+	fldi	f4 r12 5
+	fmul	f3 f2 f4
+	fmul	f2 f3 f8
+	fadd	f2 f2 f7
+	fbgt	f0 f2 L_else.21517
+	jump	L_cont.21515
+L_else.21517 : 
+	fsub	f2 f0 f2
+L_cont.21515 : 
+	fbgt	f5 f2 L_else.21520
+	addi	r6 r0 0
+	jump	L_cont.21518
+L_else.21520 : 
+	fmul	f2 f3 f12
+	fadd	f2 f2 f6
+	fbgt	f0 f2 L_else.21525
+	jump	L_cont.21523
+L_else.21525 : 
+	fsub	f2 f0 f2
+L_cont.21523 : 
+	fbgt	f11 f2 L_else.21527
+	addi	r6 r0 0
+	jump	L_cont.21518
+L_else.21527 : 
+	fbne	f4 f0 L_else.21530
+	addi	r6 r0 1
+	jump	L_cont.21528
+L_else.21530 : 
+	addi	r6 r0 0
+L_cont.21528 : 
+	sub	r6 r4 r6
+L_cont.21518 : 
+	bne	r6 r0 L_else.21522
+	addi	r6 r0 0
+	jump	L_cont.21461
+L_else.21522 : 
+	fsti	f3 r0 1073
+	addi	r6 r0 3
+	jump	L_cont.21461
+L_else.21514 : 
+	fsti	f10 r0 1073
+	addi	r6 r0 2
+	jump	L_cont.21461
+L_else.21506 : 
+	fsti	f4 r0 1073
+	addi	r6 r0 1
+	jump	L_cont.21461
+L_else.21463 : 
+	addi	r9 r0 2
+	bne	r10 r9 L_else.21548
+	fldi	f2 r12 0
+	fbgt	f0 f2 L_else.21550
+	addi	r6 r0 0
+	jump	L_cont.21461
+L_else.21550 : 
+	fldi	f2 r12 1
+	fmul	f3 f2 f7
+	fldi	f2 r12 2
+	fmul	f2 f2 f6
+	fadd	f3 f3 f2
+	fldi	f2 r12 3
+	fmul	f2 f2 f9
+	fadd	f2 f3 f2
+	fsti	f2 r0 1073
+	addi	r6 r0 1
+	jump	L_cont.21461
+L_else.21548 : 
+	fldi	f8 r12 0
+	fbne	f8 f0 L_else.21552
+	addi	r6 r0 0
+	jump	L_cont.21461
+L_else.21552 : 
+	fldi	f2 r12 1
+	fmul	f3 f2 f7
+	fldi	f2 r12 2
+	fmul	f2 f2 f6
+	fadd	f3 f3 f2
+	fldi	f2 r12 3
+	fmul	f2 f2 f9
+	fadd	f5 f3 f2
+	fmul	f2 f7 f7
+	fldi	f3 r8 0
+	fmul	f3 f2 f3
+	fmul	f4 f6 f6
+	fldi	f2 r8 1
+	fmul	f2 f4 f2
+	fadd	f3 f3 f2
+	fmul	f4 f9 f9
+	fldi	f2 r8 2
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
+	bne	r11 r0 L_else.21555
+	jump	L_cont.21553
+L_else.21555 : 
+	fmul	f4 f6 f9
+	fldi	f3 r7 0
+	fmul	f3 f4 f3
+	fadd	f3 f2 f3
+	fmul	f4 f9 f7
+	fldi	f2 r7 1
+	fmul	f2 f4 f2
+	fadd	f3 f3 f2
+	fmul	f4 f7 f6
+	fldi	f2 r7 2
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
+L_cont.21553 : 
+	addi	r7 r0 3
+	bne	r10 r7 L_else.21558
+	fldi	f3 r0 12
+	fsub	f2 f2 f3
+	jump	L_cont.21556
+L_else.21558 : 
+L_cont.21556 : 
+	fmul	f3 f5 f5
+	fmul	f2 f8 f2
+	fsub	f2 f3 f2
+	fbgt	f2 f0 L_else.21560
+	addi	r6 r0 0
+	jump	L_cont.21461
+L_else.21560 : 
+	bne	r6 r0 L_else.21563
+	fsqrt	f2 f2
+	fsub	f2 f5 f2
+	fldi	f3 r12 4
+	fmul	f2 f2 f3
+	fsti	f2 r0 1073
+	jump	L_cont.21561
+L_else.21563 : 
+	fsqrt	f2 f2
+	fadd	f2 f5 f2
+	fldi	f3 r12 4
+	fmul	f2 f2 f3
+	fsti	f2 r0 1073
+L_cont.21561 : 
+	addi	r6 r0 1
+L_cont.21461 : 
+	bne	r6 r0 L_else.21465
+	addi	r6 r0 0
+	jump	L_cont.21425
+L_else.21465 : 
 	fldi	f3 r0 1073
 	fldi	f2 r0 34
-	fbgt	f2 f3 L_else.24523
+	fbgt	f2 f3 L_else.21467
 	addi	r6 r0 0
-	jump	L_cont.24485
-L_else.24523 : 
-	ldi	r6 r18 1
-	bne	r6 r5 L_else.24526
+	jump	L_cont.21425
+L_else.21467 : 
+	ldi	r6 r22 1
+	bne	r6 r5 L_else.21470
 	addi	r6 r0 0
-	jump	L_cont.24524
-L_else.24526 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24530
-	ldi	r6 r18 2
-	bne	r6 r5 L_else.24532
+	jump	L_cont.21468
+L_else.21470 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21474
+	ldi	r6 r22 2
+	bne	r6 r5 L_else.21476
 	addi	r6 r0 0
-	jump	L_cont.24524
-L_else.24532 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24534
-	ldi	r6 r18 3
-	bne	r6 r5 L_else.24536
+	jump	L_cont.21468
+L_else.21476 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21478
+	ldi	r6 r22 3
+	bne	r6 r5 L_else.21480
 	addi	r6 r0 0
-	jump	L_cont.24524
-L_else.24536 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24538
-	ldi	r6 r18 4
-	bne	r6 r5 L_else.24540
+	jump	L_cont.21468
+L_else.21480 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21482
+	ldi	r6 r22 4
+	bne	r6 r5 L_else.21484
 	addi	r6 r0 0
-	jump	L_cont.24524
-L_else.24540 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24542
-	ldi	r6 r18 5
-	bne	r6 r5 L_else.24544
+	jump	L_cont.21468
+L_else.21484 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21486
+	ldi	r6 r22 5
+	bne	r6 r5 L_else.21488
 	addi	r6 r0 0
-	jump	L_cont.24524
-L_else.24544 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24546
-	ldi	r6 r18 6
-	bne	r6 r5 L_else.24548
+	jump	L_cont.21468
+L_else.21488 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21490
+	ldi	r6 r22 6
+	bne	r6 r5 L_else.21492
 	addi	r6 r0 0
-	jump	L_cont.24524
-L_else.24548 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24550
-	addi	r14 r0 7
-	add	r15 r0 r18
-	call	L_shadow_check_one_or_group.2182
-	jump	L_cont.24524
-L_else.24550 : 
+	jump	L_cont.21468
+L_else.21492 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21494
+	ldi	r6 r22 7
+	bne	r6 r5 L_else.21496
+	addi	r6 r0 0
+	jump	L_cont.21468
+L_else.21496 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21498
+	addi	r18 r0 8
+	add	r19 r0 r22
+	call	L_shadow_check_one_or_group.2246
+	jump	L_cont.21468
+L_else.21498 : 
 	addi	r6 r0 1
-	jump	L_cont.24524
-L_else.24546 : 
+	jump	L_cont.21468
+L_else.21494 : 
 	addi	r6 r0 1
-	jump	L_cont.24524
-L_else.24542 : 
+	jump	L_cont.21468
+L_else.21490 : 
 	addi	r6 r0 1
-	jump	L_cont.24524
-L_else.24538 : 
+	jump	L_cont.21468
+L_else.21486 : 
 	addi	r6 r0 1
-	jump	L_cont.24524
-L_else.24534 : 
+	jump	L_cont.21468
+L_else.21482 : 
 	addi	r6 r0 1
-	jump	L_cont.24524
-L_else.24530 : 
+	jump	L_cont.21468
+L_else.21478 : 
 	addi	r6 r0 1
-L_cont.24524 : 
-	bne	r6 r0 L_else.24528
-	addi	r6 r0 0
-	jump	L_cont.24485
-L_else.24528 : 
+	jump	L_cont.21468
+L_else.21474 : 
 	addi	r6 r0 1
-L_cont.24485 : 
-	bne	r6 r0 L_else.24489
-	addi	r16 r16 1
-	jump	L_shadow_check_one_or_matrix.2185
-L_else.24489 : 
-	ldi	r6 r18 1
-	bne	r6 r5 L_else.24492
+L_cont.21468 : 
+	bne	r6 r0 L_else.21472
 	addi	r6 r0 0
-	jump	L_cont.24490
-L_else.24492 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24496
-	ldi	r6 r18 2
-	bne	r6 r5 L_else.24498
-	addi	r6 r0 0
-	jump	L_cont.24490
-L_else.24498 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24500
-	ldi	r6 r18 3
-	bne	r6 r5 L_else.24502
-	addi	r6 r0 0
-	jump	L_cont.24490
-L_else.24502 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24504
-	ldi	r6 r18 4
-	bne	r6 r5 L_else.24506
-	addi	r6 r0 0
-	jump	L_cont.24490
-L_else.24506 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24508
-	ldi	r6 r18 5
-	bne	r6 r5 L_else.24510
-	addi	r6 r0 0
-	jump	L_cont.24490
-L_else.24510 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24512
-	ldi	r6 r18 6
-	bne	r6 r5 L_else.24514
-	addi	r6 r0 0
-	jump	L_cont.24490
-L_else.24514 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24516
-	addi	r14 r0 7
-	add	r15 r0 r18
-	call	L_shadow_check_one_or_group.2182
-	jump	L_cont.24490
-L_else.24516 : 
+	jump	L_cont.21425
+L_else.21472 : 
 	addi	r6 r0 1
-	jump	L_cont.24490
-L_else.24512 : 
+L_cont.21425 : 
+	bne	r6 r0 L_else.21429
+	addi	r20 r20 1
+	jump	L_shadow_check_one_or_matrix.2249
+L_else.21429 : 
+	ldi	r6 r22 1
+	bne	r6 r5 L_else.21432
+	addi	r6 r0 0
+	jump	L_cont.21430
+L_else.21432 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21436
+	ldi	r6 r22 2
+	bne	r6 r5 L_else.21438
+	addi	r6 r0 0
+	jump	L_cont.21430
+L_else.21438 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21440
+	ldi	r6 r22 3
+	bne	r6 r5 L_else.21442
+	addi	r6 r0 0
+	jump	L_cont.21430
+L_else.21442 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21444
+	ldi	r6 r22 4
+	bne	r6 r5 L_else.21446
+	addi	r6 r0 0
+	jump	L_cont.21430
+L_else.21446 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21448
+	ldi	r6 r22 5
+	bne	r6 r5 L_else.21450
+	addi	r6 r0 0
+	jump	L_cont.21430
+L_else.21450 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21452
+	ldi	r6 r22 6
+	bne	r6 r5 L_else.21454
+	addi	r6 r0 0
+	jump	L_cont.21430
+L_else.21454 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21456
+	ldi	r6 r22 7
+	bne	r6 r5 L_else.21458
+	addi	r6 r0 0
+	jump	L_cont.21430
+L_else.21458 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	call	L_shadow_check_and_group.2243
+	bne	r6 r0 L_else.21460
+	addi	r18 r0 8
+	add	r19 r0 r22
+	call	L_shadow_check_one_or_group.2246
+	jump	L_cont.21430
+L_else.21460 : 
 	addi	r6 r0 1
-	jump	L_cont.24490
-L_else.24508 : 
+	jump	L_cont.21430
+L_else.21456 : 
 	addi	r6 r0 1
-	jump	L_cont.24490
-L_else.24504 : 
+	jump	L_cont.21430
+L_else.21452 : 
 	addi	r6 r0 1
-	jump	L_cont.24490
-L_else.24500 : 
+	jump	L_cont.21430
+L_else.21448 : 
 	addi	r6 r0 1
-	jump	L_cont.24490
-L_else.24496 : 
+	jump	L_cont.21430
+L_else.21444 : 
 	addi	r6 r0 1
-L_cont.24490 : 
-	bne	r6 r0 L_else.24494
-	addi	r16 r16 1
-	jump	L_shadow_check_one_or_matrix.2185
-L_else.24494 : 
+	jump	L_cont.21430
+L_else.21440 : 
 	addi	r6 r0 1
-	return
-L_else.24482 : 
-	ldi	r6 r18 1
-	bne	r6 r5 L_else.24618
-	addi	r6 r0 0
-	jump	L_cont.24616
-L_else.24618 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24755
-	ldi	r6 r18 2
-	bne	r6 r5 L_else.24757
-	addi	r6 r0 0
-	jump	L_cont.24616
-L_else.24757 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24759
-	ldi	r6 r18 3
-	bne	r6 r5 L_else.24761
-	addi	r6 r0 0
-	jump	L_cont.24616
-L_else.24761 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24763
-	ldi	r6 r18 4
-	bne	r6 r5 L_else.24765
-	addi	r6 r0 0
-	jump	L_cont.24616
-L_else.24765 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24767
-	ldi	r6 r18 5
-	bne	r6 r5 L_else.24769
-	addi	r6 r0 0
-	jump	L_cont.24616
-L_else.24769 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24771
-	ldi	r6 r18 6
-	bne	r6 r5 L_else.24773
-	addi	r6 r0 0
-	jump	L_cont.24616
-L_else.24773 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24775
-	ldi	r6 r18 7
-	bne	r6 r5 L_else.24777
-	addi	r6 r0 0
-	jump	L_cont.24616
-L_else.24777 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24779
-	addi	r14 r0 8
-	add	r15 r0 r18
-	call	L_shadow_check_one_or_group.2182
-	jump	L_cont.24616
-L_else.24779 : 
+	jump	L_cont.21430
+L_else.21436 : 
 	addi	r6 r0 1
-	jump	L_cont.24616
-L_else.24775 : 
-	addi	r6 r0 1
-	jump	L_cont.24616
-L_else.24771 : 
-	addi	r6 r0 1
-	jump	L_cont.24616
-L_else.24767 : 
-	addi	r6 r0 1
-	jump	L_cont.24616
-L_else.24763 : 
-	addi	r6 r0 1
-	jump	L_cont.24616
-L_else.24759 : 
-	addi	r6 r0 1
-	jump	L_cont.24616
-L_else.24755 : 
-	addi	r6 r0 1
-L_cont.24616 : 
-	bne	r6 r0 L_else.24620
-	addi	r16 r16 1
-	add	r1 r17 r16
-	ldi	r18 r1 0
-	ldi	r7 r18 0
-	bne	r7 r5 L_else.24622
-	addi	r6 r0 0
-	return
-L_else.24622 : 
-	addi	r6 r0 99
-	bne	r7 r6 L_else.24625
-	addi	r6 r0 1
-	jump	L_cont.24623
-L_else.24625 : 
-	addi	r10 r0 1905
-	ldi	r8 r7 1970
-	fldi	f3 r0 1042
-	ldi	r6 r8 5
-	fldi	f2 r6 0
-	fsub	f7 f3 f2
-	fldi	f3 r0 1043
-	ldi	r6 r8 5
-	fldi	f2 r6 1
-	fsub	f6 f3 f2
-	fldi	f3 r0 1044
-	ldi	r6 r8 5
-	fldi	f2 r6 2
-	fsub	f9 f3 f2
-	ldi	r6 r10 1
-	add	r1 r6 r7
-	ldi	r9 r1 0
-	ldi	r7 r8 1
-	bne	r7 r4 L_else.24657
-	ldi	r7 r10 0
-	fldi	f2 r9 0
-	fsub	f2 f2 f7
-	fldi	f3 r9 1
-	fmul	f4 f2 f3
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.24691
-	jump	L_cont.24689
-L_else.24691 : 
-	fsub	f2 f0 f2
-L_cont.24689 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24694
-	addi	r6 r0 0
-	jump	L_cont.24692
-L_else.24694 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.24731
-	jump	L_cont.24729
-L_else.24731 : 
-	fsub	f2 f0 f2
-L_cont.24729 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24733
-	addi	r6 r0 0
-	jump	L_cont.24692
-L_else.24733 : 
-	fldi	f2 r9 1
-	fbne	f2 f0 L_else.24736
-	addi	r6 r0 1
-	jump	L_cont.24734
-L_else.24736 : 
-	addi	r6 r0 0
-L_cont.24734 : 
-	sub	r6 r4 r6
-L_cont.24692 : 
-	bne	r6 r0 L_else.24696
-	fldi	f2 r9 2
-	fsub	f3 f2 f6
-	fldi	f2 r9 3
-	fmul	f4 f3 f2
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.24699
-	jump	L_cont.24697
-L_else.24699 : 
-	fsub	f2 f0 f2
-L_cont.24697 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24702
-	addi	r6 r0 0
-	jump	L_cont.24700
-L_else.24702 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.24723
-	jump	L_cont.24721
-L_else.24723 : 
-	fsub	f2 f0 f2
-L_cont.24721 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24725
-	addi	r6 r0 0
-	jump	L_cont.24700
-L_else.24725 : 
-	fldi	f2 r9 3
-	fbne	f2 f0 L_else.24728
-	addi	r6 r0 1
-	jump	L_cont.24726
-L_else.24728 : 
-	addi	r6 r0 0
-L_cont.24726 : 
-	sub	r6 r4 r6
-L_cont.24700 : 
-	bne	r6 r0 L_else.24704
-	fldi	f2 r9 4
-	fsub	f2 f2 f9
-	fldi	f3 r9 5
-	fmul	f4 f2 f3
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.24707
-	jump	L_cont.24705
-L_else.24707 : 
-	fsub	f2 f0 f2
-L_cont.24705 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24710
-	addi	r6 r0 0
-	jump	L_cont.24708
-L_else.24710 : 
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.24715
-	jump	L_cont.24713
-L_else.24715 : 
-	fsub	f2 f0 f2
-L_cont.24713 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24717
-	addi	r6 r0 0
-	jump	L_cont.24708
-L_else.24717 : 
-	fldi	f2 r9 5
-	fbne	f2 f0 L_else.24720
-	addi	r6 r0 1
-	jump	L_cont.24718
-L_else.24720 : 
-	addi	r6 r0 0
-L_cont.24718 : 
-	sub	r6 r4 r6
-L_cont.24708 : 
-	bne	r6 r0 L_else.24712
-	addi	r6 r0 0
-	jump	L_cont.24655
-L_else.24712 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 3
-	jump	L_cont.24655
-L_else.24704 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 2
-	jump	L_cont.24655
-L_else.24696 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.24655
-L_else.24657 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.24738
-	fldi	f2 r9 0
-	fbgt	f0 f2 L_else.24740
-	addi	r6 r0 0
-	jump	L_cont.24655
-L_else.24740 : 
-	fldi	f2 r9 1
-	fmul	f3 f2 f7
-	fldi	f2 r9 2
-	fmul	f2 f2 f6
-	fadd	f3 f3 f2
-	fldi	f2 r9 3
-	fmul	f2 f2 f9
-	fadd	f2 f3 f2
-	fsti	f2 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.24655
-L_else.24738 : 
-	fldi	f8 r9 0
-	fbne	f8 f0 L_else.24742
-	addi	r6 r0 0
-	jump	L_cont.24655
-L_else.24742 : 
-	fldi	f2 r9 1
-	fmul	f3 f2 f7
-	fldi	f2 r9 2
-	fmul	f2 f2 f6
-	fadd	f3 f3 f2
-	fldi	f2 r9 3
-	fmul	f2 f2 f9
-	fadd	f5 f3 f2
-	fmul	f3 f7 f7
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fmul	f3 f6 f6
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f9 f9
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.24745
-	jump	L_cont.24743
-L_else.24745 : 
-	fmul	f4 f6 f9
-	ldi	r6 r8 9
-	fldi	f3 r6 0
-	fmul	f3 f4 f3
-	fadd	f4 f2 f3
-	fmul	f3 f9 f7
-	ldi	r6 r8 9
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f7 f6
-	ldi	r6 r8 9
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-L_cont.24743 : 
-	ldi	r6 r8 1
-	addi	r7 r0 3
-	bne	r6 r7 L_else.24748
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.24746
-L_else.24748 : 
-L_cont.24746 : 
-	fmul	f3 f5 f5
-	fmul	f2 f8 f2
-	fsub	f2 f3 f2
-	fbgt	f2 f0 L_else.24750
-	addi	r6 r0 0
-	jump	L_cont.24655
-L_else.24750 : 
-	ldi	r6 r8 6
-	bne	r6 r0 L_else.24753
-	fsqrt	f2 f2
-	fsub	f3 f5 f2
-	fldi	f2 r9 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-	jump	L_cont.24751
-L_else.24753 : 
-	fsqrt	f2 f2
-	fadd	f3 f5 f2
-	fldi	f2 r9 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-L_cont.24751 : 
-	addi	r6 r0 1
-L_cont.24655 : 
-	bne	r6 r0 L_else.24659
-	addi	r6 r0 0
-	jump	L_cont.24623
-L_else.24659 : 
-	fldi	f2 r0 1073
-	fldi	f3 r0 34
-	fbgt	f3 f2 L_else.24661
-	addi	r6 r0 0
-	jump	L_cont.24623
-L_else.24661 : 
-	ldi	r6 r18 1
-	bne	r6 r5 L_else.24664
-	addi	r6 r0 0
-	jump	L_cont.24662
-L_else.24664 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24668
-	ldi	r6 r18 2
-	bne	r6 r5 L_else.24670
-	addi	r6 r0 0
-	jump	L_cont.24662
-L_else.24670 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24672
-	ldi	r6 r18 3
-	bne	r6 r5 L_else.24674
-	addi	r6 r0 0
-	jump	L_cont.24662
-L_else.24674 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24676
-	ldi	r6 r18 4
-	bne	r6 r5 L_else.24678
-	addi	r6 r0 0
-	jump	L_cont.24662
-L_else.24678 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24680
-	ldi	r6 r18 5
-	bne	r6 r5 L_else.24682
-	addi	r6 r0 0
-	jump	L_cont.24662
-L_else.24682 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24684
-	ldi	r6 r18 6
-	bne	r6 r5 L_else.24686
-	addi	r6 r0 0
-	jump	L_cont.24662
-L_else.24686 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24688
-	addi	r14 r0 7
-	add	r15 r0 r18
-	call	L_shadow_check_one_or_group.2182
-	jump	L_cont.24662
-L_else.24688 : 
-	addi	r6 r0 1
-	jump	L_cont.24662
-L_else.24684 : 
-	addi	r6 r0 1
-	jump	L_cont.24662
-L_else.24680 : 
-	addi	r6 r0 1
-	jump	L_cont.24662
-L_else.24676 : 
-	addi	r6 r0 1
-	jump	L_cont.24662
-L_else.24672 : 
-	addi	r6 r0 1
-	jump	L_cont.24662
-L_else.24668 : 
-	addi	r6 r0 1
-L_cont.24662 : 
-	bne	r6 r0 L_else.24666
-	addi	r6 r0 0
-	jump	L_cont.24623
-L_else.24666 : 
-	addi	r6 r0 1
-L_cont.24623 : 
-	bne	r6 r0 L_else.24627
-	addi	r16 r16 1
-	jump	L_shadow_check_one_or_matrix.2185
-L_else.24627 : 
-	ldi	r6 r18 1
-	bne	r6 r5 L_else.24630
-	addi	r6 r0 0
-	jump	L_cont.24628
-L_else.24630 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24634
-	ldi	r6 r18 2
-	bne	r6 r5 L_else.24636
-	addi	r6 r0 0
-	jump	L_cont.24628
-L_else.24636 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24638
-	ldi	r6 r18 3
-	bne	r6 r5 L_else.24640
-	addi	r6 r0 0
-	jump	L_cont.24628
-L_else.24640 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24642
-	ldi	r6 r18 4
-	bne	r6 r5 L_else.24644
-	addi	r6 r0 0
-	jump	L_cont.24628
-L_else.24644 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24646
-	ldi	r6 r18 5
-	bne	r6 r5 L_else.24648
-	addi	r6 r0 0
-	jump	L_cont.24628
-L_else.24648 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24650
-	ldi	r6 r18 6
-	bne	r6 r5 L_else.24652
-	addi	r6 r0 0
-	jump	L_cont.24628
-L_else.24652 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.24654
-	addi	r14 r0 7
-	add	r15 r0 r18
-	call	L_shadow_check_one_or_group.2182
-	jump	L_cont.24628
-L_else.24654 : 
-	addi	r6 r0 1
-	jump	L_cont.24628
-L_else.24650 : 
-	addi	r6 r0 1
-	jump	L_cont.24628
-L_else.24646 : 
-	addi	r6 r0 1
-	jump	L_cont.24628
-L_else.24642 : 
-	addi	r6 r0 1
-	jump	L_cont.24628
-L_else.24638 : 
-	addi	r6 r0 1
-	jump	L_cont.24628
-L_else.24634 : 
-	addi	r6 r0 1
-L_cont.24628 : 
-	bne	r6 r0 L_else.24632
-	addi	r16 r16 1
-	jump	L_shadow_check_one_or_matrix.2185
-L_else.24632 : 
+L_cont.21430 : 
+	bne	r6 r0 L_else.21434
+	addi	r20 r20 1
+	jump	L_shadow_check_one_or_matrix.2249
+L_else.21434 : 
 	addi	r6 r0 1
 	return
-L_else.24620 : 
-	addi	r6 r0 1
+L_solve_each_element.2252 : 
+	ldi	r18 r14 0
+	bne	r18 r5 L_else.21566
 	return
-L_solve_each_element.2188 : 
-	ldi	r15 r11 0
-	bne	r15 r5 L_else.24885
-	return
-L_else.24885 : 
-	ldi	r8 r15 1970
-	fldi	f3 r0 1063
-	ldi	r6 r8 5
-	fldi	f2 r6 0
-	fsub	f8 f3 f2
+L_else.21566 : 
+	muli	r12 r18 11
+	ldi	r7 r12 1928
+	ldi	r6 r12 1925
+	ldi	r9 r12 1924
+	ldi	r8 r12 1923
+	ldi	r11 r12 1922
+	ldi	r10 r12 1920
+	fldi	f2 r0 1063
+	fldi	f3 r9 0
+	fsub	f8 f2 f3
 	fldi	f3 r0 1064
-	ldi	r6 r8 5
-	fldi	f2 r6 1
-	fsub	f7 f3 f2
-	fldi	f3 r0 1065
-	ldi	r6 r8 5
-	fldi	f2 r6 2
-	fsub	f9 f3 f2
-	ldi	r7 r8 1
-	bne	r7 r4 L_else.24888
-	fldi	f2 r13 0
-	fbne	f2 f0 L_else.25020
-	addi	r6 r0 0
-	jump	L_cont.25018
-L_else.25020 : 
-	ldi	r7 r8 4
-	ldi	r9 r8 6
-	fldi	f2 r13 0
-	fbgt	f0 f2 L_else.25067
-	addi	r6 r0 0
-	jump	L_cont.25065
-L_else.25067 : 
-	addi	r6 r0 1
-L_cont.25065 : 
-	xor	r6 r9 r6
-	fldi	f2 r7 0
-	bne	r6 r0 L_else.25070
-	fsub	f2 f0 f2
-	jump	L_cont.25068
-L_else.25070 : 
-L_cont.25068 : 
-	fsub	f2 f2 f8
-	fldi	f3 r13 0
-	fdiv	f4 f2 f3
-	fldi	f2 r13 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25073
-	jump	L_cont.25071
-L_else.25073 : 
-	fsub	f2 f0 f2
-L_cont.25071 : 
-	fldi	f3 r7 1
-	fbgt	f3 f2 L_else.25075
-	addi	r6 r0 0
-	jump	L_cont.25018
-L_else.25075 : 
-	fldi	f2 r13 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.25078
-	jump	L_cont.25076
-L_else.25078 : 
-	fsub	f2 f0 f2
-L_cont.25076 : 
-	fldi	f3 r7 2
-	fbgt	f3 f2 L_else.25080
-	addi	r6 r0 0
-	jump	L_cont.25018
-L_else.25080 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-L_cont.25018 : 
-	bne	r6 r0 L_else.25022
-	fldi	f2 r13 1
-	fbne	f2 f0 L_else.25025
-	addi	r6 r0 0
-	jump	L_cont.25023
-L_else.25025 : 
-	ldi	r9 r8 4
-	ldi	r7 r8 6
-	fldi	f2 r13 1
-	fbgt	f0 f2 L_else.25051
-	addi	r6 r0 0
-	jump	L_cont.25049
-L_else.25051 : 
-	addi	r6 r0 1
-L_cont.25049 : 
-	xor	r6 r7 r6
 	fldi	f2 r9 1
-	bne	r6 r0 L_else.25054
-	fsub	f2 f0 f2
-	jump	L_cont.25052
-L_else.25054 : 
-L_cont.25052 : 
-	fsub	f2 f2 f7
-	fldi	f3 r13 1
-	fdiv	f4 f2 f3
-	fldi	f2 r13 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.25057
-	jump	L_cont.25055
-L_else.25057 : 
-	fsub	f2 f0 f2
-L_cont.25055 : 
+	fsub	f7 f3 f2
+	fldi	f2 r0 1065
 	fldi	f3 r9 2
-	fbgt	f3 f2 L_else.25059
-	addi	r6 r0 0
-	jump	L_cont.25023
-L_else.25059 : 
-	fldi	f2 r13 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f8
-	fbgt	f0 f2 L_else.25062
-	jump	L_cont.25060
-L_else.25062 : 
-	fsub	f2 f0 f2
-L_cont.25060 : 
-	fldi	f3 r9 0
-	fbgt	f3 f2 L_else.25064
-	addi	r6 r0 0
-	jump	L_cont.25023
-L_else.25064 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-L_cont.25023 : 
-	bne	r6 r0 L_else.25027
-	fldi	f2 r13 2
-	fbne	f2 f0 L_else.25030
-	addi	r6 r0 0
-	jump	L_cont.25028
-L_else.25030 : 
-	ldi	r9 r8 4
-	ldi	r6 r8 6
-	fldi	f2 r13 2
-	fbgt	f0 f2 L_else.25035
+	fsub	f9 f2 f3
+	bne	r10 r4 L_else.21569
+	fldi	f2 r16 0
+	fbne	f2 f0 L_else.21583
 	addi	r7 r0 0
-	jump	L_cont.25033
-L_else.25035 : 
+	jump	L_cont.21581
+L_else.21583 : 
+	fldi	f2 r16 0
+	fbgt	f0 f2 L_else.21630
+	addi	r7 r0 0
+	jump	L_cont.21628
+L_else.21630 : 
 	addi	r7 r0 1
-L_cont.25033 : 
-	xor	r6 r6 r7
-	fldi	f2 r9 2
-	bne	r6 r0 L_else.25038
+L_cont.21628 : 
+	xor	r7 r6 r7
+	fldi	f2 r8 0
+	bne	r7 r0 L_else.21633
 	fsub	f2 f0 f2
-	jump	L_cont.25036
-L_else.25038 : 
-L_cont.25036 : 
-	fsub	f3 f2 f9
-	fldi	f2 r13 2
-	fdiv	f4 f3 f2
-	fldi	f2 r13 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f8
-	fbgt	f0 f2 L_else.25041
-	jump	L_cont.25039
-L_else.25041 : 
-	fsub	f2 f0 f2
-L_cont.25039 : 
-	fldi	f3 r9 0
-	fbgt	f3 f2 L_else.25043
-	addi	r6 r0 0
-	jump	L_cont.25028
-L_else.25043 : 
-	fldi	f2 r13 1
+	jump	L_cont.21631
+L_else.21633 : 
+L_cont.21631 : 
+	fsub	f2 f2 f8
+	fldi	f3 r16 0
+	fdiv	f4 f2 f3
+	fldi	f2 r16 1
 	fmul	f2 f4 f2
 	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25046
-	jump	L_cont.25044
-L_else.25046 : 
+	fbgt	f0 f2 L_else.21636
+	jump	L_cont.21634
+L_else.21636 : 
 	fsub	f2 f0 f2
-L_cont.25044 : 
-	fldi	f3 r9 1
-	fbgt	f3 f2 L_else.25048
+L_cont.21634 : 
+	fldi	f3 r8 1
+	fbgt	f3 f2 L_else.21638
+	addi	r7 r0 0
+	jump	L_cont.21581
+L_else.21638 : 
+	fldi	f2 r16 2
+	fmul	f2 f4 f2
+	fadd	f2 f2 f9
+	fbgt	f0 f2 L_else.21641
+	jump	L_cont.21639
+L_else.21641 : 
+	fsub	f2 f0 f2
+L_cont.21639 : 
+	fldi	f3 r8 2
+	fbgt	f3 f2 L_else.21643
+	addi	r7 r0 0
+	jump	L_cont.21581
+L_else.21643 : 
+	fsti	f4 r0 1073
+	addi	r7 r0 1
+L_cont.21581 : 
+	bne	r7 r0 L_else.21585
+	fldi	f2 r16 1
+	fbne	f2 f0 L_else.21588
+	addi	r7 r0 0
+	jump	L_cont.21586
+L_else.21588 : 
+	fldi	f2 r16 1
+	fbgt	f0 f2 L_else.21614
+	addi	r7 r0 0
+	jump	L_cont.21612
+L_else.21614 : 
+	addi	r7 r0 1
+L_cont.21612 : 
+	xor	r7 r6 r7
+	fldi	f2 r8 1
+	bne	r7 r0 L_else.21617
+	fsub	f2 f0 f2
+	jump	L_cont.21615
+L_else.21617 : 
+L_cont.21615 : 
+	fsub	f3 f2 f7
+	fldi	f2 r16 1
+	fdiv	f4 f3 f2
+	fldi	f2 r16 2
+	fmul	f2 f4 f2
+	fadd	f2 f2 f9
+	fbgt	f0 f2 L_else.21620
+	jump	L_cont.21618
+L_else.21620 : 
+	fsub	f2 f0 f2
+L_cont.21618 : 
+	fldi	f3 r8 2
+	fbgt	f3 f2 L_else.21622
+	addi	r7 r0 0
+	jump	L_cont.21586
+L_else.21622 : 
+	fldi	f2 r16 0
+	fmul	f2 f4 f2
+	fadd	f2 f2 f8
+	fbgt	f0 f2 L_else.21625
+	jump	L_cont.21623
+L_else.21625 : 
+	fsub	f2 f0 f2
+L_cont.21623 : 
+	fldi	f3 r8 0
+	fbgt	f3 f2 L_else.21627
+	addi	r7 r0 0
+	jump	L_cont.21586
+L_else.21627 : 
+	fsti	f4 r0 1073
+	addi	r7 r0 1
+L_cont.21586 : 
+	bne	r7 r0 L_else.21590
+	fldi	f2 r16 2
+	fbne	f2 f0 L_else.21593
 	addi	r6 r0 0
-	jump	L_cont.25028
-L_else.25048 : 
+	jump	L_cont.21591
+L_else.21593 : 
+	fldi	f2 r16 2
+	fbgt	f0 f2 L_else.21598
+	addi	r7 r0 0
+	jump	L_cont.21596
+L_else.21598 : 
+	addi	r7 r0 1
+L_cont.21596 : 
+	xor	r6 r6 r7
+	fldi	f2 r8 2
+	bne	r6 r0 L_else.21601
+	fsub	f2 f0 f2
+	jump	L_cont.21599
+L_else.21601 : 
+L_cont.21599 : 
+	fsub	f3 f2 f9
+	fldi	f2 r16 2
+	fdiv	f4 f3 f2
+	fldi	f2 r16 0
+	fmul	f2 f4 f2
+	fadd	f2 f2 f8
+	fbgt	f0 f2 L_else.21604
+	jump	L_cont.21602
+L_else.21604 : 
+	fsub	f2 f0 f2
+L_cont.21602 : 
+	fldi	f3 r8 0
+	fbgt	f3 f2 L_else.21606
+	addi	r6 r0 0
+	jump	L_cont.21591
+L_else.21606 : 
+	fldi	f2 r16 1
+	fmul	f2 f4 f2
+	fadd	f2 f2 f7
+	fbgt	f0 f2 L_else.21609
+	jump	L_cont.21607
+L_else.21609 : 
+	fsub	f2 f0 f2
+L_cont.21607 : 
+	fldi	f3 r8 1
+	fbgt	f3 f2 L_else.21611
+	addi	r6 r0 0
+	jump	L_cont.21591
+L_else.21611 : 
 	fsti	f4 r0 1073
 	addi	r6 r0 1
-L_cont.25028 : 
-	bne	r6 r0 L_else.25032
-	addi	r14 r0 0
-	jump	L_cont.24886
-L_else.25032 : 
-	addi	r14 r0 3
-	jump	L_cont.24886
-L_else.25027 : 
-	addi	r14 r0 2
-	jump	L_cont.24886
-L_else.25022 : 
-	addi	r14 r0 1
-	jump	L_cont.24886
-L_else.24888 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.25082
-	ldi	r6 r8 4
-	fldi	f3 r13 0
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fldi	f2 r13 1
-	fldi	f3 r6 1
-	fmul	f2 f2 f3
-	fadd	f4 f4 f2
-	fldi	f2 r13 2
-	fldi	f3 r6 2
-	fmul	f2 f2 f3
-	fadd	f4 f4 f2
-	fbgt	f4 f0 L_else.25084
-	addi	r14 r0 0
-	jump	L_cont.24886
-L_else.25084 : 
-	fldi	f2 r6 0
-	fmul	f3 f2 f8
-	fldi	f2 r6 1
-	fmul	f2 f2 f7
-	fadd	f3 f3 f2
-	fldi	f2 r6 2
-	fmul	f2 f2 f9
-	fadd	f2 f3 f2
+L_cont.21591 : 
+	bne	r6 r0 L_else.21595
+	addi	r17 r0 0
+	jump	L_cont.21567
+L_else.21595 : 
+	addi	r17 r0 3
+	jump	L_cont.21567
+L_else.21590 : 
+	addi	r17 r0 2
+	jump	L_cont.21567
+L_else.21585 : 
+	addi	r17 r0 1
+	jump	L_cont.21567
+L_else.21569 : 
+	addi	r9 r0 2
+	bne	r10 r9 L_else.21645
+	fldi	f2 r16 0
+	fldi	f6 r8 0
+	fmul	f2 f2 f6
+	fldi	f3 r16 1
+	fldi	f5 r8 1
+	fmul	f3 f3 f5
+	fadd	f2 f2 f3
+	fldi	f3 r16 2
+	fldi	f4 r8 2
+	fmul	f3 f3 f4
+	fadd	f3 f2 f3
+	fbgt	f3 f0 L_else.21647
+	addi	r17 r0 0
+	jump	L_cont.21567
+L_else.21647 : 
+	fmul	f2 f6 f8
+	fmul	f5 f5 f7
+	fadd	f2 f2 f5
+	fmul	f4 f4 f9
+	fadd	f2 f2 f4
 	fsub	f2 f0 f2
-	fdiv	f2 f2 f4
+	fdiv	f2 f2 f3
 	fsti	f2 r0 1073
-	addi	r14 r0 1
-	jump	L_cont.24886
-L_else.25082 : 
-	fldi	f10 r13 0
-	fldi	f5 r13 1
-	fldi	f6 r13 2
-	fmul	f3 f10 f10
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fmul	f3 f5 f5
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f6 f6
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.25087
+	addi	r17 r0 1
+	jump	L_cont.21567
+L_else.21645 : 
+	fldi	f14 r16 0
+	fldi	f13 r16 1
+	fldi	f15 r16 2
+	fmul	f2 f14 f14
+	fldi	f12 r8 0
+	fmul	f2 f2 f12
+	fmul	f3 f13 f13
+	fldi	f11 r8 1
+	fmul	f3 f3 f11
+	fadd	f2 f2 f3
+	fmul	f3 f15 f15
+	fldi	f10 r8 2
+	fmul	f3 f3 f10
+	fadd	f2 f2 f3
+	bne	r11 r0 L_else.21650
 	fadd	f4 f0 f2
-	jump	L_cont.25085
-L_else.25087 : 
-	fmul	f4 f5 f6
-	ldi	r6 r8 9
-	fldi	f3 r6 0
+	jump	L_cont.21648
+L_else.21650 : 
+	fmul	f4 f13 f15
+	fldi	f3 r7 0
 	fmul	f3 f4 f3
-	fadd	f4 f2 f3
-	fmul	f3 f6 f10
-	ldi	r6 r8 9
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f10 f5
-	ldi	r6 r8 9
-	fldi	f2 r6 2
+	fadd	f3 f2 f3
+	fmul	f4 f15 f14
+	fldi	f2 r7 1
+	fmul	f2 f4 f2
+	fadd	f3 f3 f2
+	fmul	f4 f14 f13
+	fldi	f2 r7 2
 	fmul	f2 f4 f2
 	fadd	f4 f3 f2
-L_cont.25085 : 
-	fbne	f4 f0 L_else.25089
-	addi	r14 r0 0
-	jump	L_cont.24886
-L_else.25089 : 
-	fldi	f11 r13 0
-	fldi	f12 r13 1
-	fldi	f10 r13 2
-	fmul	f3 f11 f8
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f3 f3 f2
-	fmul	f5 f12 f7
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f5 f2
-	fadd	f5 f3 f2
-	fmul	f3 f10 f9
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f2 f5 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.25092
+L_cont.21648 : 
+	fbne	f4 f0 L_else.21652
+	addi	r17 r0 0
+	jump	L_cont.21567
+L_else.21652 : 
+	fmul	f2 f14 f8
+	fmul	f3 f2 f12
+	fmul	f2 f13 f7
+	fmul	f2 f2 f11
+	fadd	f3 f3 f2
+	fmul	f2 f15 f9
+	fmul	f2 f2 f10
+	fadd	f2 f3 f2
+	bne	r11 r0 L_else.21655
 	fadd	f3 f0 f2
-	jump	L_cont.25090
-L_else.25092 : 
-	fmul	f3 f10 f7
-	fmul	f5 f12 f9
-	fadd	f5 f3 f5
-	ldi	r6 r8 9
-	fldi	f3 r6 0
+	jump	L_cont.21653
+L_else.21655 : 
+	fmul	f5 f15 f7
+	fmul	f3 f13 f9
+	fadd	f5 f5 f3
+	fldi	f3 r7 0
 	fmul	f6 f5 f3
-	fmul	f3 f11 f9
-	fmul	f5 f10 f8
-	fadd	f5 f3 f5
-	ldi	r6 r8 9
-	fldi	f3 r6 1
+	fmul	f5 f14 f9
+	fmul	f3 f15 f8
+	fadd	f5 f5 f3
+	fldi	f3 r7 1
+	fmul	f3 f5 f3
+	fadd	f6 f6 f3
+	fmul	f5 f14 f7
+	fmul	f3 f13 f8
+	fadd	f5 f5 f3
+	fldi	f3 r7 2
 	fmul	f3 f5 f3
 	fadd	f5 f6 f3
-	fmul	f6 f11 f7
-	fmul	f3 f12 f8
-	fadd	f6 f6 f3
-	ldi	r6 r8 9
-	fldi	f3 r6 2
-	fmul	f3 f6 f3
-	fadd	f5 f5 f3
-	fldi	f3 r0 30
+	fldi	f3 r0 29
 	fdiv	f3 f5 f3
 	fadd	f3 f2 f3
-L_cont.25090 : 
-	fmul	f5 f8 f8
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f6 f5 f2
-	fmul	f5 f7 f7
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f5 f2
-	fadd	f5 f6 f2
-	fmul	f6 f9 f9
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f6 f2
+L_cont.21653 : 
+	fmul	f2 f8 f8
+	fmul	f5 f2 f12
+	fmul	f2 f7 f7
+	fmul	f2 f2 f11
+	fadd	f5 f5 f2
+	fmul	f2 f9 f9
+	fmul	f2 f2 f10
 	fadd	f2 f5 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.25095
-	jump	L_cont.25093
-L_else.25095 : 
+	bne	r11 r0 L_else.21658
+	jump	L_cont.21656
+L_else.21658 : 
 	fmul	f6 f7 f9
-	ldi	r6 r8 9
-	fldi	f5 r6 0
-	fmul	f5 f6 f5
-	fadd	f6 f2 f5
-	fmul	f5 f9 f8
-	ldi	r6 r8 9
-	fldi	f2 r6 1
-	fmul	f2 f5 f2
-	fadd	f5 f6 f2
-	fmul	f6 f8 f7
-	ldi	r6 r8 9
-	fldi	f2 r6 2
-	fmul	f2 f6 f2
-	fadd	f2 f5 f2
-L_cont.25093 : 
-	ldi	r7 r8 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.25098
-	fldi	f5 r0 12
-	fsub	f2 f2 f5
-	jump	L_cont.25096
-L_else.25098 : 
-L_cont.25096 : 
-	fmul	f5 f3 f3
-	fmul	f2 f4 f2
-	fsub	f2 f5 f2
-	fbgt	f2 f0 L_else.25100
-	addi	r14 r0 0
-	jump	L_cont.24886
-L_else.25100 : 
-	fsqrt	f2 f2
-	ldi	r6 r8 6
-	bne	r6 r0 L_else.25103
-	fsub	f2 f0 f2
-	jump	L_cont.25101
-L_else.25103 : 
-L_cont.25101 : 
-	fsub	f2 f2 f3
-	fdiv	f2 f2 f4
-	fsti	f2 r0 1073
-	addi	r14 r0 1
-L_cont.24886 : 
-	bne	r14 r0 L_else.24890
-	ldi	r6 r15 1970
-	ldi	r6 r6 6
-	bne	r6 r0 L_else.24892
-	return
-L_else.24892 : 
-	addi	r11 r11 1
-	jump	L_solve_each_element.2188
-L_else.24890 : 
-	fldi	f3 r0 1073
-	fbgt	f3 f0 L_else.24895
-	jump	L_cont.24893
-L_else.24895 : 
-	fldi	f2 r0 1082
-	fbgt	f2 f3 L_else.24897
-	jump	L_cont.24893
-L_else.24897 : 
-	fldi	f2 r0 33
-	fadd	f14 f3 f2
-	fldi	f2 r13 0
-	fmul	f3 f2 f14
-	fldi	f2 r0 1063
-	fadd	f13 f3 f2
-	fldi	f2 r13 1
-	fmul	f3 f2 f14
-	fldi	f2 r0 1064
-	fadd	f12 f3 f2
-	fldi	f2 r13 2
-	fmul	f3 f2 f14
-	fldi	f2 r0 1065
-	fadd	f11 f3 f2
-	ldi	r6 r12 0
-	bne	r6 r5 L_else.24900
-	addi	r6 r0 1
-	jump	L_cont.24898
-L_else.24900 : 
-	ldi	r8 r6 1970
-	ldi	r6 r8 5
-	fldi	f2 r6 0
-	fsub	f3 f13 f2
-	ldi	r6 r8 5
-	fldi	f2 r6 1
-	fsub	f4 f12 f2
-	ldi	r6 r8 5
-	fldi	f2 r6 2
-	fsub	f5 f11 f2
-	ldi	r7 r8 1
-	bne	r7 r4 L_else.24905
-	fbgt	f0 f3 L_else.24988
-	fadd	f2 f0 f3
-	jump	L_cont.24986
-L_else.24988 : 
-	fsub	f2 f0 f3
-L_cont.24986 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24991
-	addi	r6 r0 0
-	jump	L_cont.24989
-L_else.24991 : 
-	fbgt	f0 f4 L_else.24996
-	fadd	f2 f0 f4
-	jump	L_cont.24994
-L_else.24996 : 
-	fsub	f2 f0 f4
-L_cont.24994 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24998
-	addi	r6 r0 0
-	jump	L_cont.24989
-L_else.24998 : 
-	fbgt	f0 f5 L_else.25001
-	fadd	f2 f0 f5
-	jump	L_cont.24999
-L_else.25001 : 
-	fsub	f2 f0 f5
-L_cont.24999 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.25003
-	addi	r6 r0 0
-	jump	L_cont.24989
-L_else.25003 : 
-	addi	r6 r0 1
-L_cont.24989 : 
-	bne	r6 r0 L_else.24993
-	ldi	r6 r8 6
-	sub	r6 r4 r6
-	jump	L_cont.24903
-L_else.24993 : 
-	ldi	r6 r8 6
-	jump	L_cont.24903
-L_else.24905 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.25005
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f3 f2 f3
-	fldi	f2 r6 1
-	fmul	f2 f2 f4
-	fadd	f3 f3 f2
-	fldi	f2 r6 2
-	fmul	f2 f2 f5
-	fadd	f2 f3 f2
-	ldi	r7 r8 6
-	fbgt	f0 f2 L_else.25008
-	addi	r6 r0 0
-	jump	L_cont.25006
-L_else.25008 : 
-	addi	r6 r0 1
-L_cont.25006 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-	jump	L_cont.24903
-L_else.25005 : 
-	fmul	f6 f3 f3
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f6 f6 f2
-	fmul	f7 f4 f4
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f7 f2
-	fadd	f7 f6 f2
-	fmul	f6 f5 f5
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f6 f2
-	fadd	f2 f7 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.25011
-	jump	L_cont.25009
-L_else.25011 : 
-	fmul	f7 f4 f5
-	ldi	r6 r8 9
-	fldi	f6 r6 0
-	fmul	f6 f7 f6
-	fadd	f6 f2 f6
-	fmul	f5 f5 f3
-	ldi	r6 r8 9
-	fldi	f2 r6 1
-	fmul	f2 f5 f2
-	fadd	f5 f6 f2
-	fmul	f3 f3 f4
-	ldi	r6 r8 9
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f2 f5 f2
-L_cont.25009 : 
-	ldi	r7 r8 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.25014
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.25012
-L_else.25014 : 
-L_cont.25012 : 
-	ldi	r7 r8 6
-	fbgt	f0 f2 L_else.25017
-	addi	r6 r0 0
-	jump	L_cont.25015
-L_else.25017 : 
-	addi	r6 r0 1
-L_cont.25015 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-L_cont.24903 : 
-	bne	r6 r0 L_else.24907
-	ldi	r6 r12 1
-	bne	r6 r5 L_else.24909
-	addi	r6 r0 1
-	jump	L_cont.24898
-L_else.24909 : 
-	ldi	r8 r6 1970
-	ldi	r6 r8 5
-	fldi	f2 r6 0
-	fsub	f2 f13 f2
-	ldi	r6 r8 5
-	fldi	f3 r6 1
-	fsub	f4 f12 f3
-	ldi	r6 r8 5
-	fldi	f3 r6 2
-	fsub	f5 f11 f3
-	ldi	r6 r8 1
-	bne	r6 r4 L_else.24912
-	fbgt	f0 f2 L_else.24956
-	jump	L_cont.24954
-L_else.24956 : 
-	fsub	f2 f0 f2
-L_cont.24954 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24959
-	addi	r6 r0 0
-	jump	L_cont.24957
-L_else.24959 : 
-	fbgt	f0 f4 L_else.24964
-	fadd	f2 f0 f4
-	jump	L_cont.24962
-L_else.24964 : 
-	fsub	f2 f0 f4
-L_cont.24962 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24966
-	addi	r6 r0 0
-	jump	L_cont.24957
-L_else.24966 : 
-	fbgt	f0 f5 L_else.24969
-	fadd	f2 f0 f5
-	jump	L_cont.24967
-L_else.24969 : 
-	fsub	f2 f0 f5
-L_cont.24967 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24971
-	addi	r6 r0 0
-	jump	L_cont.24957
-L_else.24971 : 
-	addi	r6 r0 1
-L_cont.24957 : 
-	bne	r6 r0 L_else.24961
-	ldi	r6 r8 6
-	sub	r6 r4 r6
-	jump	L_cont.24910
-L_else.24961 : 
-	ldi	r6 r8 6
-	jump	L_cont.24910
-L_else.24912 : 
-	addi	r7 r0 2
-	bne	r6 r7 L_else.24973
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fmul	f3 f3 f2
-	fldi	f2 r6 1
-	fmul	f2 f2 f4
-	fadd	f3 f3 f2
-	fldi	f2 r6 2
-	fmul	f2 f2 f5
-	fadd	f2 f3 f2
-	ldi	r7 r8 6
-	fbgt	f0 f2 L_else.24976
-	addi	r6 r0 0
-	jump	L_cont.24974
-L_else.24976 : 
-	addi	r6 r0 1
-L_cont.24974 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-	jump	L_cont.24910
-L_else.24973 : 
-	fmul	f6 f2 f2
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fmul	f6 f6 f3
-	fmul	f7 f4 f4
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fmul	f3 f7 f3
-	fadd	f7 f6 f3
-	fmul	f6 f5 f5
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fmul	f3 f6 f3
-	fadd	f3 f7 f3
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.24979
-	fadd	f2 f0 f3
-	jump	L_cont.24977
-L_else.24979 : 
-	fmul	f7 f4 f5
-	ldi	r6 r8 9
-	fldi	f6 r6 0
-	fmul	f6 f7 f6
-	fadd	f6 f3 f6
-	fmul	f5 f5 f2
-	ldi	r6 r8 9
-	fldi	f3 r6 1
-	fmul	f3 f5 f3
-	fadd	f5 f6 f3
-	fmul	f3 f2 f4
-	ldi	r6 r8 9
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f2 f5 f2
-L_cont.24977 : 
-	ldi	r7 r8 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.24982
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.24980
-L_else.24982 : 
-L_cont.24980 : 
-	ldi	r7 r8 6
-	fbgt	f0 f2 L_else.24985
-	addi	r6 r0 0
-	jump	L_cont.24983
-L_else.24985 : 
-	addi	r6 r0 1
-L_cont.24983 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-L_cont.24910 : 
-	bne	r6 r0 L_else.24914
-	ldi	r6 r12 2
-	bne	r6 r5 L_else.24916
-	addi	r6 r0 1
-	jump	L_cont.24898
-L_else.24916 : 
-	ldi	r8 r6 1970
-	ldi	r6 r8 5
-	fldi	f2 r6 0
-	fsub	f2 f13 f2
-	ldi	r6 r8 5
-	fldi	f3 r6 1
-	fsub	f4 f12 f3
-	ldi	r6 r8 5
-	fldi	f3 r6 2
-	fsub	f5 f11 f3
-	ldi	r6 r8 1
-	bne	r6 r4 L_else.24919
-	fbgt	f0 f2 L_else.24924
-	jump	L_cont.24922
-L_else.24924 : 
-	fsub	f2 f0 f2
-L_cont.24922 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.24927
-	addi	r6 r0 0
-	jump	L_cont.24925
-L_else.24927 : 
-	fbgt	f0 f4 L_else.24932
-	fadd	f2 f0 f4
-	jump	L_cont.24930
-L_else.24932 : 
-	fsub	f2 f0 f4
-L_cont.24930 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.24934
-	addi	r6 r0 0
-	jump	L_cont.24925
-L_else.24934 : 
-	fbgt	f0 f5 L_else.24937
-	fadd	f2 f0 f5
-	jump	L_cont.24935
-L_else.24937 : 
-	fsub	f2 f0 f5
-L_cont.24935 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.24939
-	addi	r6 r0 0
-	jump	L_cont.24925
-L_else.24939 : 
-	addi	r6 r0 1
-L_cont.24925 : 
-	bne	r6 r0 L_else.24929
-	ldi	r6 r8 6
-	sub	r6 r4 r6
-	jump	L_cont.24917
-L_else.24929 : 
-	ldi	r6 r8 6
-	jump	L_cont.24917
-L_else.24919 : 
-	addi	r7 r0 2
-	bne	r6 r7 L_else.24941
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fmul	f3 f3 f2
-	fldi	f2 r6 1
-	fmul	f2 f2 f4
-	fadd	f3 f3 f2
-	fldi	f2 r6 2
-	fmul	f2 f2 f5
-	fadd	f2 f3 f2
-	ldi	r7 r8 6
-	fbgt	f0 f2 L_else.24944
-	addi	r6 r0 0
-	jump	L_cont.24942
-L_else.24944 : 
-	addi	r6 r0 1
-L_cont.24942 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-	jump	L_cont.24917
-L_else.24941 : 
-	fmul	f6 f2 f2
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fmul	f6 f6 f3
-	fmul	f7 f4 f4
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fmul	f3 f7 f3
-	fadd	f7 f6 f3
-	fmul	f6 f5 f5
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fmul	f3 f6 f3
-	fadd	f3 f7 f3
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.24947
-	fadd	f2 f0 f3
-	jump	L_cont.24945
-L_else.24947 : 
-	fmul	f7 f4 f5
-	ldi	r6 r8 9
-	fldi	f6 r6 0
-	fmul	f6 f7 f6
-	fadd	f6 f3 f6
-	fmul	f5 f5 f2
-	ldi	r6 r8 9
-	fldi	f3 r6 1
-	fmul	f3 f5 f3
-	fadd	f5 f6 f3
-	fmul	f2 f2 f4
-	ldi	r6 r8 9
-	fldi	f3 r6 2
-	fmul	f2 f2 f3
-	fadd	f2 f5 f2
-L_cont.24945 : 
-	ldi	r7 r8 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.24950
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.24948
-L_else.24950 : 
-L_cont.24948 : 
-	ldi	r6 r8 6
-	fbgt	f0 f2 L_else.24953
-	addi	r7 r0 0
-	jump	L_cont.24951
-L_else.24953 : 
-	addi	r7 r0 1
-L_cont.24951 : 
-	xor	r6 r6 r7
-	sub	r6 r4 r6
-L_cont.24917 : 
-	bne	r6 r0 L_else.24921
-	addi	r6 r0 3
-	add	r7 r0 r12
-	fadd	f2 f0 f13
-	fadd	f3 f0 f12
-	fadd	f4 f0 f11
-	call	L_check_all_inside.2173
-	jump	L_cont.24898
-L_else.24921 : 
-	addi	r6 r0 0
-	jump	L_cont.24898
-L_else.24914 : 
-	addi	r6 r0 0
-	jump	L_cont.24898
-L_else.24907 : 
-	addi	r6 r0 0
-L_cont.24898 : 
-	bne	r6 r0 L_else.24902
-	jump	L_cont.24893
-L_else.24902 : 
-	fsti	f14 r0 1082
-	fsti	f13 r0 1042
-	fsti	f12 r0 1043
-	fsti	f11 r0 1044
-	sti	r15 r0 1045
-	sti	r14 r0 1074
-L_cont.24893 : 
-	addi	r11 r11 1
-	jump	L_solve_each_element.2188
-L_solve_one_or_network.2192 : 
-	add	r1 r17 r16
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.25106
-	return
-L_else.25106 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element.2188
-	addi	r16 r16 1
-	add	r1 r17 r16
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.25108
-	return
-L_else.25108 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element.2188
-	addi	r16 r16 1
-	add	r1 r17 r16
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.25110
-	return
-L_else.25110 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element.2188
-	addi	r16 r16 1
-	add	r1 r17 r16
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.25112
-	return
-L_else.25112 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element.2188
-	addi	r16 r16 1
-	add	r1 r17 r16
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.25114
-	return
-L_else.25114 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element.2188
-	addi	r16 r16 1
-	add	r1 r17 r16
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.25116
-	return
-L_else.25116 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element.2188
-	addi	r16 r16 1
-	add	r1 r17 r16
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.25118
-	return
-L_else.25118 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element.2188
-	addi	r16 r16 1
-	add	r1 r17 r16
-	ldi	r6 r1 0
-	bne	r6 r5 L_else.25120
-	return
-L_else.25120 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element.2188
-	addi	r16 r16 1
-	jump	L_solve_one_or_network.2192
-L_trace_or_matrix.2196 : 
-	add	r1 r20 r19
-	ldi	r17 r1 0
-	ldi	r7 r17 0
-	bne	r7 r5 L_else.25123
-	return
-L_else.25123 : 
-	addi	r6 r0 99
-	bne	r7 r6 L_else.25126
-	ldi	r6 r17 1
-	bne	r6 r5 L_else.25250
-	jump	L_cont.25124
-L_else.25250 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 2
-	bne	r6 r5 L_else.25252
-	jump	L_cont.25124
-L_else.25252 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 3
-	bne	r6 r5 L_else.25254
-	jump	L_cont.25124
-L_else.25254 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 4
-	bne	r6 r5 L_else.25256
-	jump	L_cont.25124
-L_else.25256 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 5
-	bne	r6 r5 L_else.25258
-	jump	L_cont.25124
-L_else.25258 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 6
-	bne	r6 r5 L_else.25260
-	jump	L_cont.25124
-L_else.25260 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 7
-	bne	r6 r5 L_else.25262
-	jump	L_cont.25124
-L_else.25262 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	addi	r16 r0 8
-	add	r18 r0 r21
-	call	L_solve_one_or_network.2192
-	jump	L_cont.25124
-L_else.25126 : 
-	ldi	r8 r7 1970
-	fldi	f3 r0 1063
-	ldi	r6 r8 5
-	fldi	f2 r6 0
-	fsub	f8 f3 f2
-	fldi	f3 r0 1064
-	ldi	r6 r8 5
-	fldi	f2 r6 1
-	fsub	f7 f3 f2
-	fldi	f3 r0 1065
-	ldi	r6 r8 5
-	fldi	f2 r6 2
-	fsub	f9 f3 f2
-	ldi	r7 r8 1
-	bne	r7 r4 L_else.25265
-	fldi	f2 r21 0
-	fbne	f2 f0 L_else.25286
-	addi	r6 r0 0
-	jump	L_cont.25284
-L_else.25286 : 
-	ldi	r7 r8 4
-	ldi	r9 r8 6
-	fldi	f2 r21 0
-	fbgt	f0 f2 L_else.25333
-	addi	r6 r0 0
-	jump	L_cont.25331
-L_else.25333 : 
-	addi	r6 r0 1
-L_cont.25331 : 
-	xor	r6 r9 r6
-	fldi	f2 r7 0
-	bne	r6 r0 L_else.25336
-	fsub	f2 f0 f2
-	jump	L_cont.25334
-L_else.25336 : 
-L_cont.25334 : 
-	fsub	f2 f2 f8
-	fldi	f3 r21 0
-	fdiv	f4 f2 f3
-	fldi	f2 r21 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25339
-	jump	L_cont.25337
-L_else.25339 : 
-	fsub	f2 f0 f2
-L_cont.25337 : 
-	fldi	f3 r7 1
-	fbgt	f3 f2 L_else.25341
-	addi	r6 r0 0
-	jump	L_cont.25284
-L_else.25341 : 
-	fldi	f2 r21 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.25344
-	jump	L_cont.25342
-L_else.25344 : 
-	fsub	f2 f0 f2
-L_cont.25342 : 
-	fldi	f3 r7 2
-	fbgt	f3 f2 L_else.25346
-	addi	r6 r0 0
-	jump	L_cont.25284
-L_else.25346 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-L_cont.25284 : 
-	bne	r6 r0 L_else.25288
-	fldi	f2 r21 1
-	fbne	f2 f0 L_else.25291
-	addi	r6 r0 0
-	jump	L_cont.25289
-L_else.25291 : 
-	ldi	r9 r8 4
-	ldi	r7 r8 6
-	fldi	f2 r21 1
-	fbgt	f0 f2 L_else.25317
-	addi	r6 r0 0
-	jump	L_cont.25315
-L_else.25317 : 
-	addi	r6 r0 1
-L_cont.25315 : 
-	xor	r6 r7 r6
-	fldi	f2 r9 1
-	bne	r6 r0 L_else.25320
-	fsub	f2 f0 f2
-	jump	L_cont.25318
-L_else.25320 : 
-L_cont.25318 : 
-	fsub	f2 f2 f7
-	fldi	f3 r21 1
-	fdiv	f4 f2 f3
-	fldi	f2 r21 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.25323
-	jump	L_cont.25321
-L_else.25323 : 
-	fsub	f2 f0 f2
-L_cont.25321 : 
-	fldi	f3 r9 2
-	fbgt	f3 f2 L_else.25325
-	addi	r6 r0 0
-	jump	L_cont.25289
-L_else.25325 : 
-	fldi	f2 r21 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f8
-	fbgt	f0 f2 L_else.25328
-	jump	L_cont.25326
-L_else.25328 : 
-	fsub	f2 f0 f2
-L_cont.25326 : 
-	fldi	f3 r9 0
-	fbgt	f3 f2 L_else.25330
-	addi	r6 r0 0
-	jump	L_cont.25289
-L_else.25330 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-L_cont.25289 : 
-	bne	r6 r0 L_else.25293
-	fldi	f2 r21 2
-	fbne	f2 f0 L_else.25296
-	addi	r6 r0 0
-	jump	L_cont.25294
-L_else.25296 : 
-	ldi	r9 r8 4
-	ldi	r6 r8 6
-	fldi	f2 r21 2
-	fbgt	f0 f2 L_else.25301
-	addi	r7 r0 0
-	jump	L_cont.25299
-L_else.25301 : 
-	addi	r7 r0 1
-L_cont.25299 : 
-	xor	r6 r6 r7
-	fldi	f2 r9 2
-	bne	r6 r0 L_else.25304
-	fsub	f2 f0 f2
-	jump	L_cont.25302
-L_else.25304 : 
-L_cont.25302 : 
-	fsub	f3 f2 f9
-	fldi	f2 r21 2
-	fdiv	f4 f3 f2
-	fldi	f2 r21 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f8
-	fbgt	f0 f2 L_else.25307
-	jump	L_cont.25305
-L_else.25307 : 
-	fsub	f2 f0 f2
-L_cont.25305 : 
-	fldi	f3 r9 0
-	fbgt	f3 f2 L_else.25309
-	addi	r6 r0 0
-	jump	L_cont.25294
-L_else.25309 : 
-	fldi	f2 r21 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25312
-	jump	L_cont.25310
-L_else.25312 : 
-	fsub	f2 f0 f2
-L_cont.25310 : 
-	fldi	f3 r9 1
-	fbgt	f3 f2 L_else.25314
-	addi	r6 r0 0
-	jump	L_cont.25294
-L_else.25314 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-L_cont.25294 : 
-	bne	r6 r0 L_else.25298
-	addi	r6 r0 0
-	jump	L_cont.25263
-L_else.25298 : 
-	addi	r6 r0 3
-	jump	L_cont.25263
-L_else.25293 : 
-	addi	r6 r0 2
-	jump	L_cont.25263
-L_else.25288 : 
-	addi	r6 r0 1
-	jump	L_cont.25263
-L_else.25265 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.25348
-	ldi	r6 r8 4
-	fldi	f2 r21 0
-	fldi	f3 r6 0
-	fmul	f3 f2 f3
-	fldi	f4 r21 1
-	fldi	f2 r6 1
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fldi	f4 r21 2
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f4 f3 f2
-	fbgt	f4 f0 L_else.25350
-	addi	r6 r0 0
-	jump	L_cont.25263
-L_else.25350 : 
-	fldi	f2 r6 0
-	fmul	f3 f2 f8
-	fldi	f2 r6 1
-	fmul	f2 f2 f7
-	fadd	f3 f3 f2
-	fldi	f2 r6 2
-	fmul	f2 f2 f9
-	fadd	f2 f3 f2
-	fsub	f2 f0 f2
-	fdiv	f2 f2 f4
-	fsti	f2 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.25263
-L_else.25348 : 
-	fldi	f6 r21 0
-	fldi	f10 r21 1
-	fldi	f5 r21 2
-	fmul	f3 f6 f6
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f3 f3 f2
-	fmul	f4 f10 f10
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f4 f2
-	fadd	f4 f3 f2
-	fmul	f3 f5 f5
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f2 f4 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.25353
-	fadd	f3 f0 f2
-	jump	L_cont.25351
-L_else.25353 : 
-	fmul	f4 f10 f5
-	ldi	r6 r8 9
-	fldi	f3 r6 0
-	fmul	f3 f4 f3
-	fadd	f3 f2 f3
-	fmul	f4 f5 f6
-	ldi	r6 r8 9
-	fldi	f2 r6 1
-	fmul	f2 f4 f2
-	fadd	f4 f3 f2
-	fmul	f3 f6 f10
-	ldi	r6 r8 9
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-L_cont.25351 : 
-	fbne	f3 f0 L_else.25355
-	addi	r6 r0 0
-	jump	L_cont.25263
-L_else.25355 : 
-	fldi	f12 r21 0
-	fldi	f10 r21 1
-	fldi	f11 r21 2
-	fmul	f4 f12 f8
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f5 f4 f2
-	fmul	f4 f10 f7
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f4 f2
-	fadd	f4 f5 f2
-	fmul	f5 f11 f9
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f5 f2
-	fadd	f2 f4 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.25358
-	fadd	f4 f0 f2
-	jump	L_cont.25356
-L_else.25358 : 
-	fmul	f5 f11 f7
-	fmul	f4 f10 f9
-	fadd	f5 f5 f4
-	ldi	r6 r8 9
-	fldi	f4 r6 0
-	fmul	f5 f5 f4
-	fmul	f6 f12 f9
-	fmul	f4 f11 f8
-	fadd	f6 f6 f4
-	ldi	r6 r8 9
-	fldi	f4 r6 1
-	fmul	f4 f6 f4
-	fadd	f6 f5 f4
-	fmul	f4 f12 f7
-	fmul	f5 f10 f8
-	fadd	f5 f4 f5
-	ldi	r6 r8 9
-	fldi	f4 r6 2
-	fmul	f4 f5 f4
-	fadd	f4 f6 f4
-	fldi	f5 r0 30
-	fdiv	f4 f4 f5
-	fadd	f4 f2 f4
-L_cont.25356 : 
-	fmul	f5 f8 f8
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f5 f5 f2
-	fmul	f6 f7 f7
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f6 f2
-	fadd	f6 f5 f2
-	fmul	f5 f9 f9
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f5 f2
-	fadd	f2 f6 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.25361
-	jump	L_cont.25359
-L_else.25361 : 
-	fmul	f6 f7 f9
-	ldi	r6 r8 9
-	fldi	f5 r6 0
+	fldi	f5 r7 0
 	fmul	f5 f6 f5
 	fadd	f5 f2 f5
 	fmul	f6 f9 f8
-	ldi	r6 r8 9
-	fldi	f2 r6 1
+	fldi	f2 r7 1
 	fmul	f2 f6 f2
-	fadd	f6 f5 f2
-	fmul	f5 f8 f7
-	ldi	r6 r8 9
-	fldi	f2 r6 2
-	fmul	f2 f5 f2
-	fadd	f2 f6 f2
-L_cont.25359 : 
-	ldi	r7 r8 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.25364
+	fadd	f5 f5 f2
+	fmul	f6 f8 f7
+	fldi	f2 r7 2
+	fmul	f2 f6 f2
+	fadd	f2 f5 f2
+L_cont.21656 : 
+	addi	r7 r0 3
+	bne	r10 r7 L_else.21661
 	fldi	f5 r0 12
 	fsub	f2 f2 f5
-	jump	L_cont.25362
-L_else.25364 : 
-L_cont.25362 : 
+	jump	L_cont.21659
+L_else.21661 : 
+L_cont.21659 : 
+	fmul	f5 f3 f3
+	fmul	f2 f4 f2
+	fsub	f2 f5 f2
+	fbgt	f2 f0 L_else.21663
+	addi	r17 r0 0
+	jump	L_cont.21567
+L_else.21663 : 
+	fsqrt	f2 f2
+	bne	r6 r0 L_else.21666
+	fsub	f2 f0 f2
+	jump	L_cont.21664
+L_else.21666 : 
+L_cont.21664 : 
+	fsub	f2 f2 f3
+	fdiv	f2 f2 f4
+	fsti	f2 r0 1073
+	addi	r17 r0 1
+L_cont.21567 : 
+	bne	r17 r0 L_else.21571
+	ldi	r6 r12 1925
+	bne	r6 r0 L_else.21573
+	return
+L_else.21573 : 
+	addi	r14 r14 1
+	jump	L_solve_each_element.2252
+L_else.21571 : 
+	fldi	f3 r0 1073
+	fbgt	f3 f0 L_else.21576
+	jump	L_cont.21574
+L_else.21576 : 
+	fldi	f2 r0 1082
+	fbgt	f2 f3 L_else.21578
+	jump	L_cont.21574
+L_else.21578 : 
+	fldi	f2 r0 33
+	fadd	f13 f3 f2
+	fldi	f2 r16 0
+	fmul	f3 f2 f13
+	fldi	f2 r0 1063
+	fadd	f11 f3 f2
+	fldi	f2 r16 1
+	fmul	f3 f2 f13
+	fldi	f2 r0 1064
+	fadd	f12 f3 f2
+	fldi	f2 r16 2
+	fmul	f3 f2 f13
+	fldi	f2 r0 1065
+	fadd	f14 f3 f2
+	add	r6 r0 r15
+	add	r7 r0 r15
+	fadd	f2 f0 f11
+	fadd	f3 f0 f12
+	fadd	f4 f0 f14
+	call	L_check_all_inside.2237
+	bne	r6 r0 L_else.21580
+	jump	L_cont.21574
+L_else.21580 : 
+	fsti	f13 r0 1082
+	fsti	f11 r0 1042
+	fsti	f12 r0 1043
+	fsti	f14 r0 1044
+	sti	r18 r0 1045
+	sti	r17 r0 1074
+L_cont.21574 : 
+	addi	r14 r14 1
+	jump	L_solve_each_element.2252
+L_solve_one_or_network.2256 : 
+	add	r1 r20 r19
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21669
+	return
+L_else.21669 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r21
+	call	L_solve_each_element.2252
+	addi	r19 r19 1
+	add	r1 r20 r19
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21671
+	return
+L_else.21671 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r21
+	call	L_solve_each_element.2252
+	addi	r19 r19 1
+	add	r1 r20 r19
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21673
+	return
+L_else.21673 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r21
+	call	L_solve_each_element.2252
+	addi	r19 r19 1
+	add	r1 r20 r19
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21675
+	return
+L_else.21675 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r21
+	call	L_solve_each_element.2252
+	addi	r19 r19 1
+	add	r1 r20 r19
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21677
+	return
+L_else.21677 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r21
+	call	L_solve_each_element.2252
+	addi	r19 r19 1
+	add	r1 r20 r19
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21679
+	return
+L_else.21679 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r21
+	call	L_solve_each_element.2252
+	addi	r19 r19 1
+	add	r1 r20 r19
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21681
+	return
+L_else.21681 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r21
+	call	L_solve_each_element.2252
+	addi	r19 r19 1
+	add	r1 r20 r19
+	ldi	r6 r1 0
+	bne	r6 r5 L_else.21683
+	return
+L_else.21683 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r21
+	call	L_solve_each_element.2252
+	addi	r19 r19 1
+	jump	L_solve_one_or_network.2256
+L_trace_or_matrix.2260 : 
+	add	r1 r23 r22
+	ldi	r20 r1 0
+	ldi	r7 r20 0
+	bne	r7 r5 L_else.21686
+	return
+L_else.21686 : 
+	addi	r6 r0 99
+	bne	r7 r6 L_else.21689
+	ldi	r6 r20 1
+	bne	r6 r5 L_else.21813
+	jump	L_cont.21687
+L_else.21813 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 2
+	bne	r6 r5 L_else.21815
+	jump	L_cont.21687
+L_else.21815 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 3
+	bne	r6 r5 L_else.21817
+	jump	L_cont.21687
+L_else.21817 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 4
+	bne	r6 r5 L_else.21819
+	jump	L_cont.21687
+L_else.21819 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 5
+	bne	r6 r5 L_else.21821
+	jump	L_cont.21687
+L_else.21821 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 6
+	bne	r6 r5 L_else.21823
+	jump	L_cont.21687
+L_else.21823 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 7
+	bne	r6 r5 L_else.21825
+	jump	L_cont.21687
+L_else.21825 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	addi	r19 r0 8
+	add	r21 r0 r24
+	call	L_solve_one_or_network.2256
+	jump	L_cont.21687
+L_else.21689 : 
+	muli	r10 r7 11
+	ldi	r7 r10 1928
+	ldi	r6 r10 1925
+	ldi	r9 r10 1924
+	ldi	r8 r10 1923
+	ldi	r11 r10 1922
+	ldi	r10 r10 1920
+	fldi	f3 r0 1063
+	fldi	f2 r9 0
+	fsub	f8 f3 f2
+	fldi	f2 r0 1064
+	fldi	f3 r9 1
+	fsub	f7 f2 f3
+	fldi	f3 r0 1065
+	fldi	f2 r9 2
+	fsub	f9 f3 f2
+	bne	r10 r4 L_else.21828
+	fldi	f2 r24 0
+	fbne	f2 f0 L_else.21849
+	addi	r7 r0 0
+	jump	L_cont.21847
+L_else.21849 : 
+	fldi	f2 r24 0
+	fbgt	f0 f2 L_else.21896
+	addi	r7 r0 0
+	jump	L_cont.21894
+L_else.21896 : 
+	addi	r7 r0 1
+L_cont.21894 : 
+	xor	r7 r6 r7
+	fldi	f2 r8 0
+	bne	r7 r0 L_else.21899
+	fsub	f2 f0 f2
+	jump	L_cont.21897
+L_else.21899 : 
+L_cont.21897 : 
+	fsub	f3 f2 f8
+	fldi	f2 r24 0
+	fdiv	f4 f3 f2
+	fldi	f2 r24 1
+	fmul	f2 f4 f2
+	fadd	f2 f2 f7
+	fbgt	f0 f2 L_else.21902
+	jump	L_cont.21900
+L_else.21902 : 
+	fsub	f2 f0 f2
+L_cont.21900 : 
+	fldi	f3 r8 1
+	fbgt	f3 f2 L_else.21904
+	addi	r7 r0 0
+	jump	L_cont.21847
+L_else.21904 : 
+	fldi	f2 r24 2
+	fmul	f2 f4 f2
+	fadd	f2 f2 f9
+	fbgt	f0 f2 L_else.21907
+	jump	L_cont.21905
+L_else.21907 : 
+	fsub	f2 f0 f2
+L_cont.21905 : 
+	fldi	f3 r8 2
+	fbgt	f3 f2 L_else.21909
+	addi	r7 r0 0
+	jump	L_cont.21847
+L_else.21909 : 
+	fsti	f4 r0 1073
+	addi	r7 r0 1
+L_cont.21847 : 
+	bne	r7 r0 L_else.21851
+	fldi	f2 r24 1
+	fbne	f2 f0 L_else.21854
+	addi	r7 r0 0
+	jump	L_cont.21852
+L_else.21854 : 
+	fldi	f2 r24 1
+	fbgt	f0 f2 L_else.21880
+	addi	r7 r0 0
+	jump	L_cont.21878
+L_else.21880 : 
+	addi	r7 r0 1
+L_cont.21878 : 
+	xor	r7 r6 r7
+	fldi	f2 r8 1
+	bne	r7 r0 L_else.21883
+	fsub	f2 f0 f2
+	jump	L_cont.21881
+L_else.21883 : 
+L_cont.21881 : 
+	fsub	f3 f2 f7
+	fldi	f2 r24 1
+	fdiv	f4 f3 f2
+	fldi	f2 r24 2
+	fmul	f2 f4 f2
+	fadd	f2 f2 f9
+	fbgt	f0 f2 L_else.21886
+	jump	L_cont.21884
+L_else.21886 : 
+	fsub	f2 f0 f2
+L_cont.21884 : 
+	fldi	f3 r8 2
+	fbgt	f3 f2 L_else.21888
+	addi	r7 r0 0
+	jump	L_cont.21852
+L_else.21888 : 
+	fldi	f2 r24 0
+	fmul	f2 f4 f2
+	fadd	f2 f2 f8
+	fbgt	f0 f2 L_else.21891
+	jump	L_cont.21889
+L_else.21891 : 
+	fsub	f2 f0 f2
+L_cont.21889 : 
+	fldi	f3 r8 0
+	fbgt	f3 f2 L_else.21893
+	addi	r7 r0 0
+	jump	L_cont.21852
+L_else.21893 : 
+	fsti	f4 r0 1073
+	addi	r7 r0 1
+L_cont.21852 : 
+	bne	r7 r0 L_else.21856
+	fldi	f2 r24 2
+	fbne	f2 f0 L_else.21859
+	addi	r6 r0 0
+	jump	L_cont.21857
+L_else.21859 : 
+	fldi	f2 r24 2
+	fbgt	f0 f2 L_else.21864
+	addi	r7 r0 0
+	jump	L_cont.21862
+L_else.21864 : 
+	addi	r7 r0 1
+L_cont.21862 : 
+	xor	r6 r6 r7
+	fldi	f2 r8 2
+	bne	r6 r0 L_else.21867
+	fsub	f2 f0 f2
+	jump	L_cont.21865
+L_else.21867 : 
+L_cont.21865 : 
+	fsub	f3 f2 f9
+	fldi	f2 r24 2
+	fdiv	f4 f3 f2
+	fldi	f2 r24 0
+	fmul	f2 f4 f2
+	fadd	f2 f2 f8
+	fbgt	f0 f2 L_else.21870
+	jump	L_cont.21868
+L_else.21870 : 
+	fsub	f2 f0 f2
+L_cont.21868 : 
+	fldi	f3 r8 0
+	fbgt	f3 f2 L_else.21872
+	addi	r6 r0 0
+	jump	L_cont.21857
+L_else.21872 : 
+	fldi	f2 r24 1
+	fmul	f2 f4 f2
+	fadd	f2 f2 f7
+	fbgt	f0 f2 L_else.21875
+	jump	L_cont.21873
+L_else.21875 : 
+	fsub	f2 f0 f2
+L_cont.21873 : 
+	fldi	f3 r8 1
+	fbgt	f3 f2 L_else.21877
+	addi	r6 r0 0
+	jump	L_cont.21857
+L_else.21877 : 
+	fsti	f4 r0 1073
+	addi	r6 r0 1
+L_cont.21857 : 
+	bne	r6 r0 L_else.21861
+	addi	r6 r0 0
+	jump	L_cont.21826
+L_else.21861 : 
+	addi	r6 r0 3
+	jump	L_cont.21826
+L_else.21856 : 
+	addi	r6 r0 2
+	jump	L_cont.21826
+L_else.21851 : 
+	addi	r6 r0 1
+	jump	L_cont.21826
+L_else.21828 : 
+	addi	r9 r0 2
+	bne	r10 r9 L_else.21911
+	fldi	f2 r24 0
+	fldi	f10 r8 0
+	fmul	f3 f2 f10
+	fldi	f2 r24 1
+	fldi	f6 r8 1
+	fmul	f2 f2 f6
+	fadd	f3 f3 f2
+	fldi	f2 r24 2
+	fldi	f5 r8 2
+	fmul	f2 f2 f5
+	fadd	f4 f3 f2
+	fbgt	f4 f0 L_else.21913
+	addi	r6 r0 0
+	jump	L_cont.21826
+L_else.21913 : 
+	fmul	f2 f10 f8
+	fmul	f3 f6 f7
+	fadd	f2 f2 f3
+	fmul	f3 f5 f9
+	fadd	f2 f2 f3
+	fsub	f2 f0 f2
+	fdiv	f2 f2 f4
+	fsti	f2 r0 1073
+	addi	r6 r0 1
+	jump	L_cont.21826
+L_else.21911 : 
+	fldi	f14 r24 0
+	fldi	f13 r24 1
+	fldi	f15 r24 2
+	fmul	f2 f14 f14
+	fldi	f12 r8 0
+	fmul	f2 f2 f12
+	fmul	f3 f13 f13
+	fldi	f11 r8 1
+	fmul	f3 f3 f11
+	fadd	f2 f2 f3
+	fmul	f3 f15 f15
+	fldi	f10 r8 2
+	fmul	f3 f3 f10
+	fadd	f2 f2 f3
+	bne	r11 r0 L_else.21916
+	fadd	f3 f0 f2
+	jump	L_cont.21914
+L_else.21916 : 
+	fmul	f4 f13 f15
+	fldi	f3 r7 0
+	fmul	f3 f4 f3
+	fadd	f4 f2 f3
+	fmul	f3 f15 f14
+	fldi	f2 r7 1
+	fmul	f2 f3 f2
+	fadd	f4 f4 f2
+	fmul	f2 f14 f13
+	fldi	f3 r7 2
+	fmul	f2 f2 f3
+	fadd	f3 f4 f2
+L_cont.21914 : 
+	fbne	f3 f0 L_else.21918
+	addi	r6 r0 0
+	jump	L_cont.21826
+L_else.21918 : 
+	fmul	f2 f14 f8
+	fmul	f4 f2 f12
+	fmul	f2 f13 f7
+	fmul	f2 f2 f11
+	fadd	f4 f4 f2
+	fmul	f2 f15 f9
+	fmul	f2 f2 f10
+	fadd	f2 f4 f2
+	bne	r11 r0 L_else.21921
+	fadd	f4 f0 f2
+	jump	L_cont.21919
+L_else.21921 : 
+	fmul	f4 f15 f7
+	fmul	f5 f13 f9
+	fadd	f4 f4 f5
+	fldi	f5 r7 0
+	fmul	f5 f4 f5
+	fmul	f6 f14 f9
+	fmul	f4 f15 f8
+	fadd	f6 f6 f4
+	fldi	f4 r7 1
+	fmul	f4 f6 f4
+	fadd	f5 f5 f4
+	fmul	f6 f14 f7
+	fmul	f4 f13 f8
+	fadd	f6 f6 f4
+	fldi	f4 r7 2
+	fmul	f4 f6 f4
+	fadd	f4 f5 f4
+	fldi	f5 r0 29
+	fdiv	f4 f4 f5
+	fadd	f4 f2 f4
+L_cont.21919 : 
+	fmul	f2 f8 f8
+	fmul	f5 f2 f12
+	fmul	f2 f7 f7
+	fmul	f2 f2 f11
+	fadd	f5 f5 f2
+	fmul	f2 f9 f9
+	fmul	f2 f2 f10
+	fadd	f2 f5 f2
+	bne	r11 r0 L_else.21924
+	jump	L_cont.21922
+L_else.21924 : 
+	fmul	f6 f7 f9
+	fldi	f5 r7 0
+	fmul	f5 f6 f5
+	fadd	f5 f2 f5
+	fmul	f6 f9 f8
+	fldi	f2 r7 1
+	fmul	f2 f6 f2
+	fadd	f5 f5 f2
+	fmul	f6 f8 f7
+	fldi	f2 r7 2
+	fmul	f2 f6 f2
+	fadd	f2 f5 f2
+L_cont.21922 : 
+	addi	r7 r0 3
+	bne	r10 r7 L_else.21927
+	fldi	f5 r0 12
+	fsub	f2 f2 f5
+	jump	L_cont.21925
+L_else.21927 : 
+L_cont.21925 : 
 	fmul	f5 f4 f4
 	fmul	f2 f3 f2
 	fsub	f2 f5 f2
-	fbgt	f2 f0 L_else.25366
+	fbgt	f2 f0 L_else.21929
 	addi	r6 r0 0
-	jump	L_cont.25263
-L_else.25366 : 
+	jump	L_cont.21826
+L_else.21929 : 
 	fsqrt	f2 f2
-	ldi	r6 r8 6
-	bne	r6 r0 L_else.25369
+	bne	r6 r0 L_else.21932
 	fsub	f2 f0 f2
-	jump	L_cont.25367
-L_else.25369 : 
-L_cont.25367 : 
+	jump	L_cont.21930
+L_else.21932 : 
+L_cont.21930 : 
 	fsub	f2 f2 f4
 	fdiv	f2 f2 f3
 	fsti	f2 r0 1073
 	addi	r6 r0 1
-L_cont.25263 : 
-	bne	r6 r0 L_else.25267
-	jump	L_cont.25124
-L_else.25267 : 
+L_cont.21826 : 
+	bne	r6 r0 L_else.21830
+	jump	L_cont.21687
+L_else.21830 : 
 	fldi	f3 r0 1073
 	fldi	f2 r0 1082
-	fbgt	f2 f3 L_else.25269
-	jump	L_cont.25124
-L_else.25269 : 
-	ldi	r6 r17 1
-	bne	r6 r5 L_else.25271
-	jump	L_cont.25124
-L_else.25271 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 2
-	bne	r6 r5 L_else.25273
-	jump	L_cont.25124
-L_else.25273 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 3
-	bne	r6 r5 L_else.25275
-	jump	L_cont.25124
-L_else.25275 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 4
-	bne	r6 r5 L_else.25277
-	jump	L_cont.25124
-L_else.25277 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 5
-	bne	r6 r5 L_else.25279
-	jump	L_cont.25124
-L_else.25279 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 6
-	bne	r6 r5 L_else.25281
-	jump	L_cont.25124
-L_else.25281 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 7
-	bne	r6 r5 L_else.25283
-	jump	L_cont.25124
-L_else.25283 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	addi	r16 r0 8
-	add	r18 r0 r21
-	call	L_solve_one_or_network.2192
-L_cont.25124 : 
-	addi	r19 r19 1
-	add	r1 r20 r19
-	ldi	r17 r1 0
-	ldi	r7 r17 0
-	bne	r7 r5 L_else.25128
+	fbgt	f2 f3 L_else.21832
+	jump	L_cont.21687
+L_else.21832 : 
+	ldi	r6 r20 1
+	bne	r6 r5 L_else.21834
+	jump	L_cont.21687
+L_else.21834 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 2
+	bne	r6 r5 L_else.21836
+	jump	L_cont.21687
+L_else.21836 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 3
+	bne	r6 r5 L_else.21838
+	jump	L_cont.21687
+L_else.21838 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 4
+	bne	r6 r5 L_else.21840
+	jump	L_cont.21687
+L_else.21840 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 5
+	bne	r6 r5 L_else.21842
+	jump	L_cont.21687
+L_else.21842 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 6
+	bne	r6 r5 L_else.21844
+	jump	L_cont.21687
+L_else.21844 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 7
+	bne	r6 r5 L_else.21846
+	jump	L_cont.21687
+L_else.21846 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	addi	r19 r0 8
+	add	r21 r0 r24
+	call	L_solve_one_or_network.2256
+L_cont.21687 : 
+	addi	r22 r22 1
+	add	r1 r23 r22
+	ldi	r20 r1 0
+	ldi	r7 r20 0
+	bne	r7 r5 L_else.21691
 	return
-L_else.25128 : 
+L_else.21691 : 
 	addi	r6 r0 99
-	bne	r7 r6 L_else.25131
-	ldi	r6 r17 1
-	bne	r6 r5 L_else.25133
-	jump	L_cont.25129
-L_else.25133 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 2
-	bne	r6 r5 L_else.25135
-	jump	L_cont.25129
-L_else.25135 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 3
-	bne	r6 r5 L_else.25137
-	jump	L_cont.25129
-L_else.25137 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 4
-	bne	r6 r5 L_else.25139
-	jump	L_cont.25129
-L_else.25139 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 5
-	bne	r6 r5 L_else.25141
-	jump	L_cont.25129
-L_else.25141 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 6
-	bne	r6 r5 L_else.25143
-	jump	L_cont.25129
-L_else.25143 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	addi	r16 r0 7
-	add	r18 r0 r21
-	call	L_solve_one_or_network.2192
-	jump	L_cont.25129
-L_else.25131 : 
-	ldi	r8 r7 1970
+	bne	r7 r6 L_else.21694
+	ldi	r6 r20 1
+	bne	r6 r5 L_else.21696
+	jump	L_cont.21692
+L_else.21696 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 2
+	bne	r6 r5 L_else.21698
+	jump	L_cont.21692
+L_else.21698 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 3
+	bne	r6 r5 L_else.21700
+	jump	L_cont.21692
+L_else.21700 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 4
+	bne	r6 r5 L_else.21702
+	jump	L_cont.21692
+L_else.21702 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 5
+	bne	r6 r5 L_else.21704
+	jump	L_cont.21692
+L_else.21704 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 6
+	bne	r6 r5 L_else.21706
+	jump	L_cont.21692
+L_else.21706 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	addi	r19 r0 7
+	add	r21 r0 r24
+	call	L_solve_one_or_network.2256
+	jump	L_cont.21692
+L_else.21694 : 
+	muli	r6 r7 11
+	ldi	r13 r6 1928
+	ldi	r9 r6 1925
+	ldi	r12 r6 1924
+	ldi	r7 r6 1923
+	ldi	r8 r6 1922
+	ldi	r6 r6 1920
+	add	r11 r0 r6
+	add	r10 r0 r7
+	add	r7 r0 r12
+	add	r6 r0 r13
 	fldi	f3 r0 1063
-	ldi	r6 r8 5
-	fldi	f2 r6 0
+	fldi	f2 r7 0
 	fsub	f8 f3 f2
-	fldi	f3 r0 1064
-	ldi	r6 r8 5
-	fldi	f2 r6 1
-	fsub	f7 f3 f2
-	fldi	f3 r0 1065
-	ldi	r6 r8 5
-	fldi	f2 r6 2
-	fsub	f9 f3 f2
-	ldi	r7 r8 1
-	bne	r7 r4 L_else.25146
-	fldi	f2 r21 0
-	fbne	f2 f0 L_else.25165
-	addi	r6 r0 0
-	jump	L_cont.25163
-L_else.25165 : 
-	ldi	r9 r8 4
-	ldi	r6 r8 6
-	fldi	f2 r21 0
-	fbgt	f0 f2 L_else.25212
-	addi	r7 r0 0
-	jump	L_cont.25210
-L_else.25212 : 
-	addi	r7 r0 1
-L_cont.25210 : 
-	xor	r6 r6 r7
-	fldi	f2 r9 0
-	bne	r6 r0 L_else.25215
-	fsub	f2 f0 f2
-	jump	L_cont.25213
-L_else.25215 : 
-L_cont.25213 : 
-	fsub	f2 f2 f8
-	fldi	f3 r21 0
-	fdiv	f4 f2 f3
-	fldi	f2 r21 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25218
-	jump	L_cont.25216
-L_else.25218 : 
-	fsub	f2 f0 f2
-L_cont.25216 : 
-	fldi	f3 r9 1
-	fbgt	f3 f2 L_else.25220
-	addi	r6 r0 0
-	jump	L_cont.25163
-L_else.25220 : 
-	fldi	f2 r21 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.25223
-	jump	L_cont.25221
-L_else.25223 : 
-	fsub	f2 f0 f2
-L_cont.25221 : 
-	fldi	f3 r9 2
-	fbgt	f3 f2 L_else.25225
-	addi	r6 r0 0
-	jump	L_cont.25163
-L_else.25225 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-L_cont.25163 : 
-	bne	r6 r0 L_else.25167
-	fldi	f2 r21 1
-	fbne	f2 f0 L_else.25170
-	addi	r6 r0 0
-	jump	L_cont.25168
-L_else.25170 : 
-	ldi	r9 r8 4
-	ldi	r6 r8 6
-	fldi	f2 r21 1
-	fbgt	f0 f2 L_else.25196
-	addi	r7 r0 0
-	jump	L_cont.25194
-L_else.25196 : 
-	addi	r7 r0 1
-L_cont.25194 : 
-	xor	r6 r6 r7
-	fldi	f2 r9 1
-	bne	r6 r0 L_else.25199
-	fsub	f2 f0 f2
-	jump	L_cont.25197
-L_else.25199 : 
-L_cont.25197 : 
-	fsub	f3 f2 f7
-	fldi	f2 r21 1
-	fdiv	f4 f3 f2
-	fldi	f2 r21 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.25202
-	jump	L_cont.25200
-L_else.25202 : 
-	fsub	f2 f0 f2
-L_cont.25200 : 
-	fldi	f3 r9 2
-	fbgt	f3 f2 L_else.25204
-	addi	r6 r0 0
-	jump	L_cont.25168
-L_else.25204 : 
-	fldi	f2 r21 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f8
-	fbgt	f0 f2 L_else.25207
-	jump	L_cont.25205
-L_else.25207 : 
-	fsub	f2 f0 f2
-L_cont.25205 : 
-	fldi	f3 r9 0
-	fbgt	f3 f2 L_else.25209
-	addi	r6 r0 0
-	jump	L_cont.25168
-L_else.25209 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-L_cont.25168 : 
-	bne	r6 r0 L_else.25172
-	fldi	f2 r21 2
-	fbne	f2 f0 L_else.25175
-	addi	r6 r0 0
-	jump	L_cont.25173
-L_else.25175 : 
-	ldi	r7 r8 4
-	ldi	r8 r8 6
-	fldi	f2 r21 2
-	fbgt	f0 f2 L_else.25180
-	addi	r6 r0 0
-	jump	L_cont.25178
-L_else.25180 : 
-	addi	r6 r0 1
-L_cont.25178 : 
-	xor	r6 r8 r6
-	fldi	f2 r7 2
-	bne	r6 r0 L_else.25183
-	fsub	f2 f0 f2
-	jump	L_cont.25181
-L_else.25183 : 
-L_cont.25181 : 
-	fsub	f3 f2 f9
-	fldi	f2 r21 2
-	fdiv	f4 f3 f2
-	fldi	f2 r21 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f8
-	fbgt	f0 f2 L_else.25186
-	jump	L_cont.25184
-L_else.25186 : 
-	fsub	f2 f0 f2
-L_cont.25184 : 
-	fldi	f3 r7 0
-	fbgt	f3 f2 L_else.25188
-	addi	r6 r0 0
-	jump	L_cont.25173
-L_else.25188 : 
-	fldi	f2 r21 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25191
-	jump	L_cont.25189
-L_else.25191 : 
-	fsub	f2 f0 f2
-L_cont.25189 : 
+	fldi	f2 r0 1064
 	fldi	f3 r7 1
-	fbgt	f3 f2 L_else.25193
+	fsub	f7 f2 f3
+	fldi	f3 r0 1065
+	fldi	f2 r7 2
+	fsub	f9 f3 f2
+	bne	r11 r4 L_else.21709
+	fldi	f2 r24 0
+	fbne	f2 f0 L_else.21728
 	addi	r6 r0 0
-	jump	L_cont.25173
-L_else.25193 : 
+	jump	L_cont.21726
+L_else.21728 : 
+	fldi	f2 r24 0
+	fbgt	f0 f2 L_else.21775
+	addi	r6 r0 0
+	jump	L_cont.21773
+L_else.21775 : 
+	addi	r6 r0 1
+L_cont.21773 : 
+	xor	r6 r9 r6
+	fldi	f2 r10 0
+	bne	r6 r0 L_else.21778
+	fsub	f2 f0 f2
+	jump	L_cont.21776
+L_else.21778 : 
+L_cont.21776 : 
+	fsub	f3 f2 f8
+	fldi	f2 r24 0
+	fdiv	f4 f3 f2
+	fldi	f2 r24 1
+	fmul	f2 f4 f2
+	fadd	f2 f2 f7
+	fbgt	f0 f2 L_else.21781
+	jump	L_cont.21779
+L_else.21781 : 
+	fsub	f2 f0 f2
+L_cont.21779 : 
+	fldi	f3 r10 1
+	fbgt	f3 f2 L_else.21783
+	addi	r6 r0 0
+	jump	L_cont.21726
+L_else.21783 : 
+	fldi	f2 r24 2
+	fmul	f2 f4 f2
+	fadd	f2 f2 f9
+	fbgt	f0 f2 L_else.21786
+	jump	L_cont.21784
+L_else.21786 : 
+	fsub	f2 f0 f2
+L_cont.21784 : 
+	fldi	f3 r10 2
+	fbgt	f3 f2 L_else.21788
+	addi	r6 r0 0
+	jump	L_cont.21726
+L_else.21788 : 
 	fsti	f4 r0 1073
 	addi	r6 r0 1
-L_cont.25173 : 
-	bne	r6 r0 L_else.25177
+L_cont.21726 : 
+	bne	r6 r0 L_else.21730
+	fldi	f2 r24 1
+	fbne	f2 f0 L_else.21733
 	addi	r6 r0 0
-	jump	L_cont.25144
-L_else.25177 : 
-	addi	r6 r0 3
-	jump	L_cont.25144
-L_else.25172 : 
-	addi	r6 r0 2
-	jump	L_cont.25144
-L_else.25167 : 
+	jump	L_cont.21731
+L_else.21733 : 
+	fldi	f2 r24 1
+	fbgt	f0 f2 L_else.21759
+	addi	r6 r0 0
+	jump	L_cont.21757
+L_else.21759 : 
 	addi	r6 r0 1
-	jump	L_cont.25144
-L_else.25146 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.25227
-	ldi	r6 r8 4
-	fldi	f3 r21 0
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fldi	f3 r21 1
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f4 f4 f2
-	fldi	f3 r21 2
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f4 f4 f2
-	fbgt	f4 f0 L_else.25229
-	addi	r6 r0 0
-	jump	L_cont.25144
-L_else.25229 : 
-	fldi	f2 r6 0
-	fmul	f3 f2 f8
-	fldi	f2 r6 1
-	fmul	f2 f2 f7
-	fadd	f3 f3 f2
-	fldi	f2 r6 2
-	fmul	f2 f2 f9
-	fadd	f2 f3 f2
+L_cont.21757 : 
+	xor	r6 r9 r6
+	fldi	f2 r10 1
+	bne	r6 r0 L_else.21762
 	fsub	f2 f0 f2
-	fdiv	f2 f2 f4
+	jump	L_cont.21760
+L_else.21762 : 
+L_cont.21760 : 
+	fsub	f2 f2 f7
+	fldi	f3 r24 1
+	fdiv	f4 f2 f3
+	fldi	f2 r24 2
+	fmul	f2 f4 f2
+	fadd	f2 f2 f9
+	fbgt	f0 f2 L_else.21765
+	jump	L_cont.21763
+L_else.21765 : 
+	fsub	f2 f0 f2
+L_cont.21763 : 
+	fldi	f3 r10 2
+	fbgt	f3 f2 L_else.21767
+	addi	r6 r0 0
+	jump	L_cont.21731
+L_else.21767 : 
+	fldi	f2 r24 0
+	fmul	f2 f4 f2
+	fadd	f2 f2 f8
+	fbgt	f0 f2 L_else.21770
+	jump	L_cont.21768
+L_else.21770 : 
+	fsub	f2 f0 f2
+L_cont.21768 : 
+	fldi	f3 r10 0
+	fbgt	f3 f2 L_else.21772
+	addi	r6 r0 0
+	jump	L_cont.21731
+L_else.21772 : 
+	fsti	f4 r0 1073
+	addi	r6 r0 1
+L_cont.21731 : 
+	bne	r6 r0 L_else.21735
+	fldi	f2 r24 2
+	fbne	f2 f0 L_else.21738
+	addi	r6 r0 0
+	jump	L_cont.21736
+L_else.21738 : 
+	fldi	f2 r24 2
+	fbgt	f0 f2 L_else.21743
+	addi	r6 r0 0
+	jump	L_cont.21741
+L_else.21743 : 
+	addi	r6 r0 1
+L_cont.21741 : 
+	xor	r6 r9 r6
+	fldi	f2 r10 2
+	bne	r6 r0 L_else.21746
+	fsub	f2 f0 f2
+	jump	L_cont.21744
+L_else.21746 : 
+L_cont.21744 : 
+	fsub	f2 f2 f9
+	fldi	f3 r24 2
+	fdiv	f4 f2 f3
+	fldi	f2 r24 0
+	fmul	f2 f4 f2
+	fadd	f2 f2 f8
+	fbgt	f0 f2 L_else.21749
+	jump	L_cont.21747
+L_else.21749 : 
+	fsub	f2 f0 f2
+L_cont.21747 : 
+	fldi	f3 r10 0
+	fbgt	f3 f2 L_else.21751
+	addi	r6 r0 0
+	jump	L_cont.21736
+L_else.21751 : 
+	fldi	f2 r24 1
+	fmul	f2 f4 f2
+	fadd	f2 f2 f7
+	fbgt	f0 f2 L_else.21754
+	jump	L_cont.21752
+L_else.21754 : 
+	fsub	f2 f0 f2
+L_cont.21752 : 
+	fldi	f3 r10 1
+	fbgt	f3 f2 L_else.21756
+	addi	r6 r0 0
+	jump	L_cont.21736
+L_else.21756 : 
+	fsti	f4 r0 1073
+	addi	r6 r0 1
+L_cont.21736 : 
+	bne	r6 r0 L_else.21740
+	addi	r6 r0 0
+	jump	L_cont.21707
+L_else.21740 : 
+	addi	r6 r0 3
+	jump	L_cont.21707
+L_else.21735 : 
+	addi	r6 r0 2
+	jump	L_cont.21707
+L_else.21730 : 
+	addi	r6 r0 1
+	jump	L_cont.21707
+L_else.21709 : 
+	addi	r7 r0 2
+	bne	r11 r7 L_else.21790
+	fldi	f2 r24 0
+	fldi	f6 r10 0
+	fmul	f2 f2 f6
+	fldi	f3 r24 1
+	fldi	f5 r10 1
+	fmul	f3 f3 f5
+	fadd	f2 f2 f3
+	fldi	f3 r24 2
+	fldi	f4 r10 2
+	fmul	f3 f3 f4
+	fadd	f3 f2 f3
+	fbgt	f3 f0 L_else.21792
+	addi	r6 r0 0
+	jump	L_cont.21707
+L_else.21792 : 
+	fmul	f2 f6 f8
+	fmul	f5 f5 f7
+	fadd	f2 f2 f5
+	fmul	f4 f4 f9
+	fadd	f2 f2 f4
+	fsub	f2 f0 f2
+	fdiv	f2 f2 f3
 	fsti	f2 r0 1073
 	addi	r6 r0 1
-	jump	L_cont.25144
-L_else.25227 : 
-	fldi	f6 r21 0
-	fldi	f10 r21 1
-	fldi	f5 r21 2
-	fmul	f3 f6 f6
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fmul	f3 f10 f10
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f5 f5
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.25232
-	fadd	f4 f0 f2
-	jump	L_cont.25230
-L_else.25232 : 
-	fmul	f4 f10 f5
-	ldi	r6 r8 9
+	jump	L_cont.21707
+L_else.21790 : 
+	fldi	f14 r24 0
+	fldi	f13 r24 1
+	fldi	f15 r24 2
+	fmul	f2 f14 f14
+	fldi	f12 r10 0
+	fmul	f2 f2 f12
+	fmul	f3 f13 f13
+	fldi	f11 r10 1
+	fmul	f3 f3 f11
+	fadd	f2 f2 f3
+	fmul	f3 f15 f15
+	fldi	f10 r10 2
+	fmul	f3 f3 f10
+	fadd	f2 f2 f3
+	bne	r8 r0 L_else.21795
+	fadd	f3 f0 f2
+	jump	L_cont.21793
+L_else.21795 : 
+	fmul	f4 f13 f15
 	fldi	f3 r6 0
 	fmul	f3 f4 f3
 	fadd	f3 f2 f3
-	fmul	f4 f5 f6
-	ldi	r6 r8 9
+	fmul	f4 f15 f14
 	fldi	f2 r6 1
 	fmul	f2 f4 f2
-	fadd	f4 f3 f2
-	fmul	f3 f6 f10
-	ldi	r6 r8 9
+	fadd	f3 f3 f2
+	fmul	f4 f14 f13
 	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f4 f4 f2
-L_cont.25230 : 
-	fbne	f4 f0 L_else.25234
+	fmul	f2 f4 f2
+	fadd	f3 f3 f2
+L_cont.21793 : 
+	fbne	f3 f0 L_else.21797
 	addi	r6 r0 0
-	jump	L_cont.25144
-L_else.25234 : 
-	fldi	f12 r21 0
-	fldi	f11 r21 1
-	fldi	f10 r21 2
-	fmul	f3 f12 f8
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f5 f3 f2
-	fmul	f3 f11 f7
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f5 f2
-	fmul	f5 f10 f9
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f5 f2
-	fadd	f2 f3 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.25237
-	fadd	f3 f0 f2
-	jump	L_cont.25235
-L_else.25237 : 
-	fmul	f5 f10 f7
-	fmul	f3 f11 f9
-	fadd	f5 f5 f3
-	ldi	r6 r8 9
-	fldi	f3 r6 0
-	fmul	f6 f5 f3
-	fmul	f5 f12 f9
-	fmul	f3 f10 f8
-	fadd	f5 f5 f3
-	ldi	r6 r8 9
-	fldi	f3 r6 1
-	fmul	f3 f5 f3
-	fadd	f6 f6 f3
-	fmul	f5 f12 f7
-	fmul	f3 f11 f8
-	fadd	f5 f5 f3
-	ldi	r6 r8 9
-	fldi	f3 r6 2
-	fmul	f3 f5 f3
-	fadd	f5 f6 f3
-	fldi	f3 r0 30
-	fdiv	f3 f5 f3
-	fadd	f3 f2 f3
-L_cont.25235 : 
-	fmul	f5 f8 f8
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f6 f5 f2
-	fmul	f5 f7 f7
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f5 f2
-	fadd	f5 f6 f2
-	fmul	f6 f9 f9
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f6 f2
+	jump	L_cont.21707
+L_else.21797 : 
+	fmul	f2 f14 f8
+	fmul	f4 f2 f12
+	fmul	f2 f13 f7
+	fmul	f2 f2 f11
+	fadd	f4 f4 f2
+	fmul	f2 f15 f9
+	fmul	f2 f2 f10
+	fadd	f2 f4 f2
+	bne	r8 r0 L_else.21800
+	fadd	f4 f0 f2
+	jump	L_cont.21798
+L_else.21800 : 
+	fmul	f5 f15 f7
+	fmul	f4 f13 f9
+	fadd	f5 f5 f4
+	fldi	f4 r6 0
+	fmul	f6 f5 f4
+	fmul	f4 f14 f9
+	fmul	f5 f15 f8
+	fadd	f4 f4 f5
+	fldi	f5 r6 1
+	fmul	f4 f4 f5
+	fadd	f6 f6 f4
+	fmul	f4 f14 f7
+	fmul	f5 f13 f8
+	fadd	f4 f4 f5
+	fldi	f5 r6 2
+	fmul	f4 f4 f5
+	fadd	f5 f6 f4
+	fldi	f4 r0 29
+	fdiv	f4 f5 f4
+	fadd	f4 f2 f4
+L_cont.21798 : 
+	fmul	f2 f8 f8
+	fmul	f5 f2 f12
+	fmul	f2 f7 f7
+	fmul	f2 f2 f11
+	fadd	f5 f5 f2
+	fmul	f2 f9 f9
+	fmul	f2 f2 f10
 	fadd	f2 f5 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.25240
-	jump	L_cont.25238
-L_else.25240 : 
-	fmul	f6 f7 f9
-	ldi	r6 r8 9
-	fldi	f5 r6 0
-	fmul	f5 f6 f5
+	bne	r8 r0 L_else.21803
+	jump	L_cont.21801
+L_else.21803 : 
+	fmul	f5 f7 f9
+	fldi	f6 r6 0
+	fmul	f5 f5 f6
 	fadd	f6 f2 f5
-	fmul	f5 f9 f8
-	ldi	r6 r8 9
-	fldi	f2 r6 1
-	fmul	f2 f5 f2
-	fadd	f5 f6 f2
-	fmul	f6 f8 f7
-	ldi	r6 r8 9
-	fldi	f2 r6 2
-	fmul	f2 f6 f2
-	fadd	f2 f5 f2
-L_cont.25238 : 
-	ldi	r7 r8 1
+	fmul	f2 f9 f8
+	fldi	f5 r6 1
+	fmul	f2 f2 f5
+	fadd	f6 f6 f2
+	fmul	f2 f8 f7
+	fldi	f5 r6 2
+	fmul	f2 f2 f5
+	fadd	f2 f6 f2
+L_cont.21801 : 
 	addi	r6 r0 3
-	bne	r7 r6 L_else.25243
+	bne	r11 r6 L_else.21806
 	fldi	f5 r0 12
 	fsub	f2 f2 f5
-	jump	L_cont.25241
-L_else.25243 : 
-L_cont.25241 : 
-	fmul	f5 f3 f3
-	fmul	f2 f4 f2
+	jump	L_cont.21804
+L_else.21806 : 
+L_cont.21804 : 
+	fmul	f5 f4 f4
+	fmul	f2 f3 f2
 	fsub	f2 f5 f2
-	fbgt	f2 f0 L_else.25245
+	fbgt	f2 f0 L_else.21808
 	addi	r6 r0 0
-	jump	L_cont.25144
-L_else.25245 : 
+	jump	L_cont.21707
+L_else.21808 : 
 	fsqrt	f2 f2
-	ldi	r6 r8 6
-	bne	r6 r0 L_else.25248
+	bne	r9 r0 L_else.21811
 	fsub	f2 f0 f2
-	jump	L_cont.25246
-L_else.25248 : 
-L_cont.25246 : 
-	fsub	f2 f2 f3
-	fdiv	f2 f2 f4
+	jump	L_cont.21809
+L_else.21811 : 
+L_cont.21809 : 
+	fsub	f2 f2 f4
+	fdiv	f2 f2 f3
 	fsti	f2 r0 1073
 	addi	r6 r0 1
-L_cont.25144 : 
-	bne	r6 r0 L_else.25148
-	jump	L_cont.25129
-L_else.25148 : 
+L_cont.21707 : 
+	bne	r6 r0 L_else.21711
+	jump	L_cont.21692
+L_else.21711 : 
 	fldi	f2 r0 1073
 	fldi	f3 r0 1082
-	fbgt	f3 f2 L_else.25150
-	jump	L_cont.25129
-L_else.25150 : 
-	ldi	r6 r17 1
-	bne	r6 r5 L_else.25152
-	jump	L_cont.25129
-L_else.25152 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 2
-	bne	r6 r5 L_else.25154
-	jump	L_cont.25129
-L_else.25154 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 3
-	bne	r6 r5 L_else.25156
-	jump	L_cont.25129
-L_else.25156 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 4
-	bne	r6 r5 L_else.25158
-	jump	L_cont.25129
-L_else.25158 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 5
-	bne	r6 r5 L_else.25160
-	jump	L_cont.25129
-L_else.25160 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	ldi	r6 r17 6
-	bne	r6 r5 L_else.25162
-	jump	L_cont.25129
-L_else.25162 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element.2188
-	addi	r16 r0 7
-	add	r18 r0 r21
-	call	L_solve_one_or_network.2192
-L_cont.25129 : 
-	addi	r19 r19 1
-	jump	L_trace_or_matrix.2196
-L_solve_each_element_fast.2202 : 
-	ldi	r10 r13 0
-	ldi	r14 r11 0
-	bne	r14 r5 L_else.25372
+	fbgt	f3 f2 L_else.21713
+	jump	L_cont.21692
+L_else.21713 : 
+	ldi	r6 r20 1
+	bne	r6 r5 L_else.21715
+	jump	L_cont.21692
+L_else.21715 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 2
+	bne	r6 r5 L_else.21717
+	jump	L_cont.21692
+L_else.21717 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 3
+	bne	r6 r5 L_else.21719
+	jump	L_cont.21692
+L_else.21719 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 4
+	bne	r6 r5 L_else.21721
+	jump	L_cont.21692
+L_else.21721 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 5
+	bne	r6 r5 L_else.21723
+	jump	L_cont.21692
+L_else.21723 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	ldi	r6 r20 6
+	bne	r6 r5 L_else.21725
+	jump	L_cont.21692
+L_else.21725 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r24
+	call	L_solve_each_element.2252
+	addi	r19 r0 7
+	add	r21 r0 r24
+	call	L_solve_one_or_network.2256
+L_cont.21692 : 
+	addi	r22 r22 1
+	jump	L_trace_or_matrix.2260
+L_solve_each_element_fast.2266 : 
+	ldi	r18 r14 0
+	bne	r18 r5 L_else.21935
 	return
-L_else.25372 : 
-	ldi	r9 r14 1970
-	ldi	r15 r9 10
-	fldi	f7 r15 0
-	fldi	f6 r15 1
-	fldi	f8 r15 2
-	ldi	r6 r13 1
-	add	r1 r6 r14
-	ldi	r8 r1 0
-	ldi	r7 r9 1
-	bne	r7 r4 L_else.25375
-	ldi	r7 r13 0
-	fldi	f2 r8 0
-	fsub	f3 f2 f7
-	fldi	f2 r8 1
-	fmul	f4 f3 f2
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.25507
-	jump	L_cont.25505
-L_else.25507 : 
-	fsub	f2 f0 f2
-L_cont.25505 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.25510
-	addi	r6 r0 0
-	jump	L_cont.25508
-L_else.25510 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
+L_else.21935 : 
+	muli	r11 r18 11
+	ldi	r6 r11 1929
+	ldi	r7 r11 1925
+	ldi	r8 r11 1923
+	ldi	r9 r11 1920
+	fldi	f9 r6 0
+	fldi	f8 r6 1
+	fldi	f11 r6 2
+	add	r1 r17 r18
+	ldi	r10 r1 0
+	bne	r9 r4 L_else.21938
+	fldi	f2 r10 0
+	fsub	f2 f2 f9
+	fldi	f5 r10 1
+	fmul	f4 f2 f5
+	fldi	f12 r16 1
+	fmul	f2 f4 f12
 	fadd	f2 f2 f8
-	fbgt	f0 f2 L_else.25547
-	jump	L_cont.25545
-L_else.25547 : 
+	fbgt	f0 f2 L_else.21952
+	jump	L_cont.21950
+L_else.21952 : 
 	fsub	f2 f0 f2
-L_cont.25545 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.25549
+L_cont.21950 : 
+	fldi	f10 r8 1
+	fbgt	f10 f2 L_else.21955
 	addi	r6 r0 0
-	jump	L_cont.25508
-L_else.25549 : 
-	fldi	f2 r8 1
-	fbne	f2 f0 L_else.25552
+	jump	L_cont.21953
+L_else.21955 : 
+	fldi	f2 r16 2
+	fmul	f2 f4 f2
+	fadd	f2 f2 f11
+	fbgt	f0 f2 L_else.21992
+	jump	L_cont.21990
+L_else.21992 : 
+	fsub	f2 f0 f2
+L_cont.21990 : 
+	fldi	f3 r8 2
+	fbgt	f3 f2 L_else.21994
+	addi	r6 r0 0
+	jump	L_cont.21953
+L_else.21994 : 
+	fbne	f5 f0 L_else.21997
 	addi	r6 r0 1
-	jump	L_cont.25550
-L_else.25552 : 
+	jump	L_cont.21995
+L_else.21997 : 
 	addi	r6 r0 0
-L_cont.25550 : 
+L_cont.21995 : 
 	sub	r6 r4 r6
-L_cont.25508 : 
-	bne	r6 r0 L_else.25512
-	fldi	f2 r8 2
-	fsub	f2 f2 f6
-	fldi	f3 r8 3
-	fmul	f4 f2 f3
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25515
-	jump	L_cont.25513
-L_else.25515 : 
+L_cont.21953 : 
+	bne	r6 r0 L_else.21957
+	fldi	f2 r10 2
+	fsub	f2 f2 f8
+	fldi	f4 r10 3
+	fmul	f7 f2 f4
+	fldi	f5 r16 0
+	fmul	f2 f7 f5
+	fadd	f2 f2 f9
+	fbgt	f0 f2 L_else.21960
+	jump	L_cont.21958
+L_else.21960 : 
 	fsub	f2 f0 f2
-L_cont.25513 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.25518
+L_cont.21958 : 
+	fldi	f6 r8 0
+	fbgt	f6 f2 L_else.21963
 	addi	r6 r0 0
-	jump	L_cont.25516
-L_else.25518 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
+	jump	L_cont.21961
+L_else.21963 : 
+	fldi	f2 r16 2
+	fmul	f2 f7 f2
+	fadd	f2 f2 f11
+	fbgt	f0 f2 L_else.21984
+	jump	L_cont.21982
+L_else.21984 : 
+	fsub	f2 f0 f2
+L_cont.21982 : 
+	fldi	f3 r8 2
+	fbgt	f3 f2 L_else.21986
+	addi	r6 r0 0
+	jump	L_cont.21961
+L_else.21986 : 
+	fbne	f4 f0 L_else.21989
+	addi	r6 r0 1
+	jump	L_cont.21987
+L_else.21989 : 
+	addi	r6 r0 0
+L_cont.21987 : 
+	sub	r6 r4 r6
+L_cont.21961 : 
+	bne	r6 r0 L_else.21965
+	fldi	f2 r10 4
+	fsub	f2 f2 f11
+	fldi	f4 r10 5
+	fmul	f3 f2 f4
+	fmul	f2 f3 f5
+	fadd	f2 f2 f9
+	fbgt	f0 f2 L_else.21968
+	jump	L_cont.21966
+L_else.21968 : 
+	fsub	f2 f0 f2
+L_cont.21966 : 
+	fbgt	f6 f2 L_else.21971
+	addi	r6 r0 0
+	jump	L_cont.21969
+L_else.21971 : 
+	fmul	f2 f3 f12
 	fadd	f2 f2 f8
-	fbgt	f0 f2 L_else.25539
-	jump	L_cont.25537
-L_else.25539 : 
+	fbgt	f0 f2 L_else.21976
+	jump	L_cont.21974
+L_else.21976 : 
 	fsub	f2 f0 f2
-L_cont.25537 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.25541
+L_cont.21974 : 
+	fbgt	f10 f2 L_else.21978
 	addi	r6 r0 0
-	jump	L_cont.25516
-L_else.25541 : 
-	fldi	f2 r8 3
-	fbne	f2 f0 L_else.25544
+	jump	L_cont.21969
+L_else.21978 : 
+	fbne	f4 f0 L_else.21981
 	addi	r6 r0 1
-	jump	L_cont.25542
-L_else.25544 : 
+	jump	L_cont.21979
+L_else.21981 : 
 	addi	r6 r0 0
-L_cont.25542 : 
+L_cont.21979 : 
 	sub	r6 r4 r6
-L_cont.25516 : 
-	bne	r6 r0 L_else.25520
-	fldi	f2 r8 4
-	fsub	f3 f2 f8
-	fldi	f2 r8 5
-	fmul	f4 f3 f2
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25523
-	jump	L_cont.25521
-L_else.25523 : 
-	fsub	f2 f0 f2
-L_cont.25521 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.25526
-	addi	r6 r0 0
-	jump	L_cont.25524
-L_else.25526 : 
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.25531
-	jump	L_cont.25529
-L_else.25531 : 
-	fsub	f2 f0 f2
-L_cont.25529 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.25533
-	addi	r6 r0 0
-	jump	L_cont.25524
-L_else.25533 : 
-	fldi	f2 r8 5
-	fbne	f2 f0 L_else.25536
-	addi	r6 r0 1
-	jump	L_cont.25534
-L_else.25536 : 
-	addi	r6 r0 0
-L_cont.25534 : 
-	sub	r6 r4 r6
-L_cont.25524 : 
-	bne	r6 r0 L_else.25528
-	addi	r15 r0 0
-	jump	L_cont.25373
-L_else.25528 : 
+L_cont.21969 : 
+	bne	r6 r0 L_else.21973
+	addi	r19 r0 0
+	jump	L_cont.21936
+L_else.21973 : 
+	fsti	f3 r0 1073
+	addi	r19 r0 3
+	jump	L_cont.21936
+L_else.21965 : 
+	fsti	f7 r0 1073
+	addi	r19 r0 2
+	jump	L_cont.21936
+L_else.21957 : 
 	fsti	f4 r0 1073
-	addi	r15 r0 3
-	jump	L_cont.25373
-L_else.25520 : 
-	fsti	f4 r0 1073
-	addi	r15 r0 2
-	jump	L_cont.25373
-L_else.25512 : 
-	fsti	f4 r0 1073
-	addi	r15 r0 1
-	jump	L_cont.25373
-L_else.25375 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.25554
-	fldi	f2 r8 0
-	fbgt	f0 f2 L_else.25556
-	addi	r15 r0 0
-	jump	L_cont.25373
-L_else.25556 : 
-	fldi	f2 r8 0
-	fldi	f3 r15 3
-	fmul	f2 f2 f3
+	addi	r19 r0 1
+	jump	L_cont.21936
+L_else.21938 : 
+	addi	r8 r0 2
+	bne	r9 r8 L_else.21999
+	fldi	f3 r10 0
+	fbgt	f0 f3 L_else.22001
+	addi	r19 r0 0
+	jump	L_cont.21936
+L_else.22001 : 
+	fldi	f2 r6 3
+	fmul	f2 f3 f2
 	fsti	f2 r0 1073
-	addi	r15 r0 1
-	jump	L_cont.25373
-L_else.25554 : 
-	fldi	f5 r8 0
-	fbne	f5 f0 L_else.25558
-	addi	r15 r0 0
-	jump	L_cont.25373
-L_else.25558 : 
-	fldi	f2 r8 1
-	fmul	f3 f2 f7
-	fldi	f2 r8 2
-	fmul	f2 f2 f6
-	fadd	f3 f3 f2
-	fldi	f2 r8 3
+	addi	r19 r0 1
+	jump	L_cont.21936
+L_else.21999 : 
+	fldi	f5 r10 0
+	fbne	f5 f0 L_else.22003
+	addi	r19 r0 0
+	jump	L_cont.21936
+L_else.22003 : 
+	fldi	f2 r10 1
+	fmul	f3 f2 f9
+	fldi	f2 r10 2
 	fmul	f2 f2 f8
+	fadd	f3 f3 f2
+	fldi	f2 r10 3
+	fmul	f2 f2 f11
 	fadd	f4 f3 f2
-	fldi	f2 r15 3
+	fldi	f2 r6 3
 	fmul	f3 f4 f4
 	fmul	f2 f5 f2
 	fsub	f2 f3 f2
-	fbgt	f2 f0 L_else.25560
-	addi	r15 r0 0
-	jump	L_cont.25373
-L_else.25560 : 
-	ldi	r6 r9 6
-	bne	r6 r0 L_else.25563
+	fbgt	f2 f0 L_else.22005
+	addi	r19 r0 0
+	jump	L_cont.21936
+L_else.22005 : 
+	bne	r7 r0 L_else.22008
 	fsqrt	f2 f2
 	fsub	f3 f4 f2
-	fldi	f2 r8 4
+	fldi	f2 r10 4
 	fmul	f2 f3 f2
 	fsti	f2 r0 1073
-	jump	L_cont.25561
-L_else.25563 : 
+	jump	L_cont.22006
+L_else.22008 : 
 	fsqrt	f2 f2
 	fadd	f3 f4 f2
-	fldi	f2 r8 4
+	fldi	f2 r10 4
 	fmul	f2 f3 f2
 	fsti	f2 r0 1073
-L_cont.25561 : 
-	addi	r15 r0 1
-L_cont.25373 : 
-	bne	r15 r0 L_else.25377
-	ldi	r6 r14 1970
-	ldi	r6 r6 6
-	bne	r6 r0 L_else.25379
+L_cont.22006 : 
+	addi	r19 r0 1
+L_cont.21936 : 
+	bne	r19 r0 L_else.21940
+	ldi	r6 r11 1925
+	bne	r6 r0 L_else.21942
 	return
-L_else.25379 : 
-	addi	r11 r11 1
-	jump	L_solve_each_element_fast.2202
-L_else.25377 : 
+L_else.21942 : 
+	addi	r14 r14 1
+	jump	L_solve_each_element_fast.2266
+L_else.21940 : 
 	fldi	f3 r0 1073
-	fbgt	f3 f0 L_else.25382
-	jump	L_cont.25380
-L_else.25382 : 
+	fbgt	f3 f0 L_else.21945
+	jump	L_cont.21943
+L_else.21945 : 
 	fldi	f2 r0 1082
-	fbgt	f2 f3 L_else.25384
-	jump	L_cont.25380
-L_else.25384 : 
+	fbgt	f2 f3 L_else.21947
+	jump	L_cont.21943
+L_else.21947 : 
 	fldi	f2 r0 33
 	fadd	f14 f3 f2
-	fldi	f2 r10 0
+	fldi	f2 r16 0
 	fmul	f3 f2 f14
 	fldi	f2 r0 1066
-	fadd	f13 f3 f2
-	fldi	f2 r10 1
+	fadd	f12 f3 f2
+	fldi	f2 r16 1
 	fmul	f3 f2 f14
 	fldi	f2 r0 1067
-	fadd	f12 f3 f2
-	fldi	f2 r10 2
+	fadd	f11 f3 f2
+	fldi	f2 r16 2
 	fmul	f3 f2 f14
 	fldi	f2 r0 1068
-	fadd	f11 f3 f2
-	ldi	r6 r12 0
-	bne	r6 r5 L_else.25387
-	addi	r6 r0 1
-	jump	L_cont.25385
-L_else.25387 : 
-	ldi	r8 r6 1970
-	ldi	r6 r8 5
-	fldi	f2 r6 0
-	fsub	f3 f13 f2
-	ldi	r6 r8 5
-	fldi	f2 r6 1
-	fsub	f4 f12 f2
-	ldi	r6 r8 5
-	fldi	f2 r6 2
-	fsub	f5 f11 f2
-	ldi	r6 r8 1
-	bne	r6 r4 L_else.25392
-	fbgt	f0 f3 L_else.25475
-	fadd	f2 f0 f3
-	jump	L_cont.25473
-L_else.25475 : 
-	fsub	f2 f0 f3
-L_cont.25473 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.25478
-	addi	r6 r0 0
-	jump	L_cont.25476
-L_else.25478 : 
-	fbgt	f0 f4 L_else.25483
-	fadd	f2 f0 f4
-	jump	L_cont.25481
-L_else.25483 : 
-	fsub	f2 f0 f4
-L_cont.25481 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.25485
-	addi	r6 r0 0
-	jump	L_cont.25476
-L_else.25485 : 
-	fbgt	f0 f5 L_else.25488
-	fadd	f2 f0 f5
-	jump	L_cont.25486
-L_else.25488 : 
-	fsub	f2 f0 f5
-L_cont.25486 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.25490
-	addi	r6 r0 0
-	jump	L_cont.25476
-L_else.25490 : 
-	addi	r6 r0 1
-L_cont.25476 : 
-	bne	r6 r0 L_else.25480
-	ldi	r6 r8 6
-	sub	r6 r4 r6
-	jump	L_cont.25390
-L_else.25480 : 
-	ldi	r6 r8 6
-	jump	L_cont.25390
-L_else.25392 : 
-	addi	r7 r0 2
-	bne	r6 r7 L_else.25492
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f3 f2 f3
-	fldi	f2 r6 1
-	fmul	f2 f2 f4
-	fadd	f3 f3 f2
-	fldi	f2 r6 2
-	fmul	f2 f2 f5
-	fadd	f2 f3 f2
-	ldi	r7 r8 6
-	fbgt	f0 f2 L_else.25495
-	addi	r6 r0 0
-	jump	L_cont.25493
-L_else.25495 : 
-	addi	r6 r0 1
-L_cont.25493 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-	jump	L_cont.25390
-L_else.25492 : 
-	fmul	f6 f3 f3
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f6 f6 f2
-	fmul	f7 f4 f4
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f7 f2
-	fadd	f7 f6 f2
-	fmul	f6 f5 f5
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f6 f2
-	fadd	f2 f7 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.25498
-	jump	L_cont.25496
-L_else.25498 : 
-	fmul	f7 f4 f5
-	ldi	r6 r8 9
-	fldi	f6 r6 0
-	fmul	f6 f7 f6
-	fadd	f6 f2 f6
-	fmul	f5 f5 f3
-	ldi	r6 r8 9
-	fldi	f2 r6 1
-	fmul	f2 f5 f2
-	fadd	f5 f6 f2
-	fmul	f3 f3 f4
-	ldi	r6 r8 9
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f2 f5 f2
-L_cont.25496 : 
-	ldi	r7 r8 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.25501
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.25499
-L_else.25501 : 
-L_cont.25499 : 
-	ldi	r7 r8 6
-	fbgt	f0 f2 L_else.25504
-	addi	r6 r0 0
-	jump	L_cont.25502
-L_else.25504 : 
-	addi	r6 r0 1
-L_cont.25502 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-L_cont.25390 : 
-	bne	r6 r0 L_else.25394
-	ldi	r6 r12 1
-	bne	r6 r5 L_else.25396
-	addi	r6 r0 1
-	jump	L_cont.25385
-L_else.25396 : 
-	ldi	r8 r6 1970
-	ldi	r6 r8 5
-	fldi	f2 r6 0
-	fsub	f3 f13 f2
-	ldi	r6 r8 5
-	fldi	f2 r6 1
-	fsub	f4 f12 f2
-	ldi	r6 r8 5
-	fldi	f2 r6 2
-	fsub	f5 f11 f2
-	ldi	r6 r8 1
-	bne	r6 r4 L_else.25399
-	fbgt	f0 f3 L_else.25443
-	fadd	f2 f0 f3
-	jump	L_cont.25441
-L_else.25443 : 
-	fsub	f2 f0 f3
-L_cont.25441 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.25446
-	addi	r6 r0 0
-	jump	L_cont.25444
-L_else.25446 : 
-	fbgt	f0 f4 L_else.25451
-	fadd	f2 f0 f4
-	jump	L_cont.25449
-L_else.25451 : 
-	fsub	f2 f0 f4
-L_cont.25449 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.25453
-	addi	r6 r0 0
-	jump	L_cont.25444
-L_else.25453 : 
-	fbgt	f0 f5 L_else.25456
-	fadd	f2 f0 f5
-	jump	L_cont.25454
-L_else.25456 : 
-	fsub	f2 f0 f5
-L_cont.25454 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.25458
-	addi	r6 r0 0
-	jump	L_cont.25444
-L_else.25458 : 
-	addi	r6 r0 1
-L_cont.25444 : 
-	bne	r6 r0 L_else.25448
-	ldi	r6 r8 6
-	sub	r6 r4 r6
-	jump	L_cont.25397
-L_else.25448 : 
-	ldi	r6 r8 6
-	jump	L_cont.25397
-L_else.25399 : 
-	addi	r7 r0 2
-	bne	r6 r7 L_else.25460
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f3 f2 f3
-	fldi	f2 r6 1
-	fmul	f2 f2 f4
-	fadd	f3 f3 f2
-	fldi	f2 r6 2
-	fmul	f2 f2 f5
-	fadd	f2 f3 f2
-	ldi	r7 r8 6
-	fbgt	f0 f2 L_else.25463
-	addi	r6 r0 0
-	jump	L_cont.25461
-L_else.25463 : 
-	addi	r6 r0 1
-L_cont.25461 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-	jump	L_cont.25397
-L_else.25460 : 
-	fmul	f6 f3 f3
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f6 f6 f2
-	fmul	f7 f4 f4
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f7 f2
-	fadd	f7 f6 f2
-	fmul	f6 f5 f5
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f6 f2
-	fadd	f2 f7 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.25466
-	jump	L_cont.25464
-L_else.25466 : 
-	fmul	f7 f4 f5
-	ldi	r6 r8 9
-	fldi	f6 r6 0
-	fmul	f6 f7 f6
-	fadd	f6 f2 f6
-	fmul	f5 f5 f3
-	ldi	r6 r8 9
-	fldi	f2 r6 1
-	fmul	f2 f5 f2
-	fadd	f5 f6 f2
-	fmul	f3 f3 f4
-	ldi	r6 r8 9
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f2 f5 f2
-L_cont.25464 : 
-	ldi	r7 r8 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.25469
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.25467
-L_else.25469 : 
-L_cont.25467 : 
-	ldi	r7 r8 6
-	fbgt	f0 f2 L_else.25472
-	addi	r6 r0 0
-	jump	L_cont.25470
-L_else.25472 : 
-	addi	r6 r0 1
-L_cont.25470 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-L_cont.25397 : 
-	bne	r6 r0 L_else.25401
-	ldi	r6 r12 2
-	bne	r6 r5 L_else.25403
-	addi	r6 r0 1
-	jump	L_cont.25385
-L_else.25403 : 
-	ldi	r7 r6 1970
-	ldi	r6 r7 5
-	fldi	f2 r6 0
-	fsub	f2 f13 f2
-	ldi	r6 r7 5
-	fldi	f3 r6 1
-	fsub	f4 f12 f3
-	ldi	r6 r7 5
-	fldi	f3 r6 2
-	fsub	f5 f11 f3
-	ldi	r6 r7 1
-	bne	r6 r4 L_else.25406
-	fbgt	f0 f2 L_else.25411
-	jump	L_cont.25409
-L_else.25411 : 
-	fsub	f2 f0 f2
-L_cont.25409 : 
-	ldi	r6 r7 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.25414
-	addi	r6 r0 0
-	jump	L_cont.25412
-L_else.25414 : 
-	fbgt	f0 f4 L_else.25419
-	fadd	f2 f0 f4
-	jump	L_cont.25417
-L_else.25419 : 
-	fsub	f2 f0 f4
-L_cont.25417 : 
-	ldi	r6 r7 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.25421
-	addi	r6 r0 0
-	jump	L_cont.25412
-L_else.25421 : 
-	fbgt	f0 f5 L_else.25424
-	fadd	f2 f0 f5
-	jump	L_cont.25422
-L_else.25424 : 
-	fsub	f2 f0 f5
-L_cont.25422 : 
-	ldi	r6 r7 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.25426
-	addi	r6 r0 0
-	jump	L_cont.25412
-L_else.25426 : 
-	addi	r6 r0 1
-L_cont.25412 : 
-	bne	r6 r0 L_else.25416
-	ldi	r6 r7 6
-	sub	r6 r4 r6
-	jump	L_cont.25404
-L_else.25416 : 
-	ldi	r6 r7 6
-	jump	L_cont.25404
-L_else.25406 : 
-	addi	r8 r0 2
-	bne	r6 r8 L_else.25428
-	ldi	r6 r7 4
-	fldi	f3 r6 0
-	fmul	f3 f3 f2
-	fldi	f2 r6 1
-	fmul	f2 f2 f4
-	fadd	f3 f3 f2
-	fldi	f2 r6 2
-	fmul	f2 f2 f5
-	fadd	f2 f3 f2
-	ldi	r7 r7 6
-	fbgt	f0 f2 L_else.25431
-	addi	r6 r0 0
-	jump	L_cont.25429
-L_else.25431 : 
-	addi	r6 r0 1
-L_cont.25429 : 
-	xor	r6 r7 r6
-	sub	r6 r4 r6
-	jump	L_cont.25404
-L_else.25428 : 
-	fmul	f6 f2 f2
-	ldi	r6 r7 4
-	fldi	f3 r6 0
-	fmul	f7 f6 f3
-	fmul	f6 f4 f4
-	ldi	r6 r7 4
-	fldi	f3 r6 1
-	fmul	f3 f6 f3
-	fadd	f6 f7 f3
-	fmul	f7 f5 f5
-	ldi	r6 r7 4
-	fldi	f3 r6 2
-	fmul	f3 f7 f3
-	fadd	f3 f6 f3
-	ldi	r6 r7 3
-	bne	r6 r0 L_else.25434
-	fadd	f2 f0 f3
-	jump	L_cont.25432
-L_else.25434 : 
-	fmul	f7 f4 f5
-	ldi	r6 r7 9
-	fldi	f6 r6 0
-	fmul	f6 f7 f6
-	fadd	f6 f3 f6
-	fmul	f5 f5 f2
-	ldi	r6 r7 9
-	fldi	f3 r6 1
-	fmul	f3 f5 f3
-	fadd	f5 f6 f3
-	fmul	f3 f2 f4
-	ldi	r6 r7 9
-	fldi	f2 r6 2
-	fmul	f2 f3 f2
-	fadd	f2 f5 f2
-L_cont.25432 : 
-	ldi	r8 r7 1
-	addi	r6 r0 3
-	bne	r8 r6 L_else.25437
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.25435
-L_else.25437 : 
-L_cont.25435 : 
-	ldi	r6 r7 6
-	fbgt	f0 f2 L_else.25440
-	addi	r7 r0 0
-	jump	L_cont.25438
-L_else.25440 : 
-	addi	r7 r0 1
-L_cont.25438 : 
-	xor	r6 r6 r7
-	sub	r6 r4 r6
-L_cont.25404 : 
-	bne	r6 r0 L_else.25408
-	addi	r6 r0 3
-	add	r7 r0 r12
-	fadd	f2 f0 f13
-	fadd	f3 f0 f12
-	fadd	f4 f0 f11
-	call	L_check_all_inside.2173
-	jump	L_cont.25385
-L_else.25408 : 
-	addi	r6 r0 0
-	jump	L_cont.25385
-L_else.25401 : 
-	addi	r6 r0 0
-	jump	L_cont.25385
-L_else.25394 : 
-	addi	r6 r0 0
-L_cont.25385 : 
-	bne	r6 r0 L_else.25389
-	jump	L_cont.25380
-L_else.25389 : 
+	fadd	f13 f3 f2
+	add	r6 r0 r15
+	add	r7 r0 r15
+	fadd	f2 f0 f12
+	fadd	f3 f0 f11
+	fadd	f4 f0 f13
+	call	L_check_all_inside.2237
+	bne	r6 r0 L_else.21949
+	jump	L_cont.21943
+L_else.21949 : 
 	fsti	f14 r0 1082
-	fsti	f13 r0 1042
-	fsti	f12 r0 1043
-	fsti	f11 r0 1044
-	sti	r14 r0 1045
-	sti	r15 r0 1074
-L_cont.25380 : 
-	addi	r11 r11 1
-	jump	L_solve_each_element_fast.2202
-L_solve_one_or_network_fast.2206 : 
-	add	r1 r17 r16
+	fsti	f12 r0 1042
+	fsti	f11 r0 1043
+	fsti	f13 r0 1044
+	sti	r18 r0 1045
+	sti	r19 r0 1074
+L_cont.21943 : 
+	addi	r14 r14 1
+	jump	L_solve_each_element_fast.2266
+L_solve_one_or_network_fast.2270 : 
+	add	r1 r21 r20
 	ldi	r6 r1 0
-	bne	r6 r5 L_else.25566
+	bne	r6 r5 L_else.22011
 	return
-L_else.25566 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element_fast.2202
-	addi	r16 r16 1
-	add	r1 r17 r16
+L_else.22011 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r22
+	add	r17 r0 r23
+	call	L_solve_each_element_fast.2266
+	addi	r20 r20 1
+	add	r1 r21 r20
 	ldi	r6 r1 0
-	bne	r6 r5 L_else.25568
+	bne	r6 r5 L_else.22013
 	return
-L_else.25568 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element_fast.2202
-	addi	r16 r16 1
-	add	r1 r17 r16
+L_else.22013 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r22
+	add	r17 r0 r23
+	call	L_solve_each_element_fast.2266
+	addi	r20 r20 1
+	add	r1 r21 r20
 	ldi	r6 r1 0
-	bne	r6 r5 L_else.25570
+	bne	r6 r5 L_else.22015
 	return
-L_else.25570 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element_fast.2202
-	addi	r16 r16 1
-	add	r1 r17 r16
+L_else.22015 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r22
+	add	r17 r0 r23
+	call	L_solve_each_element_fast.2266
+	addi	r20 r20 1
+	add	r1 r21 r20
 	ldi	r6 r1 0
-	bne	r6 r5 L_else.25572
+	bne	r6 r5 L_else.22017
 	return
-L_else.25572 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element_fast.2202
-	addi	r16 r16 1
-	add	r1 r17 r16
+L_else.22017 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r22
+	add	r17 r0 r23
+	call	L_solve_each_element_fast.2266
+	addi	r20 r20 1
+	add	r1 r21 r20
 	ldi	r6 r1 0
-	bne	r6 r5 L_else.25574
+	bne	r6 r5 L_else.22019
 	return
-L_else.25574 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element_fast.2202
-	addi	r16 r16 1
-	add	r1 r17 r16
+L_else.22019 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r22
+	add	r17 r0 r23
+	call	L_solve_each_element_fast.2266
+	addi	r20 r20 1
+	add	r1 r21 r20
 	ldi	r6 r1 0
-	bne	r6 r5 L_else.25576
+	bne	r6 r5 L_else.22021
 	return
-L_else.25576 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element_fast.2202
-	addi	r16 r16 1
-	add	r1 r17 r16
+L_else.22021 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r22
+	add	r17 r0 r23
+	call	L_solve_each_element_fast.2266
+	addi	r20 r20 1
+	add	r1 r21 r20
 	ldi	r6 r1 0
-	bne	r6 r5 L_else.25578
+	bne	r6 r5 L_else.22023
 	return
-L_else.25578 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element_fast.2202
-	addi	r16 r16 1
-	add	r1 r17 r16
+L_else.22023 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r22
+	add	r17 r0 r23
+	call	L_solve_each_element_fast.2266
+	addi	r20 r20 1
+	add	r1 r21 r20
 	ldi	r6 r1 0
-	bne	r6 r5 L_else.25580
+	bne	r6 r5 L_else.22025
 	return
-L_else.25580 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r18
-	call	L_solve_each_element_fast.2202
-	addi	r16 r16 1
-	jump	L_solve_one_or_network_fast.2206
-L_trace_or_matrix_fast.2210 : 
-	add	r1 r20 r19
-	ldi	r17 r1 0
-	ldi	r7 r17 0
-	bne	r7 r5 L_else.25583
+L_else.22025 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r22
+	add	r17 r0 r23
+	call	L_solve_each_element_fast.2266
+	addi	r20 r20 1
+	jump	L_solve_one_or_network_fast.2270
+L_trace_or_matrix_fast.2274 : 
+	add	r1 r25 r24
+	ldi	r21 r1 0
+	ldi	r10 r21 0
+	bne	r10 r5 L_else.22028
 	return
-L_else.25583 : 
+L_else.22028 : 
 	addi	r6 r0 99
-	bne	r7 r6 L_else.25586
-	ldi	r6 r17 1
-	bne	r6 r5 L_else.25683
-	jump	L_cont.25584
-L_else.25683 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 2
-	bne	r6 r5 L_else.25685
-	jump	L_cont.25584
-L_else.25685 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 3
-	bne	r6 r5 L_else.25687
-	jump	L_cont.25584
-L_else.25687 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 4
-	bne	r6 r5 L_else.25689
-	jump	L_cont.25584
-L_else.25689 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 5
-	bne	r6 r5 L_else.25691
-	jump	L_cont.25584
-L_else.25691 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 6
-	bne	r6 r5 L_else.25693
-	jump	L_cont.25584
-L_else.25693 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 7
-	bne	r6 r5 L_else.25695
-	jump	L_cont.25584
-L_else.25695 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	addi	r16 r0 8
-	add	r18 r0 r21
-	call	L_solve_one_or_network_fast.2206
-	jump	L_cont.25584
-L_else.25586 : 
-	ldi	r10 r7 1970
-	ldi	r9 r10 10
-	fldi	f7 r9 0
-	fldi	f6 r9 1
-	fldi	f8 r9 2
+	bne	r10 r6 L_else.22031
 	ldi	r6 r21 1
-	add	r1 r6 r7
-	ldi	r8 r1 0
-	ldi	r7 r10 1
-	bne	r7 r4 L_else.25698
-	ldi	r7 r21 0
-	fldi	f2 r8 0
-	fsub	f3 f2 f7
-	fldi	f2 r8 1
-	fmul	f4 f3 f2
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.25719
-	jump	L_cont.25717
-L_else.25719 : 
+	bne	r6 r5 L_else.22128
+	jump	L_cont.22029
+L_else.22128 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 2
+	bne	r6 r5 L_else.22130
+	jump	L_cont.22029
+L_else.22130 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 3
+	bne	r6 r5 L_else.22132
+	jump	L_cont.22029
+L_else.22132 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 4
+	bne	r6 r5 L_else.22134
+	jump	L_cont.22029
+L_else.22134 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 5
+	bne	r6 r5 L_else.22136
+	jump	L_cont.22029
+L_else.22136 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 6
+	bne	r6 r5 L_else.22138
+	jump	L_cont.22029
+L_else.22138 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 7
+	bne	r6 r5 L_else.22140
+	jump	L_cont.22029
+L_else.22140 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	addi	r20 r0 8
+	add	r22 r0 r26
+	add	r23 r0 r27
+	call	L_solve_one_or_network_fast.2270
+	jump	L_cont.22029
+L_else.22031 : 
+	muli	r8 r10 11
+	ldi	r7 r8 1929
+	ldi	r6 r8 1925
+	ldi	r9 r8 1923
+	ldi	r8 r8 1920
+	fldi	f12 r7 0
+	fldi	f7 r7 1
+	fldi	f11 r7 2
+	add	r1 r27 r10
+	ldi	r10 r1 0
+	bne	r8 r4 L_else.22143
+	fldi	f2 r10 0
+	fsub	f2 f2 f12
+	fldi	f4 r10 1
+	fmul	f5 f2 f4
+	fldi	f8 r26 1
+	fmul	f2 f5 f8
+	fadd	f2 f2 f7
+	fbgt	f0 f2 L_else.22164
+	jump	L_cont.22162
+L_else.22164 : 
 	fsub	f2 f0 f2
-L_cont.25717 : 
-	ldi	r6 r10 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.25722
+L_cont.22162 : 
+	fldi	f10 r9 1
+	fbgt	f10 f2 L_else.22167
 	addi	r6 r0 0
-	jump	L_cont.25720
-L_else.25722 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f8
-	fbgt	f0 f2 L_else.25759
-	jump	L_cont.25757
-L_else.25759 : 
+	jump	L_cont.22165
+L_else.22167 : 
+	fldi	f2 r26 2
+	fmul	f2 f5 f2
+	fadd	f2 f2 f11
+	fbgt	f0 f2 L_else.22204
+	jump	L_cont.22202
+L_else.22204 : 
 	fsub	f2 f0 f2
-L_cont.25757 : 
-	ldi	r6 r10 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.25761
+L_cont.22202 : 
+	fldi	f3 r9 2
+	fbgt	f3 f2 L_else.22206
 	addi	r6 r0 0
-	jump	L_cont.25720
-L_else.25761 : 
-	fldi	f2 r8 1
-	fbne	f2 f0 L_else.25764
+	jump	L_cont.22165
+L_else.22206 : 
+	fbne	f4 f0 L_else.22209
 	addi	r6 r0 1
-	jump	L_cont.25762
-L_else.25764 : 
+	jump	L_cont.22207
+L_else.22209 : 
 	addi	r6 r0 0
-L_cont.25762 : 
+L_cont.22207 : 
 	sub	r6 r4 r6
-L_cont.25720 : 
-	bne	r6 r0 L_else.25724
-	fldi	f2 r8 2
-	fsub	f2 f2 f6
-	fldi	f3 r8 3
+L_cont.22165 : 
+	bne	r6 r0 L_else.22169
+	fldi	f2 r10 2
+	fsub	f2 f2 f7
+	fldi	f4 r10 3
+	fmul	f9 f2 f4
+	fldi	f5 r26 0
+	fmul	f2 f9 f5
+	fadd	f2 f2 f12
+	fbgt	f0 f2 L_else.22172
+	jump	L_cont.22170
+L_else.22172 : 
+	fsub	f2 f0 f2
+L_cont.22170 : 
+	fldi	f6 r9 0
+	fbgt	f6 f2 L_else.22175
+	addi	r6 r0 0
+	jump	L_cont.22173
+L_else.22175 : 
+	fldi	f2 r26 2
+	fmul	f2 f9 f2
+	fadd	f2 f2 f11
+	fbgt	f0 f2 L_else.22196
+	jump	L_cont.22194
+L_else.22196 : 
+	fsub	f2 f0 f2
+L_cont.22194 : 
+	fldi	f3 r9 2
+	fbgt	f3 f2 L_else.22198
+	addi	r6 r0 0
+	jump	L_cont.22173
+L_else.22198 : 
+	fbne	f4 f0 L_else.22201
+	addi	r6 r0 1
+	jump	L_cont.22199
+L_else.22201 : 
+	addi	r6 r0 0
+L_cont.22199 : 
+	sub	r6 r4 r6
+L_cont.22173 : 
+	bne	r6 r0 L_else.22177
+	fldi	f2 r10 4
+	fsub	f2 f2 f11
+	fldi	f3 r10 5
 	fmul	f4 f2 f3
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
+	fmul	f2 f4 f5
+	fadd	f2 f2 f12
+	fbgt	f0 f2 L_else.22180
+	jump	L_cont.22178
+L_else.22180 : 
+	fsub	f2 f0 f2
+L_cont.22178 : 
+	fbgt	f6 f2 L_else.22183
+	addi	r6 r0 0
+	jump	L_cont.22181
+L_else.22183 : 
+	fmul	f2 f4 f8
 	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25727
-	jump	L_cont.25725
-L_else.25727 : 
+	fbgt	f0 f2 L_else.22188
+	jump	L_cont.22186
+L_else.22188 : 
 	fsub	f2 f0 f2
-L_cont.25725 : 
-	ldi	r6 r10 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.25730
+L_cont.22186 : 
+	fbgt	f10 f2 L_else.22190
 	addi	r6 r0 0
-	jump	L_cont.25728
-L_else.25730 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f8
-	fbgt	f0 f2 L_else.25751
-	jump	L_cont.25749
-L_else.25751 : 
-	fsub	f2 f0 f2
-L_cont.25749 : 
-	ldi	r6 r10 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.25753
-	addi	r6 r0 0
-	jump	L_cont.25728
-L_else.25753 : 
-	fldi	f2 r8 3
-	fbne	f2 f0 L_else.25756
+	jump	L_cont.22181
+L_else.22190 : 
+	fbne	f3 f0 L_else.22193
 	addi	r6 r0 1
-	jump	L_cont.25754
-L_else.25756 : 
+	jump	L_cont.22191
+L_else.22193 : 
 	addi	r6 r0 0
-L_cont.25754 : 
+L_cont.22191 : 
 	sub	r6 r4 r6
-L_cont.25728 : 
-	bne	r6 r0 L_else.25732
-	fldi	f2 r8 4
-	fsub	f3 f2 f8
-	fldi	f2 r8 5
-	fmul	f4 f3 f2
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25735
-	jump	L_cont.25733
-L_else.25735 : 
-	fsub	f2 f0 f2
-L_cont.25733 : 
-	ldi	r6 r10 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.25738
+L_cont.22181 : 
+	bne	r6 r0 L_else.22185
 	addi	r6 r0 0
-	jump	L_cont.25736
-L_else.25738 : 
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.25743
-	jump	L_cont.25741
-L_else.25743 : 
-	fsub	f2 f0 f2
-L_cont.25741 : 
-	ldi	r6 r10 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.25745
-	addi	r6 r0 0
-	jump	L_cont.25736
-L_else.25745 : 
-	fldi	f2 r8 5
-	fbne	f2 f0 L_else.25748
-	addi	r6 r0 1
-	jump	L_cont.25746
-L_else.25748 : 
-	addi	r6 r0 0
-L_cont.25746 : 
-	sub	r6 r4 r6
-L_cont.25736 : 
-	bne	r6 r0 L_else.25740
-	addi	r6 r0 0
-	jump	L_cont.25696
-L_else.25740 : 
+	jump	L_cont.22141
+L_else.22185 : 
 	fsti	f4 r0 1073
 	addi	r6 r0 3
-	jump	L_cont.25696
-L_else.25732 : 
-	fsti	f4 r0 1073
+	jump	L_cont.22141
+L_else.22177 : 
+	fsti	f9 r0 1073
 	addi	r6 r0 2
-	jump	L_cont.25696
-L_else.25724 : 
-	fsti	f4 r0 1073
+	jump	L_cont.22141
+L_else.22169 : 
+	fsti	f5 r0 1073
 	addi	r6 r0 1
-	jump	L_cont.25696
-L_else.25698 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.25766
-	fldi	f2 r8 0
-	fbgt	f0 f2 L_else.25768
+	jump	L_cont.22141
+L_else.22143 : 
+	addi	r9 r0 2
+	bne	r8 r9 L_else.22211
+	fldi	f3 r10 0
+	fbgt	f0 f3 L_else.22213
 	addi	r6 r0 0
-	jump	L_cont.25696
-L_else.25768 : 
-	fldi	f2 r8 0
-	fldi	f3 r9 3
-	fmul	f2 f2 f3
-	fsti	f2 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.25696
-L_else.25766 : 
-	fldi	f5 r8 0
-	fbne	f5 f0 L_else.25770
-	addi	r6 r0 0
-	jump	L_cont.25696
-L_else.25770 : 
-	fldi	f2 r8 1
-	fmul	f3 f2 f7
-	fldi	f2 r8 2
-	fmul	f2 f2 f6
-	fadd	f3 f3 f2
-	fldi	f2 r8 3
-	fmul	f2 f2 f8
-	fadd	f4 f3 f2
-	fldi	f3 r9 3
-	fmul	f2 f4 f4
-	fmul	f3 f5 f3
-	fsub	f2 f2 f3
-	fbgt	f2 f0 L_else.25772
-	addi	r6 r0 0
-	jump	L_cont.25696
-L_else.25772 : 
-	ldi	r6 r10 6
-	bne	r6 r0 L_else.25775
-	fsqrt	f2 f2
-	fsub	f3 f4 f2
-	fldi	f2 r8 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-	jump	L_cont.25773
-L_else.25775 : 
-	fsqrt	f2 f2
-	fadd	f3 f4 f2
-	fldi	f2 r8 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-L_cont.25773 : 
-	addi	r6 r0 1
-L_cont.25696 : 
-	bne	r6 r0 L_else.25700
-	jump	L_cont.25584
-L_else.25700 : 
-	fldi	f2 r0 1073
-	fldi	f3 r0 1082
-	fbgt	f3 f2 L_else.25702
-	jump	L_cont.25584
-L_else.25702 : 
-	ldi	r6 r17 1
-	bne	r6 r5 L_else.25704
-	jump	L_cont.25584
-L_else.25704 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 2
-	bne	r6 r5 L_else.25706
-	jump	L_cont.25584
-L_else.25706 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 3
-	bne	r6 r5 L_else.25708
-	jump	L_cont.25584
-L_else.25708 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 4
-	bne	r6 r5 L_else.25710
-	jump	L_cont.25584
-L_else.25710 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 5
-	bne	r6 r5 L_else.25712
-	jump	L_cont.25584
-L_else.25712 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 6
-	bne	r6 r5 L_else.25714
-	jump	L_cont.25584
-L_else.25714 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 7
-	bne	r6 r5 L_else.25716
-	jump	L_cont.25584
-L_else.25716 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	addi	r16 r0 8
-	add	r18 r0 r21
-	call	L_solve_one_or_network_fast.2206
-L_cont.25584 : 
-	addi	r19 r19 1
-	add	r1 r20 r19
-	ldi	r17 r1 0
-	ldi	r7 r17 0
-	bne	r7 r5 L_else.25588
-	return
-L_else.25588 : 
-	addi	r6 r0 99
-	bne	r7 r6 L_else.25591
-	ldi	r6 r17 1
-	bne	r6 r5 L_else.25593
-	jump	L_cont.25589
-L_else.25593 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 2
-	bne	r6 r5 L_else.25595
-	jump	L_cont.25589
-L_else.25595 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 3
-	bne	r6 r5 L_else.25597
-	jump	L_cont.25589
-L_else.25597 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 4
-	bne	r6 r5 L_else.25599
-	jump	L_cont.25589
-L_else.25599 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 5
-	bne	r6 r5 L_else.25601
-	jump	L_cont.25589
-L_else.25601 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 6
-	bne	r6 r5 L_else.25603
-	jump	L_cont.25589
-L_else.25603 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	addi	r16 r0 7
-	add	r18 r0 r21
-	call	L_solve_one_or_network_fast.2206
-	jump	L_cont.25589
-L_else.25591 : 
-	ldi	r9 r7 1970
-	ldi	r10 r9 10
-	fldi	f8 r10 0
-	fldi	f6 r10 1
-	fldi	f7 r10 2
-	ldi	r6 r21 1
-	add	r1 r6 r7
-	ldi	r8 r1 0
-	ldi	r7 r9 1
-	bne	r7 r4 L_else.25606
-	ldi	r7 r21 0
-	fldi	f2 r8 0
-	fsub	f2 f2 f8
-	fldi	f3 r8 1
-	fmul	f4 f2 f3
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.25625
-	jump	L_cont.25623
-L_else.25625 : 
-	fsub	f2 f0 f2
-L_cont.25623 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.25628
-	addi	r6 r0 0
-	jump	L_cont.25626
-L_else.25628 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25665
-	jump	L_cont.25663
-L_else.25665 : 
-	fsub	f2 f0 f2
-L_cont.25663 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.25667
-	addi	r6 r0 0
-	jump	L_cont.25626
-L_else.25667 : 
-	fldi	f2 r8 1
-	fbne	f2 f0 L_else.25670
-	addi	r6 r0 1
-	jump	L_cont.25668
-L_else.25670 : 
-	addi	r6 r0 0
-L_cont.25668 : 
-	sub	r6 r4 r6
-L_cont.25626 : 
-	bne	r6 r0 L_else.25630
-	fldi	f2 r8 2
-	fsub	f2 f2 f6
-	fldi	f3 r8 3
-	fmul	f4 f2 f3
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f8
-	fbgt	f0 f2 L_else.25633
-	jump	L_cont.25631
-L_else.25633 : 
-	fsub	f2 f0 f2
-L_cont.25631 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.25636
-	addi	r6 r0 0
-	jump	L_cont.25634
-L_else.25636 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25657
-	jump	L_cont.25655
-L_else.25657 : 
-	fsub	f2 f0 f2
-L_cont.25655 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.25659
-	addi	r6 r0 0
-	jump	L_cont.25634
-L_else.25659 : 
-	fldi	f2 r8 3
-	fbne	f2 f0 L_else.25662
-	addi	r6 r0 1
-	jump	L_cont.25660
-L_else.25662 : 
-	addi	r6 r0 0
-L_cont.25660 : 
-	sub	r6 r4 r6
-L_cont.25634 : 
-	bne	r6 r0 L_else.25638
-	fldi	f2 r8 4
-	fsub	f3 f2 f7
-	fldi	f2 r8 5
-	fmul	f4 f3 f2
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f8
-	fbgt	f0 f2 L_else.25641
-	jump	L_cont.25639
-L_else.25641 : 
-	fsub	f2 f0 f2
-L_cont.25639 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.25644
-	addi	r6 r0 0
-	jump	L_cont.25642
-L_else.25644 : 
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.25649
-	jump	L_cont.25647
-L_else.25649 : 
-	fsub	f2 f0 f2
-L_cont.25647 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.25651
-	addi	r6 r0 0
-	jump	L_cont.25642
-L_else.25651 : 
-	fldi	f2 r8 5
-	fbne	f2 f0 L_else.25654
-	addi	r6 r0 1
-	jump	L_cont.25652
-L_else.25654 : 
-	addi	r6 r0 0
-L_cont.25652 : 
-	sub	r6 r4 r6
-L_cont.25642 : 
-	bne	r6 r0 L_else.25646
-	addi	r6 r0 0
-	jump	L_cont.25604
-L_else.25646 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 3
-	jump	L_cont.25604
-L_else.25638 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 2
-	jump	L_cont.25604
-L_else.25630 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.25604
-L_else.25606 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.25672
-	fldi	f2 r8 0
-	fbgt	f0 f2 L_else.25674
-	addi	r6 r0 0
-	jump	L_cont.25604
-L_else.25674 : 
-	fldi	f3 r8 0
-	fldi	f2 r10 3
+	jump	L_cont.22141
+L_else.22213 : 
+	fldi	f2 r7 3
 	fmul	f2 f3 f2
 	fsti	f2 r0 1073
 	addi	r6 r0 1
-	jump	L_cont.25604
-L_else.25672 : 
-	fldi	f5 r8 0
-	fbne	f5 f0 L_else.25676
+	jump	L_cont.22141
+L_else.22211 : 
+	fldi	f5 r10 0
+	fbne	f5 f0 L_else.22215
 	addi	r6 r0 0
-	jump	L_cont.25604
-L_else.25676 : 
-	fldi	f2 r8 1
-	fmul	f3 f2 f8
-	fldi	f2 r8 2
-	fmul	f2 f2 f6
-	fadd	f3 f3 f2
-	fldi	f2 r8 3
+	jump	L_cont.22141
+L_else.22215 : 
+	fldi	f2 r10 1
+	fmul	f3 f2 f12
+	fldi	f2 r10 2
 	fmul	f2 f2 f7
-	fadd	f4 f3 f2
+	fadd	f3 f3 f2
 	fldi	f2 r10 3
+	fmul	f2 f2 f11
+	fadd	f4 f3 f2
+	fldi	f2 r7 3
 	fmul	f3 f4 f4
 	fmul	f2 f5 f2
 	fsub	f2 f3 f2
-	fbgt	f2 f0 L_else.25678
+	fbgt	f2 f0 L_else.22217
 	addi	r6 r0 0
-	jump	L_cont.25604
-L_else.25678 : 
-	ldi	r6 r9 6
-	bne	r6 r0 L_else.25681
+	jump	L_cont.22141
+L_else.22217 : 
+	bne	r6 r0 L_else.22220
 	fsqrt	f2 f2
 	fsub	f3 f4 f2
-	fldi	f2 r8 4
+	fldi	f2 r10 4
 	fmul	f2 f3 f2
 	fsti	f2 r0 1073
-	jump	L_cont.25679
-L_else.25681 : 
+	jump	L_cont.22218
+L_else.22220 : 
 	fsqrt	f2 f2
 	fadd	f3 f4 f2
-	fldi	f2 r8 4
+	fldi	f2 r10 4
 	fmul	f2 f3 f2
 	fsti	f2 r0 1073
-L_cont.25679 : 
+L_cont.22218 : 
 	addi	r6 r0 1
-L_cont.25604 : 
-	bne	r6 r0 L_else.25608
-	jump	L_cont.25589
-L_else.25608 : 
+L_cont.22141 : 
+	bne	r6 r0 L_else.22145
+	jump	L_cont.22029
+L_else.22145 : 
 	fldi	f3 r0 1073
 	fldi	f2 r0 1082
-	fbgt	f2 f3 L_else.25610
-	jump	L_cont.25589
-L_else.25610 : 
-	ldi	r6 r17 1
-	bne	r6 r5 L_else.25612
-	jump	L_cont.25589
-L_else.25612 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 2
-	bne	r6 r5 L_else.25614
-	jump	L_cont.25589
-L_else.25614 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 3
-	bne	r6 r5 L_else.25616
-	jump	L_cont.25589
-L_else.25616 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 4
-	bne	r6 r5 L_else.25618
-	jump	L_cont.25589
-L_else.25618 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 5
-	bne	r6 r5 L_else.25620
-	jump	L_cont.25589
-L_else.25620 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 6
-	bne	r6 r5 L_else.25622
-	jump	L_cont.25589
-L_else.25622 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r21
-	call	L_solve_each_element_fast.2202
-	addi	r16 r0 7
-	add	r18 r0 r21
-	call	L_solve_one_or_network_fast.2206
-L_cont.25589 : 
-	addi	r19 r19 1
-	jump	L_trace_or_matrix_fast.2210
-L_utexture.2225 : 
-	ldi	r9 r6 0
-	ldi	r8 r6 8
-	fldi	f2 r8 0
-	fsti	f2 r0 1049
-	ldi	r8 r6 8
-	fldi	f2 r8 1
-	fsti	f2 r0 1050
-	ldi	r8 r6 8
-	fldi	f2 r8 2
-	fsti	f2 r0 1051
-	bne	r9 r4 L_else.25778
-	fldi	f3 r7 0
-	ldi	r8 r6 5
-	fldi	f2 r8 0
-	fsub	f4 f3 f2
-	fldi	f2 r0 35
-	fmul	f2 f4 f2
-	flr	f2 f2
-	fldi	f3 r0 36
-	fmul	f2 f2 f3
-	fsub	f6 f4 f2
-	fldi	f5 r0 37
+	fbgt	f2 f3 L_else.22147
+	jump	L_cont.22029
+L_else.22147 : 
+	ldi	r6 r21 1
+	bne	r6 r5 L_else.22149
+	jump	L_cont.22029
+L_else.22149 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 2
+	bne	r6 r5 L_else.22151
+	jump	L_cont.22029
+L_else.22151 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 3
+	bne	r6 r5 L_else.22153
+	jump	L_cont.22029
+L_else.22153 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 4
+	bne	r6 r5 L_else.22155
+	jump	L_cont.22029
+L_else.22155 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 5
+	bne	r6 r5 L_else.22157
+	jump	L_cont.22029
+L_else.22157 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 6
+	bne	r6 r5 L_else.22159
+	jump	L_cont.22029
+L_else.22159 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 7
+	bne	r6 r5 L_else.22161
+	jump	L_cont.22029
+L_else.22161 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	addi	r20 r0 8
+	add	r22 r0 r26
+	add	r23 r0 r27
+	call	L_solve_one_or_network_fast.2270
+L_cont.22029 : 
+	addi	r24 r24 1
+	add	r1 r25 r24
+	ldi	r21 r1 0
+	ldi	r11 r21 0
+	bne	r11 r5 L_else.22033
+	return
+L_else.22033 : 
+	addi	r6 r0 99
+	bne	r11 r6 L_else.22036
+	ldi	r6 r21 1
+	bne	r6 r5 L_else.22038
+	jump	L_cont.22034
+L_else.22038 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 2
+	bne	r6 r5 L_else.22040
+	jump	L_cont.22034
+L_else.22040 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 3
+	bne	r6 r5 L_else.22042
+	jump	L_cont.22034
+L_else.22042 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 4
+	bne	r6 r5 L_else.22044
+	jump	L_cont.22034
+L_else.22044 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 5
+	bne	r6 r5 L_else.22046
+	jump	L_cont.22034
+L_else.22046 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 6
+	bne	r6 r5 L_else.22048
+	jump	L_cont.22034
+L_else.22048 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	addi	r20 r0 7
+	add	r22 r0 r26
+	add	r23 r0 r27
+	call	L_solve_one_or_network_fast.2270
+	jump	L_cont.22034
+L_else.22036 : 
+	muli	r6 r11 11
+	ldi	r10 r6 1929
+	ldi	r8 r6 1925
+	ldi	r7 r6 1923
+	ldi	r6 r6 1920
+	add	r9 r0 r6
+	add	r6 r0 r10
+	fldi	f8 r6 0
+	fldi	f7 r6 1
+	fldi	f11 r6 2
+	add	r1 r27 r11
+	ldi	r10 r1 0
+	bne	r9 r4 L_else.22051
+	fldi	f2 r10 0
+	fsub	f2 f2 f8
+	fldi	f4 r10 1
+	fmul	f5 f2 f4
+	fldi	f12 r26 1
+	fmul	f2 f5 f12
+	fadd	f2 f2 f7
+	fbgt	f0 f2 L_else.22070
+	jump	L_cont.22068
+L_else.22070 : 
+	fsub	f2 f0 f2
+L_cont.22068 : 
+	fldi	f10 r7 1
+	fbgt	f10 f2 L_else.22073
+	addi	r6 r0 0
+	jump	L_cont.22071
+L_else.22073 : 
+	fldi	f2 r26 2
+	fmul	f2 f5 f2
+	fadd	f2 f2 f11
+	fbgt	f0 f2 L_else.22110
+	jump	L_cont.22108
+L_else.22110 : 
+	fsub	f2 f0 f2
+L_cont.22108 : 
 	fldi	f3 r7 2
-	ldi	r6 r6 5
-	fldi	f2 r6 2
-	fsub	f4 f3 f2
-	fldi	f2 r0 35
-	fmul	f2 f4 f2
-	flr	f3 f2
-	fldi	f2 r0 36
+	fbgt	f3 f2 L_else.22112
+	addi	r6 r0 0
+	jump	L_cont.22071
+L_else.22112 : 
+	fbne	f4 f0 L_else.22115
+	addi	r6 r0 1
+	jump	L_cont.22113
+L_else.22115 : 
+	addi	r6 r0 0
+L_cont.22113 : 
+	sub	r6 r4 r6
+L_cont.22071 : 
+	bne	r6 r0 L_else.22075
+	fldi	f2 r10 2
+	fsub	f2 f2 f7
+	fldi	f4 r10 3
+	fmul	f9 f2 f4
+	fldi	f5 r26 0
+	fmul	f2 f9 f5
+	fadd	f2 f2 f8
+	fbgt	f0 f2 L_else.22078
+	jump	L_cont.22076
+L_else.22078 : 
+	fsub	f2 f0 f2
+L_cont.22076 : 
+	fldi	f6 r7 0
+	fbgt	f6 f2 L_else.22081
+	addi	r6 r0 0
+	jump	L_cont.22079
+L_else.22081 : 
+	fldi	f2 r26 2
+	fmul	f2 f9 f2
+	fadd	f2 f2 f11
+	fbgt	f0 f2 L_else.22102
+	jump	L_cont.22100
+L_else.22102 : 
+	fsub	f2 f0 f2
+L_cont.22100 : 
+	fldi	f3 r7 2
+	fbgt	f3 f2 L_else.22104
+	addi	r6 r0 0
+	jump	L_cont.22079
+L_else.22104 : 
+	fbne	f4 f0 L_else.22107
+	addi	r6 r0 1
+	jump	L_cont.22105
+L_else.22107 : 
+	addi	r6 r0 0
+L_cont.22105 : 
+	sub	r6 r4 r6
+L_cont.22079 : 
+	bne	r6 r0 L_else.22083
+	fldi	f2 r10 4
+	fsub	f2 f2 f11
+	fldi	f3 r10 5
+	fmul	f4 f2 f3
+	fmul	f2 f4 f5
+	fadd	f2 f2 f8
+	fbgt	f0 f2 L_else.22086
+	jump	L_cont.22084
+L_else.22086 : 
+	fsub	f2 f0 f2
+L_cont.22084 : 
+	fbgt	f6 f2 L_else.22089
+	addi	r6 r0 0
+	jump	L_cont.22087
+L_else.22089 : 
+	fmul	f2 f4 f12
+	fadd	f2 f2 f7
+	fbgt	f0 f2 L_else.22094
+	jump	L_cont.22092
+L_else.22094 : 
+	fsub	f2 f0 f2
+L_cont.22092 : 
+	fbgt	f10 f2 L_else.22096
+	addi	r6 r0 0
+	jump	L_cont.22087
+L_else.22096 : 
+	fbne	f3 f0 L_else.22099
+	addi	r6 r0 1
+	jump	L_cont.22097
+L_else.22099 : 
+	addi	r6 r0 0
+L_cont.22097 : 
+	sub	r6 r4 r6
+L_cont.22087 : 
+	bne	r6 r0 L_else.22091
+	addi	r6 r0 0
+	jump	L_cont.22049
+L_else.22091 : 
+	fsti	f4 r0 1073
+	addi	r6 r0 3
+	jump	L_cont.22049
+L_else.22083 : 
+	fsti	f9 r0 1073
+	addi	r6 r0 2
+	jump	L_cont.22049
+L_else.22075 : 
+	fsti	f5 r0 1073
+	addi	r6 r0 1
+	jump	L_cont.22049
+L_else.22051 : 
+	addi	r7 r0 2
+	bne	r9 r7 L_else.22117
+	fldi	f3 r10 0
+	fbgt	f0 f3 L_else.22119
+	addi	r6 r0 0
+	jump	L_cont.22049
+L_else.22119 : 
+	fldi	f2 r6 3
 	fmul	f2 f3 f2
+	fsti	f2 r0 1073
+	addi	r6 r0 1
+	jump	L_cont.22049
+L_else.22117 : 
+	fldi	f5 r10 0
+	fbne	f5 f0 L_else.22121
+	addi	r6 r0 0
+	jump	L_cont.22049
+L_else.22121 : 
+	fldi	f2 r10 1
+	fmul	f3 f2 f8
+	fldi	f2 r10 2
+	fmul	f2 f2 f7
+	fadd	f3 f3 f2
+	fldi	f2 r10 3
+	fmul	f2 f2 f11
+	fadd	f4 f3 f2
+	fldi	f2 r6 3
+	fmul	f3 f4 f4
+	fmul	f2 f5 f2
+	fsub	f2 f3 f2
+	fbgt	f2 f0 L_else.22123
+	addi	r6 r0 0
+	jump	L_cont.22049
+L_else.22123 : 
+	bne	r8 r0 L_else.22126
+	fsqrt	f2 f2
 	fsub	f3 f4 f2
-	fldi	f2 r0 37
-	fbgt	f5 f6 L_else.25781
-	fbgt	f2 f3 L_else.25783
+	fldi	f2 r10 4
+	fmul	f2 f3 f2
+	fsti	f2 r0 1073
+	jump	L_cont.22124
+L_else.22126 : 
+	fsqrt	f2 f2
+	fadd	f3 f4 f2
+	fldi	f2 r10 4
+	fmul	f2 f3 f2
+	fsti	f2 r0 1073
+L_cont.22124 : 
+	addi	r6 r0 1
+L_cont.22049 : 
+	bne	r6 r0 L_else.22053
+	jump	L_cont.22034
+L_else.22053 : 
+	fldi	f3 r0 1073
+	fldi	f2 r0 1082
+	fbgt	f2 f3 L_else.22055
+	jump	L_cont.22034
+L_else.22055 : 
+	ldi	r6 r21 1
+	bne	r6 r5 L_else.22057
+	jump	L_cont.22034
+L_else.22057 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 2
+	bne	r6 r5 L_else.22059
+	jump	L_cont.22034
+L_else.22059 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 3
+	bne	r6 r5 L_else.22061
+	jump	L_cont.22034
+L_else.22061 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 4
+	bne	r6 r5 L_else.22063
+	jump	L_cont.22034
+L_else.22063 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 5
+	bne	r6 r5 L_else.22065
+	jump	L_cont.22034
+L_else.22065 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	ldi	r6 r21 6
+	bne	r6 r5 L_else.22067
+	jump	L_cont.22034
+L_else.22067 : 
+	ldi	r14 r6 1083
+	add	r15 r0 r14
+	add	r16 r0 r26
+	add	r17 r0 r27
+	call	L_solve_each_element_fast.2266
+	addi	r20 r0 7
+	add	r22 r0 r26
+	add	r23 r0 r27
+	call	L_solve_one_or_network_fast.2270
+L_cont.22034 : 
+	addi	r24 r24 1
+	jump	L_trace_or_matrix_fast.2274
+L_utexture.2289 : 
+	fldi	f2 r9 0
+	fsti	f2 r0 1049
+	fldi	f2 r9 1
+	fsti	f2 r0 1050
+	fldi	f2 r9 2
+	fsti	f2 r0 1051
+	bne	r6 r4 L_else.22223
+	fldi	f2 r10 0
+	fldi	f3 r8 0
+	fsub	f3 f2 f3
+	fldi	f7 r0 35
+	fmul	f2 f3 f7
+	flr	f2 f2
+	fldi	f5 r0 36
+	fmul	f2 f2 f5
+	fsub	f4 f3 f2
+	fldi	f6 r0 37
+	fldi	f2 r10 2
+	fldi	f3 r8 2
+	fsub	f3 f2 f3
+	fmul	f2 f3 f7
+	flr	f2 f2
+	fmul	f2 f2 f5
+	fsub	f2 f3 f2
+	fbgt	f6 f4 L_else.22226
+	fbgt	f6 f2 L_else.22228
 	fldi	f2 r0 38
-	jump	L_cont.25779
-L_else.25783 : 
-	fldi	f2 r0 29
-	jump	L_cont.25779
-L_else.25781 : 
-	fbgt	f2 f3 L_else.25785
-	fldi	f2 r0 29
-	jump	L_cont.25779
-L_else.25785 : 
+	jump	L_cont.22224
+L_else.22228 : 
+	fldi	f2 r0 30
+	jump	L_cont.22224
+L_else.22226 : 
+	fbgt	f6 f2 L_else.22230
+	fldi	f2 r0 30
+	jump	L_cont.22224
+L_else.22230 : 
 	fldi	f2 r0 38
-L_cont.25779 : 
+L_cont.22224 : 
 	fsti	f2 r0 1050
 	return
-L_else.25778 : 
-	addi	r8 r0 2
-	bne	r9 r8 L_else.25787
-	fldi	f2 r7 1
+L_else.22223 : 
+	addi	r9 r0 2
+	bne	r6 r9 L_else.22232
+	fldi	f2 r10 1
 	fldi	f3 r0 39
 	fmul	f2 f2 f3
-	call	L_sin.1878
-	fmul	f4 f2 f2
+	call	L_sin.1942
+	fmul	f3 f2 f2
 	fldi	f2 r0 38
-	fmul	f2 f2 f4
+	fmul	f2 f2 f3
 	fsti	f2 r0 1049
-	fldi	f3 r0 38
+	fldi	f4 r0 38
 	fldi	f2 r0 12
-	fsub	f2 f2 f4
-	fmul	f2 f3 f2
+	fsub	f2 f2 f3
+	fmul	f2 f4 f2
 	fsti	f2 r0 1050
 	return
-L_else.25787 : 
-	addi	r8 r0 3
-	bne	r9 r8 L_else.25789
-	fldi	f3 r7 0
-	ldi	r8 r6 5
-	fldi	f2 r8 0
-	fsub	f4 f3 f2
-	fldi	f3 r7 2
-	ldi	r6 r6 5
-	fldi	f2 r6 2
-	fsub	f3 f3 f2
-	fmul	f2 f4 f4
-	fmul	f3 f3 f3
+L_else.22232 : 
+	addi	r9 r0 3
+	bne	r6 r9 L_else.22234
+	fldi	f2 r10 0
+	fldi	f3 r8 0
+	fsub	f3 f2 f3
+	fldi	f4 r10 2
+	fldi	f2 r8 2
+	fsub	f4 f4 f2
+	fmul	f2 f3 f3
+	fmul	f3 f4 f4
 	fadd	f2 f2 f3
 	fsqrt	f3 f2
 	fldi	f2 r0 37
@@ -7665,7 +4764,7 @@ L_else.25787 :
 	fsub	f3 f3 f2
 	fldi	f2 r0 40
 	fmul	f2 f3 f2
-	call	L_cos.1880
+	call	L_cos.1944
 	fmul	f3 f2 f2
 	fldi	f2 r0 38
 	fmul	f2 f3 f2
@@ -7676,644 +4775,187 @@ L_else.25787 :
 	fmul	f2 f3 f2
 	fsti	f2 r0 1051
 	return
-L_else.25789 : 
-	addi	r8 r0 4
-	bne	r9 r8 L_else.25791
-	fldi	f3 r7 0
-	ldi	r8 r6 5
-	fldi	f2 r8 0
-	fsub	f3 f3 f2
-	ldi	r8 r6 4
-	fldi	f2 r8 0
+L_else.22234 : 
+	addi	r9 r0 4
+	bne	r6 r9 L_else.22236
+	fldi	f2 r10 0
+	fldi	f3 r8 0
+	fsub	f3 f2 f3
+	fldi	f2 r7 0
 	fsqrt	f2 f2
-	fmul	f3 f3 f2
-	fldi	f4 r7 2
-	ldi	r8 r6 5
-	fldi	f2 r8 2
-	fsub	f4 f4 f2
-	ldi	r8 r6 4
-	fldi	f2 r8 2
-	fsqrt	f2 f2
-	fmul	f5 f4 f2
-	fmul	f4 f3 f3
-	fmul	f2 f5 f5
-	fadd	f15 f4 f2
-	fbgt	f0 f3 L_else.25794
-	fadd	f2 f0 f3
-	jump	L_cont.25792
-L_else.25794 : 
-	fsub	f2 f0 f3
-L_cont.25792 : 
+	fmul	f2 f3 f2
+	fldi	f3 r10 2
+	fldi	f4 r8 2
+	fsub	f4 f3 f4
+	fldi	f3 r7 2
+	fsqrt	f3 f3
+	fmul	f5 f4 f3
+	fmul	f3 f2 f2
+	fmul	f4 f5 f5
+	fadd	f15 f3 f4
+	fbgt	f0 f2 L_else.22239
+	fadd	f3 f0 f2
+	jump	L_cont.22237
+L_else.22239 : 
+	fsub	f3 f0 f2
+L_cont.22237 : 
 	fldi	f4 r0 41
-	fbgt	f4 f2 L_else.25797
-	fdiv	f2 f5 f3
-	fbgt	f0 f2 L_else.25812
-	jump	L_cont.25810
-L_else.25812 : 
+	fbgt	f4 f3 L_else.22242
+	fdiv	f2 f5 f2
+	fbgt	f0 f2 L_else.22257
+	jump	L_cont.22255
+L_else.22257 : 
 	fsub	f2 f0 f2
-L_cont.25810 : 
-	call	L_atan.1882
-	fldi	f3 r0 42
-	fmul	f3 f2 f3
-	fldi	f2 r0 40
-	fdiv	f3 f3 f2
-	jump	L_cont.25795
-L_else.25797 : 
-	fldi	f3 r0 43
-L_cont.25795 : 
-	flr	f2 f3
-	fsub	f16 f3 f2
-	fldi	f3 r7 1
-	ldi	r7 r6 5
-	fldi	f2 r7 1
-	fsub	f3 f3 f2
-	ldi	r6 r6 4
-	fldi	f2 r6 1
-	fsqrt	f2 f2
-	fmul	f4 f3 f2
-	fbgt	f0 f15 L_else.25800
-	fadd	f2 f0 f15
-	jump	L_cont.25798
-L_else.25800 : 
-	fsub	f2 f0 f15
-L_cont.25798 : 
-	fldi	f3 r0 41
-	fbgt	f3 f2 L_else.25803
-	fdiv	f2 f4 f15
-	fbgt	f0 f2 L_else.25809
-	jump	L_cont.25807
-L_else.25809 : 
-	fsub	f2 f0 f2
-L_cont.25807 : 
-	call	L_atan.1882
+L_cont.22255 : 
+	call	L_atan.1946
 	fldi	f3 r0 42
 	fmul	f2 f2 f3
 	fldi	f3 r0 40
 	fdiv	f2 f2 f3
-	jump	L_cont.25801
-L_else.25803 : 
+	jump	L_cont.22240
+L_else.22242 : 
 	fldi	f2 r0 43
-L_cont.25801 : 
+L_cont.22240 : 
 	flr	f3 f2
-	fsub	f3 f2 f3
-	fldi	f4 r0 44
-	fldi	f2 r0 11
-	fsub	f2 f2 f16
+	fsub	f16 f2 f3
+	fldi	f3 r10 1
+	fldi	f2 r8 1
+	fsub	f3 f3 f2
+	fldi	f2 r7 1
+	fsqrt	f2 f2
+	fmul	f3 f3 f2
+	fbgt	f0 f15 L_else.22245
+	fadd	f2 f0 f15
+	jump	L_cont.22243
+L_else.22245 : 
+	fsub	f2 f0 f15
+L_cont.22243 : 
+	fldi	f4 r0 41
+	fbgt	f4 f2 L_else.22248
+	fdiv	f2 f3 f15
+	fbgt	f0 f2 L_else.22254
+	jump	L_cont.22252
+L_else.22254 : 
+	fsub	f2 f0 f2
+L_cont.22252 : 
+	call	L_atan.1946
+	fldi	f3 r0 42
+	fmul	f3 f2 f3
+	fldi	f2 r0 40
+	fdiv	f3 f3 f2
+	jump	L_cont.22246
+L_else.22248 : 
+	fldi	f3 r0 43
+L_cont.22246 : 
+	flr	f2 f3
+	fsub	f5 f3 f2
+	fldi	f3 r0 44
+	fldi	f4 r0 11
+	fsub	f2 f4 f16
 	fmul	f2 f2 f2
-	fsub	f4 f4 f2
-	fldi	f2 r0 11
-	fsub	f2 f2 f3
+	fsub	f3 f3 f2
+	fsub	f2 f4 f5
 	fmul	f2 f2 f2
-	fsub	f2 f4 f2
-	fbgt	f0 f2 L_else.25806
-	jump	L_cont.25804
-L_else.25806 : 
-	fldi	f2 r0 29
-L_cont.25804 : 
+	fsub	f2 f3 f2
+	fbgt	f0 f2 L_else.22251
+	jump	L_cont.22249
+L_else.22251 : 
+	fldi	f2 r0 30
+L_cont.22249 : 
 	fldi	f3 r0 38
 	fmul	f2 f3 f2
 	fldi	f3 r0 45
 	fdiv	f2 f2 f3
 	fsti	f2 r0 1051
 	return
-L_else.25791 : 
+L_else.22236 : 
 	return
-L_trace_reflections.2232 : 
-	bgt	r0 r22 L_else.25815
-	ldi	r25 r22 1185
-	ldi	r24 r25 1
+L_trace_reflections.2296 : 
+	bgt	r0 r28 L_else.22260
+	muli	r6 r28 4
+	fldi	f17 r6 1137
+	ldi	r27 r6 1136
+	ldi	r30 r6 1135
+	ldi	r31 r6 1134
 	fldi	f2 r0 46
 	fsti	f2 r0 1082
-	addi	r19 r0 0
-	ldi	r20 r0 1183
-	add	r21 r0 r24
-	call	L_trace_or_matrix_fast.2210
+	addi	r24 r0 0
+	ldi	r25 r0 1133
+	add	r26 r0 r30
+	call	L_trace_or_matrix_fast.2274
 	fldi	f3 r0 1082
 	fldi	f2 r0 34
-	fbgt	f3 f2 L_else.25818
+	fbgt	f3 f2 L_else.22263
 	addi	r6 r0 0
-	jump	L_cont.25816
-L_else.25818 : 
+	jump	L_cont.22261
+L_else.22263 : 
 	fldi	f2 r0 47
-	fbgt	f2 f3 L_else.25966
+	fbgt	f2 f3 L_else.22277
 	addi	r6 r0 0
-	jump	L_cont.25816
-L_else.25966 : 
+	jump	L_cont.22261
+L_else.22277 : 
 	addi	r6 r0 1
-L_cont.25816 : 
-	bne	r6 r0 L_else.25821
-	jump	L_cont.25819
-L_else.25821 : 
-	ldi	r7 r0 1045
-	addi	r6 r0 4
-	mul	r7 r7 r6
-	ldi	r6 r0 1074
-	add	r7 r7 r6
-	ldi	r6 r25 0
-	bne	r7 r6 L_else.25823
-	ldi	r17 r0 1183
-	ldi	r16 r17 0
-	ldi	r7 r16 0
-	bne	r7 r5 L_else.25826
-	addi	r6 r0 0
-	jump	L_cont.25824
-L_else.25826 : 
-	addi	r6 r0 99
-	bne	r7 r6 L_else.25836
-	addi	r6 r0 1
-	jump	L_cont.25834
-L_else.25836 : 
-	addi	r10 r0 1905
-	ldi	r9 r7 1970
-	fldi	f3 r0 1042
-	ldi	r6 r9 5
-	fldi	f2 r6 0
-	fsub	f7 f3 f2
-	fldi	f3 r0 1043
-	ldi	r6 r9 5
-	fldi	f2 r6 1
-	fsub	f6 f3 f2
-	fldi	f3 r0 1044
-	ldi	r6 r9 5
-	fldi	f2 r6 2
-	fsub	f9 f3 f2
-	ldi	r6 r10 1
-	add	r1 r6 r7
-	ldi	r8 r1 0
-	ldi	r7 r9 1
-	bne	r7 r4 L_else.25868
-	ldi	r7 r10 0
-	fldi	f2 r8 0
-	fsub	f2 f2 f7
-	fldi	f3 r8 1
-	fmul	f4 f2 f3
-	fldi	f2 r7 1
+L_cont.22261 : 
+	bne	r6 r0 L_else.22266
+	jump	L_cont.22264
+L_else.22266 : 
+	ldi	r6 r0 1045
+	muli	r6 r6 4
+	ldi	r7 r0 1074
+	add	r6 r6 r7
+	bne	r6 r31 L_else.22268
+	ldi	r20 r0 1133
+	add	r21 r0 r20
+	call	L_shadow_check_one_or_matrix.2249
+	bne	r6 r0 L_else.22270
+	fldi	f2 r0 1046
+	fldi	f3 r30 0
+	fmul	f3 f2 f3
+	fldi	f4 r0 1047
+	fldi	f2 r30 1
 	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.25902
-	jump	L_cont.25900
-L_else.25902 : 
-	fsub	f2 f0 f2
-L_cont.25900 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.25905
-	addi	r6 r0 0
-	jump	L_cont.25903
-L_else.25905 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.25942
-	jump	L_cont.25940
-L_else.25942 : 
-	fsub	f2 f0 f2
-L_cont.25940 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.25944
-	addi	r6 r0 0
-	jump	L_cont.25903
-L_else.25944 : 
-	fldi	f2 r8 1
-	fbne	f2 f0 L_else.25947
-	addi	r6 r0 1
-	jump	L_cont.25945
-L_else.25947 : 
-	addi	r6 r0 0
-L_cont.25945 : 
-	sub	r6 r4 r6
-L_cont.25903 : 
-	bne	r6 r0 L_else.25907
-	fldi	f2 r8 2
-	fsub	f3 f2 f6
-	fldi	f2 r8 3
-	fmul	f4 f3 f2
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25910
-	jump	L_cont.25908
-L_else.25910 : 
-	fsub	f2 f0 f2
-L_cont.25908 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.25913
-	addi	r6 r0 0
-	jump	L_cont.25911
-L_else.25913 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.25934
-	jump	L_cont.25932
-L_else.25934 : 
-	fsub	f2 f0 f2
-L_cont.25932 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.25936
-	addi	r6 r0 0
-	jump	L_cont.25911
-L_else.25936 : 
-	fldi	f2 r8 3
-	fbne	f2 f0 L_else.25939
-	addi	r6 r0 1
-	jump	L_cont.25937
-L_else.25939 : 
-	addi	r6 r0 0
-L_cont.25937 : 
-	sub	r6 r4 r6
-L_cont.25911 : 
-	bne	r6 r0 L_else.25915
-	fldi	f2 r8 4
-	fsub	f2 f2 f9
-	fldi	f3 r8 5
-	fmul	f4 f2 f3
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.25918
-	jump	L_cont.25916
-L_else.25918 : 
-	fsub	f2 f0 f2
-L_cont.25916 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.25921
-	addi	r6 r0 0
-	jump	L_cont.25919
-L_else.25921 : 
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.25926
-	jump	L_cont.25924
-L_else.25926 : 
-	fsub	f2 f0 f2
-L_cont.25924 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.25928
-	addi	r6 r0 0
-	jump	L_cont.25919
-L_else.25928 : 
-	fldi	f2 r8 5
-	fbne	f2 f0 L_else.25931
-	addi	r6 r0 1
-	jump	L_cont.25929
-L_else.25931 : 
-	addi	r6 r0 0
-L_cont.25929 : 
-	sub	r6 r4 r6
-L_cont.25919 : 
-	bne	r6 r0 L_else.25923
-	addi	r6 r0 0
-	jump	L_cont.25866
-L_else.25923 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 3
-	jump	L_cont.25866
-L_else.25915 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 2
-	jump	L_cont.25866
-L_else.25907 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.25866
-L_else.25868 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.25949
-	fldi	f2 r8 0
-	fbgt	f0 f2 L_else.25951
-	addi	r6 r0 0
-	jump	L_cont.25866
-L_else.25951 : 
-	fldi	f2 r8 1
-	fmul	f3 f2 f7
-	fldi	f2 r8 2
-	fmul	f2 f2 f6
 	fadd	f3 f3 f2
-	fldi	f2 r8 3
-	fmul	f2 f2 f9
-	fadd	f2 f3 f2
-	fsti	f2 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.25866
-L_else.25949 : 
-	fldi	f8 r8 0
-	fbne	f8 f0 L_else.25953
-	addi	r6 r0 0
-	jump	L_cont.25866
-L_else.25953 : 
-	fldi	f2 r8 1
-	fmul	f3 f2 f7
-	fldi	f2 r8 2
-	fmul	f2 f2 f6
-	fadd	f3 f3 f2
-	fldi	f2 r8 3
-	fmul	f2 f2 f9
-	fadd	f5 f3 f2
-	fmul	f3 f7 f7
-	ldi	r6 r9 4
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fmul	f3 f6 f6
-	ldi	r6 r9 4
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f9 f9
-	ldi	r6 r9 4
-	fldi	f2 r6 2
+	fldi	f4 r0 1048
+	fldi	f2 r30 2
 	fmul	f2 f4 f2
 	fadd	f2 f3 f2
-	ldi	r6 r9 3
-	bne	r6 r0 L_else.25956
-	jump	L_cont.25954
-L_else.25956 : 
-	fmul	f4 f6 f9
-	ldi	r6 r9 9
-	fldi	f3 r6 0
-	fmul	f3 f4 f3
-	fadd	f4 f2 f3
-	fmul	f3 f9 f7
-	ldi	r6 r9 9
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f7 f6
-	ldi	r6 r9 9
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-L_cont.25954 : 
-	ldi	r7 r9 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.25959
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.25957
-L_else.25959 : 
-L_cont.25957 : 
-	fmul	f3 f5 f5
-	fmul	f2 f8 f2
-	fsub	f2 f3 f2
-	fbgt	f2 f0 L_else.25961
-	addi	r6 r0 0
-	jump	L_cont.25866
-L_else.25961 : 
-	ldi	r6 r9 6
-	bne	r6 r0 L_else.25964
-	fsqrt	f2 f2
-	fsub	f3 f5 f2
-	fldi	f2 r8 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-	jump	L_cont.25962
-L_else.25964 : 
-	fsqrt	f2 f2
-	fadd	f3 f5 f2
-	fldi	f2 r8 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-L_cont.25962 : 
-	addi	r6 r0 1
-L_cont.25866 : 
-	bne	r6 r0 L_else.25870
-	addi	r6 r0 0
-	jump	L_cont.25834
-L_else.25870 : 
-	fldi	f2 r0 1073
-	fldi	f3 r0 34
-	fbgt	f3 f2 L_else.25872
-	addi	r6 r0 0
-	jump	L_cont.25834
-L_else.25872 : 
-	ldi	r6 r16 1
-	bne	r6 r5 L_else.25875
-	addi	r6 r0 0
-	jump	L_cont.25873
-L_else.25875 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.25879
-	ldi	r6 r16 2
-	bne	r6 r5 L_else.25881
-	addi	r6 r0 0
-	jump	L_cont.25873
-L_else.25881 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.25883
-	ldi	r6 r16 3
-	bne	r6 r5 L_else.25885
-	addi	r6 r0 0
-	jump	L_cont.25873
-L_else.25885 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.25887
-	ldi	r6 r16 4
-	bne	r6 r5 L_else.25889
-	addi	r6 r0 0
-	jump	L_cont.25873
-L_else.25889 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.25891
-	ldi	r6 r16 5
-	bne	r6 r5 L_else.25893
-	addi	r6 r0 0
-	jump	L_cont.25873
-L_else.25893 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.25895
-	ldi	r6 r16 6
-	bne	r6 r5 L_else.25897
-	addi	r6 r0 0
-	jump	L_cont.25873
-L_else.25897 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.25899
-	addi	r14 r0 7
-	add	r15 r0 r16
-	call	L_shadow_check_one_or_group.2182
-	jump	L_cont.25873
-L_else.25899 : 
-	addi	r6 r0 1
-	jump	L_cont.25873
-L_else.25895 : 
-	addi	r6 r0 1
-	jump	L_cont.25873
-L_else.25891 : 
-	addi	r6 r0 1
-	jump	L_cont.25873
-L_else.25887 : 
-	addi	r6 r0 1
-	jump	L_cont.25873
-L_else.25883 : 
-	addi	r6 r0 1
-	jump	L_cont.25873
-L_else.25879 : 
-	addi	r6 r0 1
-L_cont.25873 : 
-	bne	r6 r0 L_else.25877
-	addi	r6 r0 0
-	jump	L_cont.25834
-L_else.25877 : 
-	addi	r6 r0 1
-L_cont.25834 : 
-	bne	r6 r0 L_else.25838
-	addi	r16 r0 1
-	call	L_shadow_check_one_or_matrix.2185
-	jump	L_cont.25824
-L_else.25838 : 
-	ldi	r6 r16 1
-	bne	r6 r5 L_else.25841
-	addi	r6 r0 0
-	jump	L_cont.25839
-L_else.25841 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.25845
-	ldi	r6 r16 2
-	bne	r6 r5 L_else.25847
-	addi	r6 r0 0
-	jump	L_cont.25839
-L_else.25847 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.25849
-	ldi	r6 r16 3
-	bne	r6 r5 L_else.25851
-	addi	r6 r0 0
-	jump	L_cont.25839
-L_else.25851 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.25853
-	ldi	r6 r16 4
-	bne	r6 r5 L_else.25855
-	addi	r6 r0 0
-	jump	L_cont.25839
-L_else.25855 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.25857
-	ldi	r6 r16 5
-	bne	r6 r5 L_else.25859
-	addi	r6 r0 0
-	jump	L_cont.25839
-L_else.25859 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.25861
-	ldi	r6 r16 6
-	bne	r6 r5 L_else.25863
-	addi	r6 r0 0
-	jump	L_cont.25839
-L_else.25863 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.25865
-	addi	r14 r0 7
-	add	r15 r0 r16
-	call	L_shadow_check_one_or_group.2182
-	jump	L_cont.25839
-L_else.25865 : 
-	addi	r6 r0 1
-	jump	L_cont.25839
-L_else.25861 : 
-	addi	r6 r0 1
-	jump	L_cont.25839
-L_else.25857 : 
-	addi	r6 r0 1
-	jump	L_cont.25839
-L_else.25853 : 
-	addi	r6 r0 1
-	jump	L_cont.25839
-L_else.25849 : 
-	addi	r6 r0 1
-	jump	L_cont.25839
-L_else.25845 : 
-	addi	r6 r0 1
-L_cont.25839 : 
-	bne	r6 r0 L_else.25843
-	addi	r16 r0 1
-	call	L_shadow_check_one_or_matrix.2185
-	jump	L_cont.25824
-L_else.25843 : 
-	addi	r6 r0 1
-L_cont.25824 : 
-	bne	r6 r0 L_else.25828
-	ldi	r6 r24 0
-	fldi	f3 r0 1046
-	fldi	f2 r6 0
+	fmul	f3 f17 f15
+	fmul	f5 f3 f2
+	fldi	f3 r29 0
+	fldi	f2 r30 0
 	fmul	f4 f3 f2
-	fldi	f2 r0 1047
-	fldi	f3 r6 1
+	fldi	f2 r29 1
+	fldi	f3 r30 1
 	fmul	f2 f2 f3
 	fadd	f4 f4 f2
-	fldi	f2 r0 1048
-	fldi	f3 r6 2
+	fldi	f2 r29 2
+	fldi	f3 r30 2
 	fmul	f2 f2 f3
-	fadd	f3 f4 f2
-	fldi	f5 r25 2
-	fmul	f2 f5 f15
-	fmul	f4 f2 f3
-	ldi	r6 r24 0
-	fldi	f2 r23 0
-	fldi	f3 r6 0
-	fmul	f3 f2 f3
-	fldi	f6 r23 1
-	fldi	f2 r6 1
-	fmul	f2 f6 f2
-	fadd	f3 f3 f2
-	fldi	f6 r23 2
-	fldi	f2 r6 2
-	fmul	f2 f6 f2
-	fadd	f2 f3 f2
-	fmul	f5 f5 f2
-	fbgt	f4 f0 L_else.25831
-	jump	L_cont.25829
-L_else.25831 : 
+	fadd	f2 f4 f2
+	fmul	f4 f17 f2
+	fbgt	f5 f0 L_else.22273
+	jump	L_cont.22271
+L_else.22273 : 
 	fldi	f3 r0 1055
 	fldi	f2 r0 1049
-	fmul	f2 f4 f2
+	fmul	f2 f5 f2
 	fadd	f2 f3 f2
 	fsti	f2 r0 1055
 	fldi	f3 r0 1056
 	fldi	f2 r0 1050
-	fmul	f2 f4 f2
+	fmul	f2 f5 f2
 	fadd	f2 f3 f2
 	fsti	f2 r0 1056
 	fldi	f3 r0 1057
 	fldi	f2 r0 1051
-	fmul	f2 f4 f2
+	fmul	f2 f5 f2
 	fadd	f2 f3 f2
 	fsti	f2 r0 1057
-L_cont.25829 : 
-	fbgt	f5 f0 L_else.25833
-	jump	L_cont.25819
-L_else.25833 : 
-	fmul	f2 f5 f5
+L_cont.22271 : 
+	fbgt	f4 f0 L_else.22275
+	jump	L_cont.22264
+L_else.22275 : 
+	fmul	f2 f4 f4
 	fmul	f2 f2 f2
 	fmul	f3 f2 f16
 	fldi	f2 r0 1055
@@ -8325,63 +4967,84 @@ L_else.25833 :
 	fldi	f2 r0 1057
 	fadd	f2 f2 f3
 	fsti	f2 r0 1057
-	jump	L_cont.25819
-L_else.25828 : 
-	jump	L_cont.25819
-L_else.25823 : 
-L_cont.25819 : 
-	addi	r22 r22 -1
-	jump	L_trace_reflections.2232
-L_else.25815 : 
+	jump	L_cont.22264
+L_else.22270 : 
+	jump	L_cont.22264
+L_else.22268 : 
+L_cont.22264 : 
+	addi	r28 r28 -1
+	jump	L_trace_reflections.2296
+L_else.22260 : 
 	return
-L_trace_ray.2237 : 
-	addi	r6 r0 4
-	bgt	r26 r6 L_else.25969
-	ldi	r29 r28 2
+L_trace_ray.2301 : 
+	addi	r16 r0 4
+	bgt	r6 r16 L_else.22280
 	fldi	f2 r0 46
 	fsti	f2 r0 1082
-	addi	r19 r0 0
-	ldi	r20 r0 1183
-	add	r21 r0 r27
-	call	L_trace_or_matrix.2196
+	addi	r22 r0 0
+	ldi	r23 r0 1133
+	sti	r11 r2 0
+	sti	r15 r2 1
+	sti	r14 r2 2
+	sti	r13 r2 3
+	sti	r8 r2 4
+	sti	r12 r2 5
+	sti	r9 r2 6
+	sti	r7 r2 7
+	sti	r6 r2 8
+	sti	r10 r2 9
+	add	r24 r0 r7
+	addi	r2 r2 10
+	call	L_trace_or_matrix.2260
+	addi	r2 r2 -10
+	ldi	r11 r2 0
+	ldi	r15 r2 1
+	ldi	r14 r2 2
+	ldi	r13 r2 3
+	ldi	r8 r2 4
+	ldi	r12 r2 5
+	ldi	r9 r2 6
+	ldi	r7 r2 7
+	ldi	r6 r2 8
+	ldi	r10 r2 9
 	fldi	f3 r0 1082
 	fldi	f2 r0 34
-	fbgt	f3 f2 L_else.25972
-	addi	r6 r0 0
-	jump	L_cont.25970
-L_else.25972 : 
+	fbgt	f3 f2 L_else.22283
+	addi	r16 r0 0
+	jump	L_cont.22281
+L_else.22283 : 
 	fldi	f2 r0 47
-	fbgt	f2 f3 L_else.26150
-	addi	r6 r0 0
-	jump	L_cont.25970
-L_else.26150 : 
-	addi	r6 r0 1
-L_cont.25970 : 
-	bne	r6 r0 L_else.25974
-	addi	r6 r0 -1
-	add	r1 r29 r26
-	sti	r6 r1 0
-	bne	r26 r0 L_else.25976
+	fbgt	f2 f3 L_else.22327
+	addi	r16 r0 0
+	jump	L_cont.22281
+L_else.22327 : 
+	addi	r16 r0 1
+L_cont.22281 : 
+	bne	r16 r0 L_else.22285
+	addi	r8 r0 -1
+	add	r1 r10 r6
+	sti	r8 r1 0
+	bne	r6 r0 L_else.22287
 	return
-L_else.25976 : 
-	fldi	f2 r27 0
+L_else.22287 : 
+	fldi	f2 r7 0
 	fldi	f3 r0 1039
 	fmul	f3 f2 f3
-	fldi	f4 r27 1
+	fldi	f4 r7 1
 	fldi	f2 r0 1040
 	fmul	f2 f4 f2
 	fadd	f3 f3 f2
-	fldi	f4 r27 2
+	fldi	f4 r7 2
 	fldi	f2 r0 1041
 	fmul	f2 f4 f2
 	fadd	f2 f3 f2
 	fsub	f3 f0 f2
-	fbgt	f3 f0 L_else.25978
+	fbgt	f3 f0 L_else.22289
 	return
-L_else.25978 : 
+L_else.22289 : 
 	fmul	f2 f3 f3
 	fmul	f2 f2 f3
-	fmul	f3 f2 f17
+	fmul	f3 f2 f18
 	fldi	f2 r0 1081
 	fmul	f3 f3 f2
 	fldi	f2 r0 1055
@@ -8394,120 +5057,109 @@ L_else.25978 :
 	fadd	f2 f2 f3
 	fsti	f2 r0 1057
 	return
-L_else.25974 : 
-	ldi	r10 r0 1045
-	ldi	r31 r10 1970
-	ldi	r30 r31 2
-	ldi	r6 r31 7
-	fldi	f2 r6 0
-	fmul	f19 f2 f17
-	ldi	r7 r31 1
-	bne	r7 r4 L_else.25981
-	ldi	r7 r0 1074
-	addi	r6 r0 1046
-	fldi	f2 r0 29
-	fsti	f2 r0 1046
-	fsti	f2 r0 1047
-	fsti	f2 r0 1048
-	addi	r7 r7 -1
-	add	r1 r27 r7
+L_else.22285 : 
+	ldi	r21 r0 1045
+	muli	r19 r21 11
+	ldi	r23 r19 1928
+	ldi	r20 r19 1927
+	ldi	r16 r19 1926
+	ldi	r25 r19 1925
+	ldi	r22 r19 1924
+	ldi	r18 r19 1923
+	ldi	r24 r19 1922
+	ldi	r17 r19 1921
+	ldi	r26 r19 1920
+	ldi	r19 r19 1919
+	fldi	f2 r16 0
+	fmul	f17 f2 f18
+	bne	r26 r4 L_else.22292
+	ldi	r23 r0 1074
+	addi	r24 r0 1046
+	fsti	f0 r0 1046
+	fsti	f0 r0 1047
+	fsti	f0 r0 1048
+	addi	r23 r23 -1
+	add	r1 r7 r23
 	fldi	f2 r1 0
-	fbne	f2 f0 L_else.26136
-	fldi	f2 r0 29
-	jump	L_cont.26134
-L_else.26136 : 
-	fbgt	f2 f0 L_else.26138
+	fbne	f2 f0 L_else.22313
+	fldi	f2 r0 30
+	jump	L_cont.22311
+L_else.22313 : 
+	fbgt	f2 f0 L_else.22315
 	fldi	f2 r0 31
-	jump	L_cont.26134
-L_else.26138 : 
+	jump	L_cont.22311
+L_else.22315 : 
 	fldi	f2 r0 12
-L_cont.26134 : 
+L_cont.22311 : 
 	fsub	f2 f0 f2
-	add	r1 r6 r7
+	add	r1 r24 r23
 	fsti	f2 r1 0
-	jump	L_cont.25979
-L_else.25981 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.26140
-	ldi	r6 r31 4
-	fldi	f2 r6 0
+	jump	L_cont.22290
+L_else.22292 : 
+	addi	r27 r0 2
+	bne	r26 r27 L_else.22317
+	fldi	f2 r18 0
 	fsub	f2 f0 f2
 	fsti	f2 r0 1046
-	ldi	r6 r31 4
-	fldi	f2 r6 1
+	fldi	f2 r18 1
 	fsub	f2 f0 f2
 	fsti	f2 r0 1047
-	ldi	r6 r31 4
-	fldi	f2 r6 2
+	fldi	f2 r18 2
 	fsub	f2 f0 f2
 	fsti	f2 r0 1048
-	jump	L_cont.25979
-L_else.26140 : 
-	fldi	f3 r0 1042
-	ldi	r6 r31 5
-	fldi	f2 r6 0
-	fsub	f7 f3 f2
+	jump	L_cont.22290
+L_else.22317 : 
+	fldi	f2 r0 1042
+	fldi	f3 r22 0
+	fsub	f9 f2 f3
 	fldi	f3 r0 1043
-	ldi	r6 r31 5
-	fldi	f2 r6 1
+	fldi	f2 r22 1
 	fsub	f8 f3 f2
-	fldi	f3 r0 1044
-	ldi	r6 r31 5
-	fldi	f2 r6 2
-	fsub	f9 f3 f2
-	ldi	r6 r31 4
-	fldi	f2 r6 0
-	fmul	f5 f7 f2
-	ldi	r6 r31 4
-	fldi	f2 r6 1
-	fmul	f6 f8 f2
-	ldi	r6 r31 4
-	fldi	f2 r6 2
-	fmul	f4 f9 f2
-	ldi	r6 r31 3
-	bne	r6 r0 L_else.26143
-	fsti	f5 r0 1046
-	fsti	f6 r0 1047
+	fldi	f2 r0 1044
+	fldi	f3 r22 2
+	fsub	f7 f2 f3
+	fldi	f2 r18 0
+	fmul	f6 f9 f2
+	fldi	f2 r18 1
+	fmul	f5 f8 f2
+	fldi	f2 r18 2
+	fmul	f4 f7 f2
+	bne	r24 r0 L_else.22320
+	fsti	f6 r0 1046
+	fsti	f5 r0 1047
 	fsti	f4 r0 1048
-	jump	L_cont.26141
-L_else.26143 : 
-	ldi	r6 r31 9
-	fldi	f2 r6 2
+	jump	L_cont.22318
+L_else.22320 : 
+	fldi	f2 r23 2
 	fmul	f3 f8 f2
-	ldi	r6 r31 9
-	fldi	f2 r6 1
-	fmul	f2 f9 f2
-	fadd	f2 f3 f2
-	fldi	f3 r0 30
-	fdiv	f2 f2 f3
-	fadd	f2 f5 f2
-	fsti	f2 r0 1046
-	ldi	r6 r31 9
-	fldi	f2 r6 2
-	fmul	f3 f7 f2
-	ldi	r6 r31 9
-	fldi	f2 r6 0
-	fmul	f2 f9 f2
+	fldi	f2 r23 1
+	fmul	f2 f7 f2
 	fadd	f3 f3 f2
-	fldi	f2 r0 30
+	fldi	f2 r0 29
 	fdiv	f2 f3 f2
 	fadd	f2 f6 f2
-	fsti	f2 r0 1047
-	ldi	r6 r31 9
-	fldi	f2 r6 1
-	fmul	f3 f7 f2
-	ldi	r6 r31 9
-	fldi	f2 r6 0
-	fmul	f2 f8 f2
+	fsti	f2 r0 1046
+	fldi	f2 r23 2
+	fmul	f3 f9 f2
+	fldi	f2 r23 0
+	fmul	f2 f7 f2
 	fadd	f2 f3 f2
-	fldi	f3 r0 30
+	fldi	f3 r0 29
 	fdiv	f2 f2 f3
+	fadd	f2 f5 f2
+	fsti	f2 r0 1047
+	fldi	f2 r23 1
+	fmul	f3 f9 f2
+	fldi	f2 r23 0
+	fmul	f2 f8 f2
+	fadd	f3 f3 f2
+	fldi	f2 r0 29
+	fdiv	f2 f3 f2
 	fadd	f2 f4 f2
 	fsti	f2 r0 1048
-L_cont.26141 : 
-	ldi	r6 r31 6
-	fldi	f2 r0 1046
-	fmul	f3 f2 f2
+L_cont.22318 : 
+	fldi	f4 r0 1046
+	fmul	f3 f4 f4
 	fldi	f2 r0 1047
 	fmul	f2 f2 f2
 	fadd	f3 f3 f2
@@ -8515,20 +5167,19 @@ L_cont.26141 :
 	fmul	f2 f2 f2
 	fadd	f2 f3 f2
 	fsqrt	f3 f2
-	fbne	f3 f0 L_else.26146
+	fbne	f3 f0 L_else.22323
 	fldi	f3 r0 12
-	jump	L_cont.26144
-L_else.26146 : 
-	bne	r6 r0 L_else.26148
+	jump	L_cont.22321
+L_else.22323 : 
+	bne	r25 r0 L_else.22325
 	fldi	f2 r0 12
 	fdiv	f3 f2 f3
-	jump	L_cont.26144
-L_else.26148 : 
+	jump	L_cont.22321
+L_else.22325 : 
 	fldi	f2 r0 31
 	fdiv	f3 f2 f3
-L_cont.26144 : 
-	fldi	f2 r0 1046
-	fmul	f2 f2 f3
+L_cont.22321 : 
+	fmul	f2 f4 f3
 	fsti	f2 r0 1046
 	fldi	f2 r0 1047
 	fmul	f2 f2 f3
@@ -8536,588 +5187,173 @@ L_cont.26144 :
 	fldi	f2 r0 1048
 	fmul	f2 f2 f3
 	fsti	f2 r0 1048
-L_cont.25979 : 
-	addi	r19 r0 1042
+L_cont.22290 : 
+	addi	r23 r0 1042
 	fldi	f2 r0 1042
 	fsti	f2 r0 1063
 	fldi	f2 r0 1043
 	fsti	f2 r0 1064
 	fldi	f2 r0 1044
 	fsti	f2 r0 1065
-	add	r6 r0 r31
-	add	r7 r0 r19
-	call	L_utexture.2225
-	addi	r6 r0 4
-	mul	r7 r10 r6
-	ldi	r6 r0 1074
-	add	r6 r7 r6
-	add	r1 r29 r26
-	sti	r6 r1 0
-	ldi	r6 r28 1
-	add	r1 r6 r26
-	ldi	r6 r1 0
+	sti	r10 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	sti	r8 r2 3
+	sti	r9 r2 4
+	add	r6 r0 r19
+	add	r7 r0 r18
+	add	r8 r0 r22
+	add	r9 r0 r20
+	add	r10 r0 r23
+	addi	r2 r2 5
+	call	L_utexture.2289
+	addi	r2 r2 -5
+	ldi	r10 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	ldi	r8 r2 3
+	ldi	r9 r2 4
+	muli	r18 r21 4
+	ldi	r19 r0 1074
+	add	r18 r18 r19
+	add	r1 r10 r6
+	sti	r18 r1 0
+	add	r1 r9 r6
+	ldi	r18 r1 0
 	fldi	f2 r0 1042
-	fsti	f2 r6 0
+	fsti	f2 r18 0
 	fldi	f2 r0 1043
-	fsti	f2 r6 1
+	fsti	f2 r18 1
 	fldi	f2 r0 1044
-	fsti	f2 r6 2
-	ldi	r7 r28 3
-	ldi	r6 r31 7
-	fldi	f2 r6 0
-	fldi	f3 r0 11
-	fbgt	f3 f2 L_else.25984
-	addi	r6 r0 1
-	add	r1 r7 r26
-	sti	r6 r1 0
-	ldi	r6 r28 4
-	add	r1 r6 r26
-	ldi	r7 r1 0
+	fsti	f2 r18 2
+	fldi	f3 r16 0
+	fldi	f2 r0 11
+	fbgt	f2 f3 L_else.22295
+	addi	r18 r0 1
+	add	r1 r11 r6
+	sti	r18 r1 0
+	add	r1 r12 r6
+	ldi	r18 r1 0
 	fldi	f2 r0 1049
-	fsti	f2 r7 0
+	fsti	f2 r18 0
 	fldi	f2 r0 1050
-	fsti	f2 r7 1
+	fsti	f2 r18 1
 	fldi	f2 r0 1051
-	fsti	f2 r7 2
-	add	r1 r6 r26
-	ldi	r6 r1 0
+	fsti	f2 r18 2
+	add	r1 r12 r6
+	ldi	r18 r1 0
 	fldi	f2 r0 48
-	fmul	f3 f2 f19
-	fldi	f2 r6 0
+	fmul	f3 f2 f17
+	fldi	f2 r18 0
 	fmul	f2 f2 f3
-	fsti	f2 r6 0
-	fldi	f2 r6 1
+	fsti	f2 r18 0
+	fldi	f2 r18 1
 	fmul	f2 f2 f3
-	fsti	f2 r6 1
-	fldi	f2 r6 2
+	fsti	f2 r18 1
+	fldi	f2 r18 2
 	fmul	f2 f2 f3
-	fsti	f2 r6 2
-	ldi	r6 r28 7
-	add	r1 r6 r26
-	ldi	r6 r1 0
+	fsti	f2 r18 2
+	add	r1 r15 r6
+	ldi	r18 r1 0
 	fldi	f2 r0 1046
-	fsti	f2 r6 0
+	fsti	f2 r18 0
 	fldi	f2 r0 1047
-	fsti	f2 r6 1
+	fsti	f2 r18 1
 	fldi	f2 r0 1048
-	fsti	f2 r6 2
-	jump	L_cont.25982
-L_else.25984 : 
-	addi	r6 r0 0
-	add	r1 r7 r26
-	sti	r6 r1 0
-L_cont.25982 : 
-	fldi	f5 r0 49
-	fldi	f2 r27 0
+	fsti	f2 r18 2
+	jump	L_cont.22293
+L_else.22295 : 
+	addi	r18 r0 0
+	add	r1 r11 r6
+	sti	r18 r1 0
+L_cont.22293 : 
+	fldi	f7 r0 49
+	fldi	f6 r7 0
+	fldi	f5 r0 1046
+	fmul	f4 f6 f5
+	fldi	f3 r7 1
+	fldi	f2 r0 1047
+	fmul	f2 f3 f2
+	fadd	f4 f4 f2
+	fldi	f3 r7 2
+	fldi	f2 r0 1048
+	fmul	f2 f3 f2
+	fadd	f2 f4 f2
+	fmul	f4 f7 f2
+	fmul	f2 f4 f5
+	fadd	f2 f6 f2
+	fsti	f2 r7 0
+	fldi	f3 r7 1
+	fldi	f2 r0 1047
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
+	fsti	f2 r7 1
+	fldi	f3 r7 2
+	fldi	f2 r0 1048
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
+	fsti	f2 r7 2
+	fldi	f2 r16 1
+	fmul	f16 f18 f2
+	ldi	r20 r0 1133
+	sti	r15 r2 0
+	sti	r14 r2 1
+	sti	r13 r2 2
+	sti	r12 r2 3
+	sti	r11 r2 4
+	sti	r10 r2 5
+	sti	r9 r2 6
+	sti	r8 r2 7
+	sti	r16 r2 8
+	sti	r17 r2 9
+	sti	r6 r2 10
+	sti	r7 r2 11
+	add	r21 r0 r20
+	addi	r2 r2 12
+	call	L_shadow_check_one_or_matrix.2249
+	addi	r2 r2 -12
+	add	r18 r0 r6
+	ldi	r15 r2 0
+	ldi	r14 r2 1
+	ldi	r13 r2 2
+	ldi	r12 r2 3
+	ldi	r11 r2 4
+	ldi	r10 r2 5
+	ldi	r9 r2 6
+	ldi	r8 r2 7
+	ldi	r16 r2 8
+	ldi	r17 r2 9
+	ldi	r6 r2 10
+	ldi	r7 r2 11
+	bne	r18 r0 L_else.22298
 	fldi	f3 r0 1046
-	fmul	f3 f2 f3
-	fldi	f4 r27 1
-	fldi	f2 r0 1047
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fldi	f4 r27 2
-	fldi	f2 r0 1048
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fmul	f4 f5 f2
-	fldi	f3 r27 0
-	fldi	f2 r0 1046
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsti	f2 r27 0
-	fldi	f3 r27 1
-	fldi	f2 r0 1047
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsti	f2 r27 1
-	fldi	f3 r27 2
-	fldi	f2 r0 1048
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsti	f2 r27 2
-	ldi	r6 r31 7
-	fldi	f2 r6 1
-	fmul	f16 f17 f2
-	ldi	r17 r0 1183
-	ldi	r16 r17 0
-	ldi	r7 r16 0
-	bne	r7 r5 L_else.25987
-	addi	r6 r0 0
-	jump	L_cont.25985
-L_else.25987 : 
-	addi	r6 r0 99
-	bne	r7 r6 L_else.26005
-	addi	r6 r0 1
-	jump	L_cont.26003
-L_else.26005 : 
-	addi	r10 r0 1905
-	ldi	r9 r7 1970
-	fldi	f3 r0 1042
-	ldi	r6 r9 5
-	fldi	f2 r6 0
-	fsub	f7 f3 f2
-	fldi	f3 r0 1043
-	ldi	r6 r9 5
-	fldi	f2 r6 1
-	fsub	f5 f3 f2
-	fldi	f3 r0 1044
-	ldi	r6 r9 5
-	fldi	f2 r6 2
-	fsub	f9 f3 f2
-	ldi	r6 r10 1
-	add	r1 r6 r7
-	ldi	r8 r1 0
-	ldi	r7 r9 1
-	bne	r7 r4 L_else.26037
-	ldi	r7 r10 0
-	fldi	f2 r8 0
-	fsub	f2 f2 f7
-	fldi	f3 r8 1
-	fmul	f4 f2 f3
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f5
-	fbgt	f0 f2 L_else.26071
-	jump	L_cont.26069
-L_else.26071 : 
-	fsub	f2 f0 f2
-L_cont.26069 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.26074
-	addi	r6 r0 0
-	jump	L_cont.26072
-L_else.26074 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.26111
-	jump	L_cont.26109
-L_else.26111 : 
-	fsub	f2 f0 f2
-L_cont.26109 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.26113
-	addi	r6 r0 0
-	jump	L_cont.26072
-L_else.26113 : 
-	fldi	f2 r8 1
-	fbne	f2 f0 L_else.26116
-	addi	r6 r0 1
-	jump	L_cont.26114
-L_else.26116 : 
-	addi	r6 r0 0
-L_cont.26114 : 
-	sub	r6 r4 r6
-L_cont.26072 : 
-	bne	r6 r0 L_else.26076
-	fldi	f2 r8 2
-	fsub	f3 f2 f5
-	fldi	f2 r8 3
-	fmul	f4 f3 f2
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.26079
-	jump	L_cont.26077
-L_else.26079 : 
-	fsub	f2 f0 f2
-L_cont.26077 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.26082
-	addi	r6 r0 0
-	jump	L_cont.26080
-L_else.26082 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.26103
-	jump	L_cont.26101
-L_else.26103 : 
-	fsub	f2 f0 f2
-L_cont.26101 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.26105
-	addi	r6 r0 0
-	jump	L_cont.26080
-L_else.26105 : 
-	fldi	f2 r8 3
-	fbne	f2 f0 L_else.26108
-	addi	r6 r0 1
-	jump	L_cont.26106
-L_else.26108 : 
-	addi	r6 r0 0
-L_cont.26106 : 
-	sub	r6 r4 r6
-L_cont.26080 : 
-	bne	r6 r0 L_else.26084
-	fldi	f2 r8 4
-	fsub	f2 f2 f9
-	fldi	f3 r8 5
-	fmul	f4 f2 f3
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.26087
-	jump	L_cont.26085
-L_else.26087 : 
-	fsub	f2 f0 f2
-L_cont.26085 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.26090
-	addi	r6 r0 0
-	jump	L_cont.26088
-L_else.26090 : 
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f5
-	fbgt	f0 f2 L_else.26095
-	jump	L_cont.26093
-L_else.26095 : 
-	fsub	f2 f0 f2
-L_cont.26093 : 
-	ldi	r6 r9 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.26097
-	addi	r6 r0 0
-	jump	L_cont.26088
-L_else.26097 : 
-	fldi	f2 r8 5
-	fbne	f2 f0 L_else.26100
-	addi	r6 r0 1
-	jump	L_cont.26098
-L_else.26100 : 
-	addi	r6 r0 0
-L_cont.26098 : 
-	sub	r6 r4 r6
-L_cont.26088 : 
-	bne	r6 r0 L_else.26092
-	addi	r6 r0 0
-	jump	L_cont.26035
-L_else.26092 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 3
-	jump	L_cont.26035
-L_else.26084 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 2
-	jump	L_cont.26035
-L_else.26076 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.26035
-L_else.26037 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.26118
-	fldi	f2 r8 0
-	fbgt	f0 f2 L_else.26120
-	addi	r6 r0 0
-	jump	L_cont.26035
-L_else.26120 : 
-	fldi	f2 r8 1
-	fmul	f3 f2 f7
-	fldi	f2 r8 2
-	fmul	f2 f2 f5
-	fadd	f3 f3 f2
-	fldi	f2 r8 3
-	fmul	f2 f2 f9
-	fadd	f2 f3 f2
-	fsti	f2 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.26035
-L_else.26118 : 
-	fldi	f8 r8 0
-	fbne	f8 f0 L_else.26122
-	addi	r6 r0 0
-	jump	L_cont.26035
-L_else.26122 : 
-	fldi	f2 r8 1
-	fmul	f3 f2 f7
-	fldi	f2 r8 2
-	fmul	f2 f2 f5
-	fadd	f3 f3 f2
-	fldi	f2 r8 3
-	fmul	f2 f2 f9
-	fadd	f6 f3 f2
-	fmul	f3 f7 f7
-	ldi	r6 r9 4
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fmul	f3 f5 f5
-	ldi	r6 r9 4
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f9 f9
-	ldi	r6 r9 4
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	ldi	r6 r9 3
-	bne	r6 r0 L_else.26125
-	jump	L_cont.26123
-L_else.26125 : 
-	fmul	f4 f5 f9
-	ldi	r6 r9 9
-	fldi	f3 r6 0
-	fmul	f3 f4 f3
-	fadd	f4 f2 f3
-	fmul	f3 f9 f7
-	ldi	r6 r9 9
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f7 f5
-	ldi	r6 r9 9
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-L_cont.26123 : 
-	ldi	r7 r9 1
-	addi	r6 r0 3
-	bne	r7 r6 L_else.26128
-	fldi	f3 r0 12
-	fsub	f2 f2 f3
-	jump	L_cont.26126
-L_else.26128 : 
-L_cont.26126 : 
-	fmul	f3 f6 f6
-	fmul	f2 f8 f2
-	fsub	f2 f3 f2
-	fbgt	f2 f0 L_else.26130
-	addi	r6 r0 0
-	jump	L_cont.26035
-L_else.26130 : 
-	ldi	r6 r9 6
-	bne	r6 r0 L_else.26133
-	fsqrt	f2 f2
-	fsub	f3 f6 f2
-	fldi	f2 r8 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-	jump	L_cont.26131
-L_else.26133 : 
-	fsqrt	f2 f2
-	fadd	f3 f6 f2
-	fldi	f2 r8 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-L_cont.26131 : 
-	addi	r6 r0 1
-L_cont.26035 : 
-	bne	r6 r0 L_else.26039
-	addi	r6 r0 0
-	jump	L_cont.26003
-L_else.26039 : 
-	fldi	f2 r0 1073
-	fldi	f3 r0 34
-	fbgt	f3 f2 L_else.26041
-	addi	r6 r0 0
-	jump	L_cont.26003
-L_else.26041 : 
-	ldi	r6 r16 1
-	bne	r6 r5 L_else.26044
-	addi	r6 r0 0
-	jump	L_cont.26042
-L_else.26044 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26048
-	ldi	r6 r16 2
-	bne	r6 r5 L_else.26050
-	addi	r6 r0 0
-	jump	L_cont.26042
-L_else.26050 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26052
-	ldi	r6 r16 3
-	bne	r6 r5 L_else.26054
-	addi	r6 r0 0
-	jump	L_cont.26042
-L_else.26054 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26056
-	ldi	r6 r16 4
-	bne	r6 r5 L_else.26058
-	addi	r6 r0 0
-	jump	L_cont.26042
-L_else.26058 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26060
-	ldi	r6 r16 5
-	bne	r6 r5 L_else.26062
-	addi	r6 r0 0
-	jump	L_cont.26042
-L_else.26062 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26064
-	ldi	r6 r16 6
-	bne	r6 r5 L_else.26066
-	addi	r6 r0 0
-	jump	L_cont.26042
-L_else.26066 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26068
-	addi	r14 r0 7
-	add	r15 r0 r16
-	call	L_shadow_check_one_or_group.2182
-	jump	L_cont.26042
-L_else.26068 : 
-	addi	r6 r0 1
-	jump	L_cont.26042
-L_else.26064 : 
-	addi	r6 r0 1
-	jump	L_cont.26042
-L_else.26060 : 
-	addi	r6 r0 1
-	jump	L_cont.26042
-L_else.26056 : 
-	addi	r6 r0 1
-	jump	L_cont.26042
-L_else.26052 : 
-	addi	r6 r0 1
-	jump	L_cont.26042
-L_else.26048 : 
-	addi	r6 r0 1
-L_cont.26042 : 
-	bne	r6 r0 L_else.26046
-	addi	r6 r0 0
-	jump	L_cont.26003
-L_else.26046 : 
-	addi	r6 r0 1
-L_cont.26003 : 
-	bne	r6 r0 L_else.26007
-	addi	r16 r0 1
-	call	L_shadow_check_one_or_matrix.2185
-	jump	L_cont.25985
-L_else.26007 : 
-	ldi	r6 r16 1
-	bne	r6 r5 L_else.26010
-	addi	r6 r0 0
-	jump	L_cont.26008
-L_else.26010 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26014
-	ldi	r6 r16 2
-	bne	r6 r5 L_else.26016
-	addi	r6 r0 0
-	jump	L_cont.26008
-L_else.26016 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26018
-	ldi	r6 r16 3
-	bne	r6 r5 L_else.26020
-	addi	r6 r0 0
-	jump	L_cont.26008
-L_else.26020 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26022
-	ldi	r6 r16 4
-	bne	r6 r5 L_else.26024
-	addi	r6 r0 0
-	jump	L_cont.26008
-L_else.26024 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26026
-	ldi	r6 r16 5
-	bne	r6 r5 L_else.26028
-	addi	r6 r0 0
-	jump	L_cont.26008
-L_else.26028 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26030
-	ldi	r6 r16 6
-	bne	r6 r5 L_else.26032
-	addi	r6 r0 0
-	jump	L_cont.26008
-L_else.26032 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26034
-	addi	r14 r0 7
-	add	r15 r0 r16
-	call	L_shadow_check_one_or_group.2182
-	jump	L_cont.26008
-L_else.26034 : 
-	addi	r6 r0 1
-	jump	L_cont.26008
-L_else.26030 : 
-	addi	r6 r0 1
-	jump	L_cont.26008
-L_else.26026 : 
-	addi	r6 r0 1
-	jump	L_cont.26008
-L_else.26022 : 
-	addi	r6 r0 1
-	jump	L_cont.26008
-L_else.26018 : 
-	addi	r6 r0 1
-	jump	L_cont.26008
-L_else.26014 : 
-	addi	r6 r0 1
-L_cont.26008 : 
-	bne	r6 r0 L_else.26012
-	addi	r16 r0 1
-	call	L_shadow_check_one_or_matrix.2185
-	jump	L_cont.25985
-L_else.26012 : 
-	addi	r6 r0 1
-L_cont.25985 : 
-	bne	r6 r0 L_else.25990
-	fldi	f2 r0 1046
-	fldi	f3 r0 1039
-	fmul	f3 f2 f3
-	fldi	f4 r0 1047
-	fldi	f2 r0 1040
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fldi	f4 r0 1048
-	fldi	f2 r0 1041
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsub	f2 f0 f2
-	fmul	f5 f2 f19
-	fldi	f3 r27 0
 	fldi	f2 r0 1039
 	fmul	f4 f3 f2
-	fldi	f2 r27 1
+	fldi	f2 r0 1047
 	fldi	f3 r0 1040
 	fmul	f2 f2 f3
 	fadd	f4 f4 f2
-	fldi	f2 r27 2
+	fldi	f2 r0 1048
 	fldi	f3 r0 1041
 	fmul	f2 f2 f3
 	fadd	f2 f4 f2
+	fsub	f2 f0 f2
+	fmul	f5 f2 f17
+	fldi	f2 r7 0
+	fldi	f3 r0 1039
+	fmul	f3 f2 f3
+	fldi	f4 r7 1
+	fldi	f2 r0 1040
+	fmul	f2 f4 f2
+	fadd	f3 f3 f2
+	fldi	f4 r7 2
+	fldi	f2 r0 1041
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
 	fsub	f4 f0 f2
-	fbgt	f5 f0 L_else.26000
-	jump	L_cont.25998
-L_else.26000 : 
+	fbgt	f5 f0 L_else.22308
+	jump	L_cont.22306
+L_else.22308 : 
 	fldi	f3 r0 1055
 	fldi	f2 r0 1049
 	fmul	f2 f5 f2
@@ -9133,10 +5369,10 @@ L_else.26000 :
 	fmul	f2 f5 f2
 	fadd	f2 f3 f2
 	fsti	f2 r0 1057
-L_cont.25998 : 
-	fbgt	f4 f0 L_else.26002
-	jump	L_cont.25988
-L_else.26002 : 
+L_cont.22306 : 
+	fbgt	f4 f0 L_else.22310
+	jump	L_cont.22296
+L_else.22310 : 
 	fmul	f2 f4 f4
 	fmul	f2 f2 f2
 	fmul	f3 f2 f16
@@ -9149,1154 +5385,218 @@ L_else.26002 :
 	fldi	f2 r0 1057
 	fadd	f2 f2 f3
 	fsti	f2 r0 1057
-	jump	L_cont.25988
-L_else.25990 : 
-L_cont.25988 : 
+	jump	L_cont.22296
+L_else.22298 : 
+L_cont.22296 : 
 	fldi	f2 r0 1042
 	fsti	f2 r0 1066
 	fldi	f2 r0 1043
 	fsti	f2 r0 1067
 	fldi	f2 r0 1044
 	fsti	f2 r0 1068
-	ldi	r6 r0 1072
-	addi	r7 r6 -1
-	add	r6 r0 r19
-	call	L_setup_startp_constants.2148
-	ldi	r6 r0 1075
-	addi	r22 r6 -1
-	add	r23 r0 r27
-	fadd	f15 f0 f19
-	call	L_trace_reflections.2232
+	ldi	r18 r0 1072
+	addi	r18 r18 -1
+	sti	r6 r2 0
+	sti	r8 r2 1
+	sti	r9 r2 2
+	sti	r10 r2 3
+	sti	r11 r2 4
+	sti	r12 r2 5
+	sti	r13 r2 6
+	sti	r7 r2 7
+	add	r6 r0 r23
+	add	r7 r0 r18
+	addi	r2 r2 8
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -8
+	ldi	r6 r2 0
+	ldi	r8 r2 1
+	ldi	r9 r2 2
+	ldi	r10 r2 3
+	ldi	r11 r2 4
+	ldi	r12 r2 5
+	ldi	r13 r2 6
+	ldi	r7 r2 7
+	ldi	r18 r0 1075
+	addi	r28 r18 -1
+	sti	r15 r2 0
+	sti	r14 r2 1
+	sti	r13 r2 2
+	sti	r12 r2 3
+	sti	r11 r2 4
+	sti	r10 r2 5
+	sti	r9 r2 6
+	sti	r8 r2 7
+	sti	r7 r2 8
+	sti	r16 r2 9
+	sti	r17 r2 10
+	sti	r6 r2 11
+	add	r29 r0 r7
+	fadd	f15 f0 f17
+	addi	r2 r2 12
+	call	L_trace_reflections.2296
+	addi	r2 r2 -12
+	ldi	r15 r2 0
+	ldi	r14 r2 1
+	ldi	r13 r2 2
+	ldi	r12 r2 3
+	ldi	r11 r2 4
+	ldi	r10 r2 5
+	ldi	r9 r2 6
+	ldi	r8 r2 7
+	ldi	r7 r2 8
+	ldi	r16 r2 9
+	ldi	r17 r2 10
+	ldi	r6 r2 11
 	fldi	f2 r0 50
-	fbgt	f17 f2 L_else.25992
+	fbgt	f18 f2 L_else.22300
 	return
-L_else.25992 : 
-	addi	r6 r0 4
-	bgt	r6 r26 L_else.25995
-	jump	L_cont.25993
-L_else.25995 : 
-	addi	r6 r26 1
-	addi	r7 r0 -1
-	add	r1 r29 r6
-	sti	r7 r1 0
-L_cont.25993 : 
-	addi	r6 r0 2
-	bne	r30 r6 L_else.25997
-	fldi	f3 r0 12
-	ldi	r6 r31 7
-	fldi	f2 r6 0
-	fsub	f2 f3 f2
-	fmul	f17 f17 f2
-	addi	r26 r26 1
-	fldi	f2 r0 1082
-	fadd	f18 f18 f2
-	jump	L_trace_ray.2237
-L_else.25997 : 
-	return
-L_else.25969 : 
-	return
-L_trace_diffuse_ray.2243 : 
-	fldi	f2 r0 46
-	fsti	f2 r0 1082
-	addi	r19 r0 0
-	ldi	r20 r0 1183
-	add	r21 r0 r22
-	call	L_trace_or_matrix_fast.2210
-	fldi	f3 r0 1082
-	fldi	f2 r0 34
-	fbgt	f3 f2 L_else.26154
-	addi	r6 r0 0
-	jump	L_cont.26152
-L_else.26154 : 
-	fldi	f2 r0 47
-	fbgt	f2 f3 L_else.26315
-	addi	r6 r0 0
-	jump	L_cont.26152
-L_else.26315 : 
-	addi	r6 r0 1
-L_cont.26152 : 
-	bne	r6 r0 L_else.26156
-	return
-L_else.26156 : 
-	ldi	r6 r0 1045
-	ldi	r19 r6 1970
-	ldi	r8 r22 0
-	ldi	r7 r19 1
-	bne	r7 r4 L_else.26159
-	ldi	r6 r0 1074
-	addi	r7 r0 1046
-	fldi	f2 r0 29
-	fsti	f2 r0 1046
-	fsti	f2 r0 1047
-	fsti	f2 r0 1048
-	addi	r6 r6 -1
-	add	r1 r8 r6
-	fldi	f2 r1 0
-	fbne	f2 f0 L_else.26301
-	fldi	f2 r0 29
-	jump	L_cont.26299
-L_else.26301 : 
-	fbgt	f2 f0 L_else.26303
-	fldi	f2 r0 31
-	jump	L_cont.26299
-L_else.26303 : 
+L_else.22300 : 
+	addi	r18 r0 4
+	bgt	r18 r6 L_else.22303
+	jump	L_cont.22301
+L_else.22303 : 
+	addi	r19 r6 1
+	addi	r18 r0 -1
+	add	r1 r10 r19
+	sti	r18 r1 0
+L_cont.22301 : 
+	addi	r18 r0 2
+	bne	r17 r18 L_else.22305
 	fldi	f2 r0 12
-L_cont.26299 : 
-	fsub	f2 f0 f2
-	add	r1 r7 r6
-	fsti	f2 r1 0
-	jump	L_cont.26157
-L_else.26159 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.26305
-	ldi	r6 r19 4
-	fldi	f2 r6 0
-	fsub	f2 f0 f2
-	fsti	f2 r0 1046
-	ldi	r6 r19 4
-	fldi	f2 r6 1
-	fsub	f2 f0 f2
-	fsti	f2 r0 1047
-	ldi	r6 r19 4
-	fldi	f2 r6 2
-	fsub	f2 f0 f2
-	fsti	f2 r0 1048
-	jump	L_cont.26157
-L_else.26305 : 
-	fldi	f3 r0 1042
-	ldi	r6 r19 5
-	fldi	f2 r6 0
-	fsub	f9 f3 f2
-	fldi	f3 r0 1043
-	ldi	r6 r19 5
-	fldi	f2 r6 1
-	fsub	f8 f3 f2
-	fldi	f3 r0 1044
-	ldi	r6 r19 5
-	fldi	f2 r6 2
-	fsub	f6 f3 f2
-	ldi	r6 r19 4
-	fldi	f2 r6 0
-	fmul	f7 f9 f2
-	ldi	r6 r19 4
-	fldi	f2 r6 1
-	fmul	f4 f8 f2
-	ldi	r6 r19 4
-	fldi	f2 r6 2
-	fmul	f5 f6 f2
-	ldi	r6 r19 3
-	bne	r6 r0 L_else.26308
-	fsti	f7 r0 1046
-	fsti	f4 r0 1047
-	fsti	f5 r0 1048
-	jump	L_cont.26306
-L_else.26308 : 
-	ldi	r6 r19 9
-	fldi	f2 r6 2
-	fmul	f3 f8 f2
-	ldi	r6 r19 9
-	fldi	f2 r6 1
-	fmul	f2 f6 f2
-	fadd	f2 f3 f2
-	fldi	f3 r0 30
-	fdiv	f2 f2 f3
-	fadd	f2 f7 f2
-	fsti	f2 r0 1046
-	ldi	r6 r19 9
-	fldi	f2 r6 2
-	fmul	f3 f9 f2
-	ldi	r6 r19 9
-	fldi	f2 r6 0
-	fmul	f2 f6 f2
-	fadd	f3 f3 f2
-	fldi	f2 r0 30
-	fdiv	f2 f3 f2
-	fadd	f2 f4 f2
-	fsti	f2 r0 1047
-	ldi	r6 r19 9
-	fldi	f2 r6 1
-	fmul	f3 f9 f2
-	ldi	r6 r19 9
-	fldi	f2 r6 0
-	fmul	f2 f8 f2
-	fadd	f2 f3 f2
-	fldi	f3 r0 30
-	fdiv	f2 f2 f3
-	fadd	f2 f5 f2
-	fsti	f2 r0 1048
-L_cont.26306 : 
-	ldi	r6 r19 6
-	fldi	f2 r0 1046
-	fmul	f3 f2 f2
-	fldi	f2 r0 1047
-	fmul	f2 f2 f2
-	fadd	f3 f3 f2
-	fldi	f2 r0 1048
-	fmul	f2 f2 f2
-	fadd	f2 f3 f2
-	fsqrt	f3 f2
-	fbne	f3 f0 L_else.26311
-	fldi	f3 r0 12
-	jump	L_cont.26309
-L_else.26311 : 
-	bne	r6 r0 L_else.26313
-	fldi	f2 r0 12
-	fdiv	f3 f2 f3
-	jump	L_cont.26309
-L_else.26313 : 
-	fldi	f2 r0 31
-	fdiv	f3 f2 f3
-L_cont.26309 : 
-	fldi	f2 r0 1046
-	fmul	f2 f2 f3
-	fsti	f2 r0 1046
-	fldi	f2 r0 1047
-	fmul	f2 f2 f3
-	fsti	f2 r0 1047
-	fldi	f2 r0 1048
-	fmul	f2 f2 f3
-	fsti	f2 r0 1048
-L_cont.26157 : 
-	addi	r7 r0 1042
-	add	r6 r0 r19
-	call	L_utexture.2225
-	ldi	r17 r0 1183
-	ldi	r16 r17 0
-	ldi	r7 r16 0
-	bne	r7 r5 L_else.26162
-	addi	r6 r0 0
-	jump	L_cont.26160
-L_else.26162 : 
-	addi	r6 r0 99
-	bne	r7 r6 L_else.26170
-	addi	r6 r0 1
-	jump	L_cont.26168
-L_else.26170 : 
-	addi	r10 r0 1905
-	ldi	r8 r7 1970
-	fldi	f3 r0 1042
-	ldi	r6 r8 5
-	fldi	f2 r6 0
-	fsub	f7 f3 f2
-	fldi	f3 r0 1043
-	ldi	r6 r8 5
-	fldi	f2 r6 1
-	fsub	f5 f3 f2
-	fldi	f3 r0 1044
-	ldi	r6 r8 5
-	fldi	f2 r6 2
-	fsub	f9 f3 f2
-	ldi	r6 r10 1
-	add	r1 r6 r7
-	ldi	r9 r1 0
-	ldi	r7 r8 1
-	bne	r7 r4 L_else.26202
-	ldi	r7 r10 0
-	fldi	f2 r9 0
-	fsub	f2 f2 f7
-	fldi	f3 r9 1
-	fmul	f4 f2 f3
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f5
-	fbgt	f0 f2 L_else.26236
-	jump	L_cont.26234
-L_else.26236 : 
-	fsub	f2 f0 f2
-L_cont.26234 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.26239
-	addi	r6 r0 0
-	jump	L_cont.26237
-L_else.26239 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.26276
-	jump	L_cont.26274
-L_else.26276 : 
-	fsub	f2 f0 f2
-L_cont.26274 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.26278
-	addi	r6 r0 0
-	jump	L_cont.26237
-L_else.26278 : 
-	fldi	f2 r9 1
-	fbne	f2 f0 L_else.26281
-	addi	r6 r0 1
-	jump	L_cont.26279
-L_else.26281 : 
-	addi	r6 r0 0
-L_cont.26279 : 
-	sub	r6 r4 r6
-L_cont.26237 : 
-	bne	r6 r0 L_else.26241
-	fldi	f2 r9 2
-	fsub	f3 f2 f5
-	fldi	f2 r9 3
-	fmul	f4 f3 f2
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.26244
-	jump	L_cont.26242
-L_else.26244 : 
-	fsub	f2 f0 f2
-L_cont.26242 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.26247
-	addi	r6 r0 0
-	jump	L_cont.26245
-L_else.26247 : 
-	fldi	f2 r7 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f9
-	fbgt	f0 f2 L_else.26268
-	jump	L_cont.26266
-L_else.26268 : 
-	fsub	f2 f0 f2
-L_cont.26266 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.26270
-	addi	r6 r0 0
-	jump	L_cont.26245
-L_else.26270 : 
-	fldi	f2 r9 3
-	fbne	f2 f0 L_else.26273
-	addi	r6 r0 1
-	jump	L_cont.26271
-L_else.26273 : 
-	addi	r6 r0 0
-L_cont.26271 : 
-	sub	r6 r4 r6
-L_cont.26245 : 
-	bne	r6 r0 L_else.26249
-	fldi	f2 r9 4
-	fsub	f2 f2 f9
-	fldi	f3 r9 5
-	fmul	f4 f2 f3
-	fldi	f2 r7 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.26252
-	jump	L_cont.26250
-L_else.26252 : 
-	fsub	f2 f0 f2
-L_cont.26250 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.26255
-	addi	r6 r0 0
-	jump	L_cont.26253
-L_else.26255 : 
-	fldi	f2 r7 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f5
-	fbgt	f0 f2 L_else.26260
-	jump	L_cont.26258
-L_else.26260 : 
-	fsub	f2 f0 f2
-L_cont.26258 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.26262
-	addi	r6 r0 0
-	jump	L_cont.26253
-L_else.26262 : 
-	fldi	f2 r9 5
-	fbne	f2 f0 L_else.26265
-	addi	r6 r0 1
-	jump	L_cont.26263
-L_else.26265 : 
-	addi	r6 r0 0
-L_cont.26263 : 
-	sub	r6 r4 r6
-L_cont.26253 : 
-	bne	r6 r0 L_else.26257
-	addi	r6 r0 0
-	jump	L_cont.26200
-L_else.26257 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 3
-	jump	L_cont.26200
-L_else.26249 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 2
-	jump	L_cont.26200
-L_else.26241 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.26200
-L_else.26202 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.26283
-	fldi	f2 r9 0
-	fbgt	f0 f2 L_else.26285
-	addi	r6 r0 0
-	jump	L_cont.26200
-L_else.26285 : 
-	fldi	f2 r9 1
-	fmul	f3 f2 f7
-	fldi	f2 r9 2
-	fmul	f2 f2 f5
-	fadd	f3 f3 f2
-	fldi	f2 r9 3
-	fmul	f2 f2 f9
-	fadd	f2 f3 f2
-	fsti	f2 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.26200
-L_else.26283 : 
-	fldi	f8 r9 0
-	fbne	f8 f0 L_else.26287
-	addi	r6 r0 0
-	jump	L_cont.26200
-L_else.26287 : 
-	fldi	f2 r9 1
-	fmul	f3 f2 f7
-	fldi	f2 r9 2
-	fmul	f2 f2 f5
-	fadd	f3 f3 f2
-	fldi	f2 r9 3
-	fmul	f2 f2 f9
-	fadd	f6 f3 f2
-	fmul	f3 f7 f7
-	ldi	r6 r8 4
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fmul	f3 f5 f5
-	ldi	r6 r8 4
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f9 f9
-	ldi	r6 r8 4
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	ldi	r6 r8 3
-	bne	r6 r0 L_else.26290
-	jump	L_cont.26288
-L_else.26290 : 
-	fmul	f4 f5 f9
-	ldi	r6 r8 9
-	fldi	f3 r6 0
-	fmul	f3 f4 f3
-	fadd	f4 f2 f3
-	fmul	f3 f9 f7
-	ldi	r6 r8 9
-	fldi	f2 r6 1
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fmul	f4 f7 f5
-	ldi	r6 r8 9
-	fldi	f2 r6 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-L_cont.26288 : 
-	ldi	r6 r8 1
-	addi	r7 r0 3
-	bne	r6 r7 L_else.26293
-	fldi	f3 r0 12
+	fldi	f3 r16 0
 	fsub	f2 f2 f3
-	jump	L_cont.26291
-L_else.26293 : 
-L_cont.26291 : 
-	fmul	f3 f6 f6
-	fmul	f2 f8 f2
-	fsub	f2 f3 f2
-	fbgt	f2 f0 L_else.26295
-	addi	r6 r0 0
-	jump	L_cont.26200
-L_else.26295 : 
-	ldi	r6 r8 6
-	bne	r6 r0 L_else.26298
-	fsqrt	f2 f2
-	fsub	f3 f6 f2
-	fldi	f2 r9 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-	jump	L_cont.26296
-L_else.26298 : 
-	fsqrt	f2 f2
-	fadd	f3 f6 f2
-	fldi	f2 r9 4
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-L_cont.26296 : 
-	addi	r6 r0 1
-L_cont.26200 : 
-	bne	r6 r0 L_else.26204
-	addi	r6 r0 0
-	jump	L_cont.26168
-L_else.26204 : 
-	fldi	f2 r0 1073
-	fldi	f3 r0 34
-	fbgt	f3 f2 L_else.26206
-	addi	r6 r0 0
-	jump	L_cont.26168
-L_else.26206 : 
-	ldi	r6 r16 1
-	bne	r6 r5 L_else.26209
-	addi	r6 r0 0
-	jump	L_cont.26207
-L_else.26209 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26213
-	ldi	r6 r16 2
-	bne	r6 r5 L_else.26215
-	addi	r6 r0 0
-	jump	L_cont.26207
-L_else.26215 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26217
-	ldi	r6 r16 3
-	bne	r6 r5 L_else.26219
-	addi	r6 r0 0
-	jump	L_cont.26207
-L_else.26219 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26221
-	ldi	r6 r16 4
-	bne	r6 r5 L_else.26223
-	addi	r6 r0 0
-	jump	L_cont.26207
-L_else.26223 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26225
-	ldi	r6 r16 5
-	bne	r6 r5 L_else.26227
-	addi	r6 r0 0
-	jump	L_cont.26207
-L_else.26227 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26229
-	ldi	r6 r16 6
-	bne	r6 r5 L_else.26231
-	addi	r6 r0 0
-	jump	L_cont.26207
-L_else.26231 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26233
-	addi	r14 r0 7
-	add	r15 r0 r16
-	call	L_shadow_check_one_or_group.2182
-	jump	L_cont.26207
-L_else.26233 : 
-	addi	r6 r0 1
-	jump	L_cont.26207
-L_else.26229 : 
-	addi	r6 r0 1
-	jump	L_cont.26207
-L_else.26225 : 
-	addi	r6 r0 1
-	jump	L_cont.26207
-L_else.26221 : 
-	addi	r6 r0 1
-	jump	L_cont.26207
-L_else.26217 : 
-	addi	r6 r0 1
-	jump	L_cont.26207
-L_else.26213 : 
-	addi	r6 r0 1
-L_cont.26207 : 
-	bne	r6 r0 L_else.26211
-	addi	r6 r0 0
-	jump	L_cont.26168
-L_else.26211 : 
-	addi	r6 r0 1
-L_cont.26168 : 
-	bne	r6 r0 L_else.26172
-	addi	r16 r0 1
-	call	L_shadow_check_one_or_matrix.2185
-	jump	L_cont.26160
-L_else.26172 : 
-	ldi	r6 r16 1
-	bne	r6 r5 L_else.26175
-	addi	r6 r0 0
-	jump	L_cont.26173
-L_else.26175 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26179
-	ldi	r6 r16 2
-	bne	r6 r5 L_else.26181
-	addi	r6 r0 0
-	jump	L_cont.26173
-L_else.26181 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26183
-	ldi	r6 r16 3
-	bne	r6 r5 L_else.26185
-	addi	r6 r0 0
-	jump	L_cont.26173
-L_else.26185 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26187
-	ldi	r6 r16 4
-	bne	r6 r5 L_else.26189
-	addi	r6 r0 0
-	jump	L_cont.26173
-L_else.26189 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26191
-	ldi	r6 r16 5
-	bne	r6 r5 L_else.26193
-	addi	r6 r0 0
-	jump	L_cont.26173
-L_else.26193 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26195
-	ldi	r6 r16 6
-	bne	r6 r5 L_else.26197
-	addi	r6 r0 0
-	jump	L_cont.26173
-L_else.26197 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	call	L_shadow_check_and_group.2179
-	bne	r6 r0 L_else.26199
-	addi	r14 r0 7
-	add	r15 r0 r16
-	call	L_shadow_check_one_or_group.2182
-	jump	L_cont.26173
-L_else.26199 : 
-	addi	r6 r0 1
-	jump	L_cont.26173
-L_else.26195 : 
-	addi	r6 r0 1
-	jump	L_cont.26173
-L_else.26191 : 
-	addi	r6 r0 1
-	jump	L_cont.26173
-L_else.26187 : 
-	addi	r6 r0 1
-	jump	L_cont.26173
-L_else.26183 : 
-	addi	r6 r0 1
-	jump	L_cont.26173
-L_else.26179 : 
-	addi	r6 r0 1
-L_cont.26173 : 
-	bne	r6 r0 L_else.26177
-	addi	r16 r0 1
-	call	L_shadow_check_one_or_matrix.2185
-	jump	L_cont.26160
-L_else.26177 : 
-	addi	r6 r0 1
-L_cont.26160 : 
-	bne	r6 r0 L_else.26164
-	fldi	f2 r0 1046
-	fldi	f3 r0 1039
-	fmul	f3 f2 f3
-	fldi	f4 r0 1047
-	fldi	f2 r0 1040
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fldi	f4 r0 1048
-	fldi	f2 r0 1041
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsub	f2 f0 f2
-	fbgt	f2 f0 L_else.26167
-	fldi	f2 r0 29
-	jump	L_cont.26165
-L_else.26167 : 
-L_cont.26165 : 
-	fmul	f3 f17 f2
-	ldi	r6 r19 7
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fldi	f2 r0 1052
-	fldi	f3 r0 1049
-	fmul	f3 f4 f3
-	fadd	f2 f2 f3
-	fsti	f2 r0 1052
-	fldi	f2 r0 1053
-	fldi	f3 r0 1050
-	fmul	f3 f4 f3
-	fadd	f2 f2 f3
-	fsti	f2 r0 1053
-	fldi	f2 r0 1054
-	fldi	f3 r0 1051
-	fmul	f3 f4 f3
-	fadd	f2 f2 f3
-	fsti	f2 r0 1054
+	fmul	f18 f18 f2
+	addi	r6 r6 1
+	fldi	f2 r0 1082
+	fadd	f19 f19 f2
+	jump	L_trace_ray.2301
+L_else.22305 : 
 	return
-L_else.26164 : 
+L_else.22280 : 
 	return
-L_iter_trace_diffuse_rays.2246 : 
-	bgt	r0 r22 L_else.26318
-	add	r1 r23 r22
-	ldi	r6 r1 0
-	ldi	r6 r6 0
-	fldi	f3 r6 0
-	fldi	f2 r24 0
-	fmul	f4 f3 f2
-	fldi	f3 r6 1
-	fldi	f2 r24 1
-	fmul	f2 f3 f2
-	fadd	f4 f4 f2
-	fldi	f3 r6 2
-	fldi	f2 r24 2
-	fmul	f2 f3 f2
-	fadd	f3 f4 f2
-	fbgt	f0 f3 L_else.26321
-	add	r1 r23 r22
-	ldi	r26 r1 0
-	fldi	f2 r0 51
-	fdiv	f17 f3 f2
+L_trace_diffuse_ray.2307 : 
 	fldi	f2 r0 46
 	fsti	f2 r0 1082
-	ldi	r20 r0 1183
-	ldi	r17 r20 0
-	ldi	r7 r17 0
-	bne	r7 r5 L_else.26329
-	jump	L_cont.26327
-L_else.26329 : 
-	addi	r6 r0 99
-	bne	r7 r6 L_else.26362
-	ldi	r6 r17 1
-	bne	r6 r5 L_else.26364
-	jump	L_cont.26360
-L_else.26364 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 2
-	bne	r6 r5 L_else.26366
-	jump	L_cont.26360
-L_else.26366 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 3
-	bne	r6 r5 L_else.26368
-	jump	L_cont.26360
-L_else.26368 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 4
-	bne	r6 r5 L_else.26370
-	jump	L_cont.26360
-L_else.26370 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	addi	r16 r0 5
-	add	r18 r0 r26
-	call	L_solve_one_or_network_fast.2206
-	jump	L_cont.26360
-L_else.26362 : 
-	ldi	r8 r7 1970
-	ldi	r10 r8 10
-	fldi	f7 r10 0
-	fldi	f6 r10 1
-	fldi	f4 r10 2
-	ldi	r6 r26 1
-	add	r1 r6 r7
-	ldi	r7 r1 0
-	ldi	r9 r8 1
-	bne	r9 r4 L_else.26373
-	ldi	r9 r26 0
+	addi	r24 r0 0
+	ldi	r25 r0 1133
+	add	r26 r0 r28
+	call	L_trace_or_matrix_fast.2274
+	fldi	f3 r0 1082
+	fldi	f2 r0 34
+	fbgt	f3 f2 L_else.22331
+	addi	r6 r0 0
+	jump	L_cont.22329
+L_else.22331 : 
+	fldi	f2 r0 47
+	fbgt	f2 f3 L_else.22358
+	addi	r6 r0 0
+	jump	L_cont.22329
+L_else.22358 : 
+	addi	r6 r0 1
+L_cont.22329 : 
+	bne	r6 r0 L_else.22333
+	return
+L_else.22333 : 
+	ldi	r6 r0 1045
+	muli	r6 r6 11
+	ldi	r11 r6 1928
+	ldi	r9 r6 1927
+	ldi	r23 r6 1926
+	ldi	r10 r6 1925
+	ldi	r8 r6 1924
+	ldi	r7 r6 1923
+	ldi	r13 r6 1922
+	ldi	r12 r6 1920
+	ldi	r6 r6 1919
+	bne	r12 r4 L_else.22336
+	ldi	r10 r0 1074
+	addi	r11 r0 1046
+	fsti	f0 r0 1046
+	fsti	f0 r0 1047
+	fsti	f0 r0 1048
+	addi	r10 r10 -1
+	add	r1 r28 r10
+	fldi	f2 r1 0
+	fbne	f2 f0 L_else.22344
+	fldi	f2 r0 30
+	jump	L_cont.22342
+L_else.22344 : 
+	fbgt	f2 f0 L_else.22346
+	fldi	f2 r0 31
+	jump	L_cont.22342
+L_else.22346 : 
+	fldi	f2 r0 12
+L_cont.22342 : 
+	fsub	f2 f0 f2
+	add	r1 r11 r10
+	fsti	f2 r1 0
+	jump	L_cont.22334
+L_else.22336 : 
+	addi	r14 r0 2
+	bne	r12 r14 L_else.22348
 	fldi	f2 r7 0
-	fsub	f2 f2 f7
-	fldi	f3 r7 1
-	fmul	f5 f2 f3
-	fldi	f2 r9 1
-	fmul	f2 f5 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.26388
-	jump	L_cont.26386
-L_else.26388 : 
 	fsub	f2 f0 f2
-L_cont.26386 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.26391
-	addi	r6 r0 0
-	jump	L_cont.26389
-L_else.26391 : 
-	fldi	f2 r9 2
-	fmul	f2 f5 f2
-	fadd	f2 f2 f4
-	fbgt	f0 f2 L_else.26428
-	jump	L_cont.26426
-L_else.26428 : 
-	fsub	f2 f0 f2
-L_cont.26426 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.26430
-	addi	r6 r0 0
-	jump	L_cont.26389
-L_else.26430 : 
+	fsti	f2 r0 1046
 	fldi	f2 r7 1
-	fbne	f2 f0 L_else.26433
-	addi	r6 r0 1
-	jump	L_cont.26431
-L_else.26433 : 
-	addi	r6 r0 0
-L_cont.26431 : 
-	sub	r6 r4 r6
-L_cont.26389 : 
-	bne	r6 r0 L_else.26393
+	fsub	f2 f0 f2
+	fsti	f2 r0 1047
 	fldi	f2 r7 2
-	fsub	f3 f2 f6
-	fldi	f2 r7 3
-	fmul	f5 f3 f2
-	fldi	f2 r9 0
-	fmul	f2 f5 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.26396
-	jump	L_cont.26394
-L_else.26396 : 
 	fsub	f2 f0 f2
-L_cont.26394 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.26399
-	addi	r6 r0 0
-	jump	L_cont.26397
-L_else.26399 : 
-	fldi	f2 r9 2
-	fmul	f2 f5 f2
-	fadd	f2 f2 f4
-	fbgt	f0 f2 L_else.26420
-	jump	L_cont.26418
-L_else.26420 : 
-	fsub	f2 f0 f2
-L_cont.26418 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.26422
-	addi	r6 r0 0
-	jump	L_cont.26397
-L_else.26422 : 
-	fldi	f2 r7 3
-	fbne	f2 f0 L_else.26425
-	addi	r6 r0 1
-	jump	L_cont.26423
-L_else.26425 : 
-	addi	r6 r0 0
-L_cont.26423 : 
-	sub	r6 r4 r6
-L_cont.26397 : 
-	bne	r6 r0 L_else.26401
-	fldi	f2 r7 4
-	fsub	f2 f2 f4
-	fldi	f3 r7 5
-	fmul	f4 f2 f3
-	fldi	f2 r9 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.26404
-	jump	L_cont.26402
-L_else.26404 : 
-	fsub	f2 f0 f2
-L_cont.26402 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.26407
-	addi	r6 r0 0
-	jump	L_cont.26405
-L_else.26407 : 
-	fldi	f2 r9 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.26412
-	jump	L_cont.26410
-L_else.26412 : 
-	fsub	f2 f0 f2
-L_cont.26410 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.26414
-	addi	r6 r0 0
-	jump	L_cont.26405
-L_else.26414 : 
-	fldi	f2 r7 5
-	fbne	f2 f0 L_else.26417
-	addi	r6 r0 1
-	jump	L_cont.26415
-L_else.26417 : 
-	addi	r6 r0 0
-L_cont.26415 : 
-	sub	r6 r4 r6
-L_cont.26405 : 
-	bne	r6 r0 L_else.26409
-	addi	r6 r0 0
-	jump	L_cont.26371
-L_else.26409 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 3
-	jump	L_cont.26371
-L_else.26401 : 
-	fsti	f5 r0 1073
-	addi	r6 r0 2
-	jump	L_cont.26371
-L_else.26393 : 
-	fsti	f5 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.26371
-L_else.26373 : 
-	addi	r6 r0 2
-	bne	r9 r6 L_else.26435
+	fsti	f2 r0 1048
+	jump	L_cont.22334
+L_else.22348 : 
+	fldi	f2 r0 1042
+	fldi	f3 r8 0
+	fsub	f8 f2 f3
+	fldi	f3 r0 1043
+	fldi	f2 r8 1
+	fsub	f9 f3 f2
+	fldi	f2 r0 1044
+	fldi	f3 r8 2
+	fsub	f7 f2 f3
 	fldi	f2 r7 0
-	fbgt	f0 f2 L_else.26437
-	addi	r6 r0 0
-	jump	L_cont.26371
-L_else.26437 : 
-	fldi	f3 r7 0
-	fldi	f2 r10 3
-	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.26371
-L_else.26435 : 
-	fldi	f5 r7 0
-	fbne	f5 f0 L_else.26439
-	addi	r6 r0 0
-	jump	L_cont.26371
-L_else.26439 : 
+	fmul	f6 f8 f2
 	fldi	f2 r7 1
-	fmul	f3 f2 f7
+	fmul	f5 f9 f2
 	fldi	f2 r7 2
-	fmul	f2 f2 f6
+	fmul	f4 f7 f2
+	bne	r13 r0 L_else.22351
+	fsti	f6 r0 1046
+	fsti	f5 r0 1047
+	fsti	f4 r0 1048
+	jump	L_cont.22349
+L_else.22351 : 
+	fldi	f2 r11 2
+	fmul	f3 f9 f2
+	fldi	f2 r11 1
+	fmul	f2 f7 f2
 	fadd	f3 f3 f2
-	fldi	f2 r7 3
-	fmul	f2 f2 f4
-	fadd	f4 f3 f2
-	fldi	f2 r10 3
+	fldi	f2 r0 29
+	fdiv	f2 f3 f2
+	fadd	f2 f6 f2
+	fsti	f2 r0 1046
+	fldi	f2 r11 2
+	fmul	f3 f8 f2
+	fldi	f2 r11 0
+	fmul	f2 f7 f2
+	fadd	f2 f3 f2
+	fldi	f3 r0 29
+	fdiv	f2 f2 f3
+	fadd	f2 f5 f2
+	fsti	f2 r0 1047
+	fldi	f2 r11 1
+	fmul	f3 f8 f2
+	fldi	f2 r11 0
+	fmul	f2 f9 f2
+	fadd	f3 f3 f2
+	fldi	f2 r0 29
+	fdiv	f2 f3 f2
+	fadd	f2 f4 f2
+	fsti	f2 r0 1048
+L_cont.22349 : 
+	fldi	f4 r0 1046
 	fmul	f3 f4 f4
-	fmul	f2 f5 f2
-	fsub	f2 f3 f2
-	fbgt	f2 f0 L_else.26441
-	addi	r6 r0 0
-	jump	L_cont.26371
-L_else.26441 : 
-	ldi	r6 r8 6
-	bne	r6 r0 L_else.26444
-	fsqrt	f2 f2
-	fsub	f2 f4 f2
-	fldi	f3 r7 4
-	fmul	f2 f2 f3
-	fsti	f2 r0 1073
-	jump	L_cont.26442
-L_else.26444 : 
-	fsqrt	f2 f2
-	fadd	f2 f4 f2
-	fldi	f3 r7 4
-	fmul	f2 f2 f3
-	fsti	f2 r0 1073
-L_cont.26442 : 
-	addi	r6 r0 1
-L_cont.26371 : 
-	bne	r6 r0 L_else.26375
-	jump	L_cont.26360
-L_else.26375 : 
-	fldi	f3 r0 1073
-	fldi	f2 r0 1082
-	fbgt	f2 f3 L_else.26377
-	jump	L_cont.26360
-L_else.26377 : 
-	ldi	r6 r17 1
-	bne	r6 r5 L_else.26379
-	jump	L_cont.26360
-L_else.26379 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 2
-	bne	r6 r5 L_else.26381
-	jump	L_cont.26360
-L_else.26381 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 3
-	bne	r6 r5 L_else.26383
-	jump	L_cont.26360
-L_else.26383 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 4
-	bne	r6 r5 L_else.26385
-	jump	L_cont.26360
-L_else.26385 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	addi	r16 r0 5
-	add	r18 r0 r26
-	call	L_solve_one_or_network_fast.2206
-L_cont.26360 : 
-	addi	r19 r0 1
-	add	r21 r0 r26
-	call	L_trace_or_matrix_fast.2210
-L_cont.26327 : 
-	fldi	f3 r0 1082
-	fldi	f2 r0 34
-	fbgt	f3 f2 L_else.26332
-	addi	r6 r0 0
-	jump	L_cont.26330
-L_else.26332 : 
-	fldi	f2 r0 47
-	fbgt	f2 f3 L_else.26359
-	addi	r6 r0 0
-	jump	L_cont.26330
-L_else.26359 : 
-	addi	r6 r0 1
-L_cont.26330 : 
-	bne	r6 r0 L_else.26334
-	jump	L_cont.26319
-L_else.26334 : 
-	ldi	r6 r0 1045
-	ldi	r19 r6 1970
-	ldi	r7 r26 0
-	ldi	r8 r19 1
-	bne	r8 r4 L_else.26337
-	ldi	r8 r0 1074
-	addi	r6 r0 1046
-	fldi	f2 r0 29
-	fsti	f2 r0 1046
-	fsti	f2 r0 1047
-	fsti	f2 r0 1048
-	addi	r8 r8 -1
-	add	r1 r7 r8
-	fldi	f2 r1 0
-	fbne	f2 f0 L_else.26345
-	fldi	f2 r0 29
-	jump	L_cont.26343
-L_else.26345 : 
-	fbgt	f2 f0 L_else.26347
-	fldi	f2 r0 31
-	jump	L_cont.26343
-L_else.26347 : 
-	fldi	f2 r0 12
-L_cont.26343 : 
-	fsub	f2 f0 f2
-	add	r1 r6 r8
-	fsti	f2 r1 0
-	jump	L_cont.26335
-L_else.26337 : 
-	addi	r6 r0 2
-	bne	r8 r6 L_else.26349
-	ldi	r6 r19 4
-	fldi	f2 r6 0
-	fsub	f2 f0 f2
-	fsti	f2 r0 1046
-	ldi	r6 r19 4
-	fldi	f2 r6 1
-	fsub	f2 f0 f2
-	fsti	f2 r0 1047
-	ldi	r6 r19 4
-	fldi	f2 r6 2
-	fsub	f2 f0 f2
-	fsti	f2 r0 1048
-	jump	L_cont.26335
-L_else.26349 : 
-	fldi	f3 r0 1042
-	ldi	r6 r19 5
-	fldi	f2 r6 0
-	fsub	f8 f3 f2
-	fldi	f3 r0 1043
-	ldi	r6 r19 5
-	fldi	f2 r6 1
-	fsub	f7 f3 f2
-	fldi	f3 r0 1044
-	ldi	r6 r19 5
-	fldi	f2 r6 2
-	fsub	f9 f3 f2
-	ldi	r6 r19 4
-	fldi	f2 r6 0
-	fmul	f5 f8 f2
-	ldi	r6 r19 4
-	fldi	f2 r6 1
-	fmul	f6 f7 f2
-	ldi	r6 r19 4
-	fldi	f2 r6 2
-	fmul	f4 f9 f2
-	ldi	r6 r19 3
-	bne	r6 r0 L_else.26352
-	fsti	f5 r0 1046
-	fsti	f6 r0 1047
-	fsti	f4 r0 1048
-	jump	L_cont.26350
-L_else.26352 : 
-	ldi	r6 r19 9
-	fldi	f2 r6 2
-	fmul	f3 f7 f2
-	ldi	r6 r19 9
-	fldi	f2 r6 1
-	fmul	f2 f9 f2
-	fadd	f2 f3 f2
-	fldi	f3 r0 30
-	fdiv	f2 f2 f3
-	fadd	f2 f5 f2
-	fsti	f2 r0 1046
-	ldi	r6 r19 9
-	fldi	f2 r6 2
-	fmul	f3 f8 f2
-	ldi	r6 r19 9
-	fldi	f2 r6 0
-	fmul	f2 f9 f2
-	fadd	f3 f3 f2
-	fldi	f2 r0 30
-	fdiv	f2 f3 f2
-	fadd	f2 f6 f2
-	fsti	f2 r0 1047
-	ldi	r6 r19 9
-	fldi	f2 r6 1
-	fmul	f3 f8 f2
-	ldi	r6 r19 9
-	fldi	f2 r6 0
-	fmul	f2 f7 f2
-	fadd	f2 f3 f2
-	fldi	f3 r0 30
-	fdiv	f2 f2 f3
-	fadd	f2 f4 f2
-	fsti	f2 r0 1048
-L_cont.26350 : 
-	ldi	r6 r19 6
-	fldi	f2 r0 1046
-	fmul	f3 f2 f2
 	fldi	f2 r0 1047
 	fmul	f2 f2 f2
 	fadd	f3 f3 f2
@@ -10304,20 +5604,19 @@ L_cont.26350 :
 	fmul	f2 f2 f2
 	fadd	f2 f3 f2
 	fsqrt	f3 f2
-	fbne	f3 f0 L_else.26355
+	fbne	f3 f0 L_else.22354
 	fldi	f3 r0 12
-	jump	L_cont.26353
-L_else.26355 : 
-	bne	r6 r0 L_else.26357
+	jump	L_cont.22352
+L_else.22354 : 
+	bne	r10 r0 L_else.22356
 	fldi	f2 r0 12
 	fdiv	f3 f2 f3
-	jump	L_cont.26353
-L_else.26357 : 
+	jump	L_cont.22352
+L_else.22356 : 
 	fldi	f2 r0 31
 	fdiv	f3 f2 f3
-L_cont.26353 : 
-	fldi	f2 r0 1046
-	fmul	f2 f2 f3
+L_cont.22352 : 
+	fmul	f2 f4 f3
 	fsti	f2 r0 1046
 	fldi	f2 r0 1047
 	fmul	f2 f2 f3
@@ -10325,1226 +5624,960 @@ L_cont.26353 :
 	fldi	f2 r0 1048
 	fmul	f2 f2 f3
 	fsti	f2 r0 1048
-L_cont.26335 : 
-	addi	r7 r0 1042
-	add	r6 r0 r19
-	call	L_utexture.2225
-	addi	r16 r0 0
-	ldi	r17 r0 1183
-	call	L_shadow_check_one_or_matrix.2185
-	bne	r6 r0 L_else.26339
-	fldi	f2 r0 1046
-	fldi	f3 r0 1039
-	fmul	f3 f2 f3
-	fldi	f4 r0 1047
+L_cont.22334 : 
+	addi	r10 r0 1042
+	call	L_utexture.2289
+	ldi	r20 r0 1133
+	add	r21 r0 r20
+	call	L_shadow_check_one_or_matrix.2249
+	bne	r6 r0 L_else.22338
+	fldi	f3 r0 1046
+	fldi	f2 r0 1039
+	fmul	f4 f3 f2
+	fldi	f3 r0 1047
 	fldi	f2 r0 1040
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fldi	f4 r0 1048
-	fldi	f2 r0 1041
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsub	f2 f0 f2
-	fbgt	f2 f0 L_else.26342
-	fldi	f2 r0 29
-	jump	L_cont.26340
-L_else.26342 : 
-L_cont.26340 : 
-	fmul	f3 f17 f2
-	ldi	r6 r19 7
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fldi	f3 r0 1052
-	fldi	f2 r0 1049
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1052
-	fldi	f3 r0 1053
-	fldi	f2 r0 1050
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1053
-	fldi	f3 r0 1054
-	fldi	f2 r0 1051
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1054
-	jump	L_cont.26319
-L_else.26339 : 
-	jump	L_cont.26319
-L_else.26321 : 
-	addi	r6 r22 1
-	add	r1 r23 r6
-	ldi	r26 r1 0
-	fldi	f2 r0 52
-	fdiv	f17 f3 f2
-	fldi	f2 r0 46
-	fsti	f2 r0 1082
-	ldi	r20 r0 1183
-	ldi	r17 r20 0
-	ldi	r7 r17 0
-	bne	r7 r5 L_else.26447
-	jump	L_cont.26445
-L_else.26447 : 
-	addi	r6 r0 99
-	bne	r7 r6 L_else.26480
-	ldi	r6 r17 1
-	bne	r6 r5 L_else.26482
-	jump	L_cont.26478
-L_else.26482 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 2
-	bne	r6 r5 L_else.26484
-	jump	L_cont.26478
-L_else.26484 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 3
-	bne	r6 r5 L_else.26486
-	jump	L_cont.26478
-L_else.26486 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 4
-	bne	r6 r5 L_else.26488
-	jump	L_cont.26478
-L_else.26488 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	addi	r16 r0 5
-	add	r18 r0 r26
-	call	L_solve_one_or_network_fast.2206
-	jump	L_cont.26478
-L_else.26480 : 
-	ldi	r8 r7 1970
-	ldi	r10 r8 10
-	fldi	f7 r10 0
-	fldi	f5 r10 1
-	fldi	f6 r10 2
-	ldi	r6 r26 1
-	add	r1 r6 r7
-	ldi	r7 r1 0
-	ldi	r9 r8 1
-	bne	r9 r4 L_else.26491
-	ldi	r9 r26 0
-	fldi	f2 r7 0
-	fsub	f2 f2 f7
-	fldi	f3 r7 1
-	fmul	f4 f2 f3
-	fldi	f2 r9 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f5
-	fbgt	f0 f2 L_else.26506
-	jump	L_cont.26504
-L_else.26506 : 
-	fsub	f2 f0 f2
-L_cont.26504 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.26509
-	addi	r6 r0 0
-	jump	L_cont.26507
-L_else.26509 : 
-	fldi	f2 r9 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.26546
-	jump	L_cont.26544
-L_else.26546 : 
-	fsub	f2 f0 f2
-L_cont.26544 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.26548
-	addi	r6 r0 0
-	jump	L_cont.26507
-L_else.26548 : 
-	fldi	f2 r7 1
-	fbne	f2 f0 L_else.26551
-	addi	r6 r0 1
-	jump	L_cont.26549
-L_else.26551 : 
-	addi	r6 r0 0
-L_cont.26549 : 
-	sub	r6 r4 r6
-L_cont.26507 : 
-	bne	r6 r0 L_else.26511
-	fldi	f2 r7 2
-	fsub	f3 f2 f5
-	fldi	f2 r7 3
-	fmul	f4 f3 f2
-	fldi	f2 r9 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.26514
-	jump	L_cont.26512
-L_else.26514 : 
-	fsub	f2 f0 f2
-L_cont.26512 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.26517
-	addi	r6 r0 0
-	jump	L_cont.26515
-L_else.26517 : 
-	fldi	f2 r9 2
-	fmul	f2 f4 f2
-	fadd	f2 f2 f6
-	fbgt	f0 f2 L_else.26538
-	jump	L_cont.26536
-L_else.26538 : 
-	fsub	f2 f0 f2
-L_cont.26536 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 2
-	fbgt	f3 f2 L_else.26540
-	addi	r6 r0 0
-	jump	L_cont.26515
-L_else.26540 : 
-	fldi	f2 r7 3
-	fbne	f2 f0 L_else.26543
-	addi	r6 r0 1
-	jump	L_cont.26541
-L_else.26543 : 
-	addi	r6 r0 0
-L_cont.26541 : 
-	sub	r6 r4 r6
-L_cont.26515 : 
-	bne	r6 r0 L_else.26519
-	fldi	f2 r7 4
-	fsub	f2 f2 f6
-	fldi	f3 r7 5
-	fmul	f4 f2 f3
-	fldi	f2 r9 0
-	fmul	f2 f4 f2
-	fadd	f2 f2 f7
-	fbgt	f0 f2 L_else.26522
-	jump	L_cont.26520
-L_else.26522 : 
-	fsub	f2 f0 f2
-L_cont.26520 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 0
-	fbgt	f3 f2 L_else.26525
-	addi	r6 r0 0
-	jump	L_cont.26523
-L_else.26525 : 
-	fldi	f2 r9 1
-	fmul	f2 f4 f2
-	fadd	f2 f2 f5
-	fbgt	f0 f2 L_else.26530
-	jump	L_cont.26528
-L_else.26530 : 
-	fsub	f2 f0 f2
-L_cont.26528 : 
-	ldi	r6 r8 4
-	fldi	f3 r6 1
-	fbgt	f3 f2 L_else.26532
-	addi	r6 r0 0
-	jump	L_cont.26523
-L_else.26532 : 
-	fldi	f2 r7 5
-	fbne	f2 f0 L_else.26535
-	addi	r6 r0 1
-	jump	L_cont.26533
-L_else.26535 : 
-	addi	r6 r0 0
-L_cont.26533 : 
-	sub	r6 r4 r6
-L_cont.26523 : 
-	bne	r6 r0 L_else.26527
-	addi	r6 r0 0
-	jump	L_cont.26489
-L_else.26527 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 3
-	jump	L_cont.26489
-L_else.26519 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 2
-	jump	L_cont.26489
-L_else.26511 : 
-	fsti	f4 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.26489
-L_else.26491 : 
-	addi	r6 r0 2
-	bne	r9 r6 L_else.26553
-	fldi	f2 r7 0
-	fbgt	f0 f2 L_else.26555
-	addi	r6 r0 0
-	jump	L_cont.26489
-L_else.26555 : 
-	fldi	f3 r7 0
-	fldi	f2 r10 3
 	fmul	f2 f3 f2
-	fsti	f2 r0 1073
-	addi	r6 r0 1
-	jump	L_cont.26489
-L_else.26553 : 
-	fldi	f4 r7 0
-	fbne	f4 f0 L_else.26557
-	addi	r6 r0 0
-	jump	L_cont.26489
-L_else.26557 : 
-	fldi	f2 r7 1
-	fmul	f3 f2 f7
-	fldi	f2 r7 2
-	fmul	f2 f2 f5
-	fadd	f3 f3 f2
-	fldi	f2 r7 3
-	fmul	f2 f2 f6
-	fadd	f5 f3 f2
-	fldi	f2 r10 3
-	fmul	f3 f5 f5
-	fmul	f2 f4 f2
-	fsub	f2 f3 f2
-	fbgt	f2 f0 L_else.26559
-	addi	r6 r0 0
-	jump	L_cont.26489
-L_else.26559 : 
-	ldi	r6 r8 6
-	bne	r6 r0 L_else.26562
-	fsqrt	f2 f2
-	fsub	f2 f5 f2
-	fldi	f3 r7 4
-	fmul	f2 f2 f3
-	fsti	f2 r0 1073
-	jump	L_cont.26560
-L_else.26562 : 
-	fsqrt	f2 f2
-	fadd	f2 f5 f2
-	fldi	f3 r7 4
-	fmul	f2 f2 f3
-	fsti	f2 r0 1073
-L_cont.26560 : 
-	addi	r6 r0 1
-L_cont.26489 : 
-	bne	r6 r0 L_else.26493
-	jump	L_cont.26478
-L_else.26493 : 
-	fldi	f3 r0 1073
-	fldi	f2 r0 1082
-	fbgt	f2 f3 L_else.26495
-	jump	L_cont.26478
-L_else.26495 : 
-	ldi	r6 r17 1
-	bne	r6 r5 L_else.26497
-	jump	L_cont.26478
-L_else.26497 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 2
-	bne	r6 r5 L_else.26499
-	jump	L_cont.26478
-L_else.26499 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 3
-	bne	r6 r5 L_else.26501
-	jump	L_cont.26478
-L_else.26501 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	ldi	r6 r17 4
-	bne	r6 r5 L_else.26503
-	jump	L_cont.26478
-L_else.26503 : 
-	ldi	r11 r6 1083
-	add	r12 r0 r11
-	add	r13 r0 r26
-	call	L_solve_each_element_fast.2202
-	addi	r16 r0 5
-	add	r18 r0 r26
-	call	L_solve_one_or_network_fast.2206
-L_cont.26478 : 
-	addi	r19 r0 1
-	add	r21 r0 r26
-	call	L_trace_or_matrix_fast.2210
-L_cont.26445 : 
-	fldi	f3 r0 1082
-	fldi	f2 r0 34
-	fbgt	f3 f2 L_else.26450
-	addi	r6 r0 0
-	jump	L_cont.26448
-L_else.26450 : 
-	fldi	f2 r0 47
-	fbgt	f2 f3 L_else.26477
-	addi	r6 r0 0
-	jump	L_cont.26448
-L_else.26477 : 
-	addi	r6 r0 1
-L_cont.26448 : 
-	bne	r6 r0 L_else.26452
-	jump	L_cont.26319
-L_else.26452 : 
-	ldi	r6 r0 1045
-	ldi	r19 r6 1970
-	ldi	r7 r26 0
-	ldi	r8 r19 1
-	bne	r8 r4 L_else.26455
-	ldi	r8 r0 1074
-	addi	r6 r0 1046
-	fldi	f2 r0 29
-	fsti	f2 r0 1046
-	fsti	f2 r0 1047
-	fsti	f2 r0 1048
-	addi	r8 r8 -1
-	add	r1 r7 r8
-	fldi	f2 r1 0
-	fbne	f2 f0 L_else.26463
-	fldi	f2 r0 29
-	jump	L_cont.26461
-L_else.26463 : 
-	fbgt	f2 f0 L_else.26465
-	fldi	f2 r0 31
-	jump	L_cont.26461
-L_else.26465 : 
-	fldi	f2 r0 12
-L_cont.26461 : 
-	fsub	f2 f0 f2
-	add	r1 r6 r8
-	fsti	f2 r1 0
-	jump	L_cont.26453
-L_else.26455 : 
-	addi	r6 r0 2
-	bne	r8 r6 L_else.26467
-	ldi	r6 r19 4
-	fldi	f2 r6 0
-	fsub	f2 f0 f2
-	fsti	f2 r0 1046
-	ldi	r6 r19 4
-	fldi	f2 r6 1
-	fsub	f2 f0 f2
-	fsti	f2 r0 1047
-	ldi	r6 r19 4
-	fldi	f2 r6 2
-	fsub	f2 f0 f2
-	fsti	f2 r0 1048
-	jump	L_cont.26453
-L_else.26467 : 
-	fldi	f3 r0 1042
-	ldi	r6 r19 5
-	fldi	f2 r6 0
-	fsub	f8 f3 f2
-	fldi	f3 r0 1043
-	ldi	r6 r19 5
-	fldi	f2 r6 1
-	fsub	f7 f3 f2
-	fldi	f3 r0 1044
-	ldi	r6 r19 5
-	fldi	f2 r6 2
-	fsub	f9 f3 f2
-	ldi	r6 r19 4
-	fldi	f2 r6 0
-	fmul	f5 f8 f2
-	ldi	r6 r19 4
-	fldi	f2 r6 1
-	fmul	f6 f7 f2
-	ldi	r6 r19 4
-	fldi	f2 r6 2
-	fmul	f4 f9 f2
-	ldi	r6 r19 3
-	bne	r6 r0 L_else.26470
-	fsti	f5 r0 1046
-	fsti	f6 r0 1047
-	fsti	f4 r0 1048
-	jump	L_cont.26468
-L_else.26470 : 
-	ldi	r6 r19 9
-	fldi	f2 r6 2
-	fmul	f3 f7 f2
-	ldi	r6 r19 9
-	fldi	f2 r6 1
-	fmul	f2 f9 f2
-	fadd	f2 f3 f2
-	fldi	f3 r0 30
-	fdiv	f2 f2 f3
-	fadd	f2 f5 f2
-	fsti	f2 r0 1046
-	ldi	r6 r19 9
-	fldi	f2 r6 2
-	fmul	f3 f8 f2
-	ldi	r6 r19 9
-	fldi	f2 r6 0
-	fmul	f2 f9 f2
-	fadd	f3 f3 f2
-	fldi	f2 r0 30
-	fdiv	f2 f3 f2
-	fadd	f2 f6 f2
-	fsti	f2 r0 1047
-	ldi	r6 r19 9
-	fldi	f2 r6 1
-	fmul	f3 f8 f2
-	ldi	r6 r19 9
-	fldi	f2 r6 0
-	fmul	f2 f7 f2
-	fadd	f2 f3 f2
-	fldi	f3 r0 30
-	fdiv	f2 f2 f3
-	fadd	f2 f4 f2
-	fsti	f2 r0 1048
-L_cont.26468 : 
-	ldi	r6 r19 6
-	fldi	f2 r0 1046
-	fmul	f3 f2 f2
-	fldi	f2 r0 1047
-	fmul	f2 f2 f2
-	fadd	f3 f3 f2
-	fldi	f2 r0 1048
-	fmul	f2 f2 f2
-	fadd	f2 f3 f2
-	fsqrt	f3 f2
-	fbne	f3 f0 L_else.26473
-	fldi	f3 r0 12
-	jump	L_cont.26471
-L_else.26473 : 
-	bne	r6 r0 L_else.26475
-	fldi	f2 r0 12
-	fdiv	f3 f2 f3
-	jump	L_cont.26471
-L_else.26475 : 
-	fldi	f2 r0 31
-	fdiv	f3 f2 f3
-L_cont.26471 : 
-	fldi	f2 r0 1046
-	fmul	f2 f2 f3
-	fsti	f2 r0 1046
-	fldi	f2 r0 1047
-	fmul	f2 f2 f3
-	fsti	f2 r0 1047
-	fldi	f2 r0 1048
-	fmul	f2 f2 f3
-	fsti	f2 r0 1048
-L_cont.26453 : 
-	addi	r7 r0 1042
-	add	r6 r0 r19
-	call	L_utexture.2225
-	addi	r16 r0 0
-	ldi	r17 r0 1183
-	call	L_shadow_check_one_or_matrix.2185
-	bne	r6 r0 L_else.26457
-	fldi	f2 r0 1046
-	fldi	f3 r0 1039
-	fmul	f3 f2 f3
-	fldi	f4 r0 1047
-	fldi	f2 r0 1040
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fldi	f4 r0 1048
-	fldi	f2 r0 1041
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsub	f2 f0 f2
-	fbgt	f2 f0 L_else.26460
-	fldi	f2 r0 29
-	jump	L_cont.26458
-L_else.26460 : 
-L_cont.26458 : 
-	fmul	f3 f17 f2
-	ldi	r6 r19 7
-	fldi	f2 r6 0
-	fmul	f4 f3 f2
-	fldi	f3 r0 1052
-	fldi	f2 r0 1049
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1052
-	fldi	f3 r0 1053
-	fldi	f2 r0 1050
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1053
-	fldi	f3 r0 1054
-	fldi	f2 r0 1051
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1054
-	jump	L_cont.26319
-L_else.26457 : 
-L_cont.26319 : 
-	addi	r26 r22 -2
-	bgt	r0 r26 L_else.26323
-	add	r1 r23 r26
-	ldi	r6 r1 0
-	ldi	r6 r6 0
-	fldi	f3 r6 0
-	fldi	f2 r24 0
-	fmul	f4 f3 f2
-	fldi	f2 r6 1
-	fldi	f3 r24 1
-	fmul	f2 f2 f3
 	fadd	f4 f4 f2
-	fldi	f2 r6 2
-	fldi	f3 r24 2
-	fmul	f2 f2 f3
-	fadd	f3 f4 f2
-	fbgt	f0 f3 L_else.26326
-	add	r1 r23 r26
-	ldi	r22 r1 0
-	fldi	f2 r0 51
-	fdiv	f17 f3 f2
-	call	L_trace_diffuse_ray.2243
-	jump	L_cont.26324
-L_else.26326 : 
-	addi	r6 r26 1
-	add	r1 r23 r6
-	ldi	r22 r1 0
-	fldi	f2 r0 52
-	fdiv	f17 f3 f2
-	call	L_trace_diffuse_ray.2243
-L_cont.26324 : 
-	addi	r22 r26 -2
-	jump	L_iter_trace_diffuse_rays.2246
-L_else.26323 : 
-	return
-L_else.26318 : 
-	return
-L_calc_diffuse_using_1point.2259 : 
-	ldi	r7 r6 5
-	ldi	r9 r6 7
-	ldi	r8 r6 1
-	ldi	r28 r6 4
-	add	r1 r7 r27
-	ldi	r7 r1 0
-	fldi	f2 r7 0
+	fldi	f3 r0 1048
+	fldi	f2 r0 1041
+	fmul	f2 f3 f2
+	fadd	f2 f4 f2
+	fsub	f2 f0 f2
+	fbgt	f2 f0 L_else.22341
+	fldi	f2 r0 30
+	jump	L_cont.22339
+L_else.22341 : 
+L_cont.22339 : 
+	fmul	f2 f17 f2
+	fldi	f3 r23 0
+	fmul	f4 f2 f3
+	fldi	f3 r0 1052
+	fldi	f2 r0 1049
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
 	fsti	f2 r0 1052
-	fldi	f2 r7 1
+	fldi	f3 r0 1053
+	fldi	f2 r0 1050
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
 	fsti	f2 r0 1053
-	fldi	f2 r7 2
+	fldi	f3 r0 1054
+	fldi	f2 r0 1051
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
 	fsti	f2 r0 1054
-	ldi	r6 r6 6
-	ldi	r31 r6 0
-	add	r1 r9 r27
-	ldi	r29 r1 0
-	add	r1 r8 r27
-	ldi	r30 r1 0
-	bne	r31 r0 L_else.26566
-	jump	L_cont.26564
-L_else.26566 : 
-	ldi	r23 r0 1076
+	return
+L_else.22338 : 
+	return
+L_iter_trace_diffuse_rays.2310 : 
+	bgt	r0 r6 L_else.22361
+	muli	r9 r6 2
+	addi	r8 r9 1
+	add	r1 r29 r9
+	ldi	r7 r1 0
+	fldi	f3 r7 0
 	fldi	f2 r30 0
-	fsti	f2 r0 1066
+	fmul	f4 f3 f2
+	fldi	f3 r7 1
 	fldi	f2 r30 1
-	fsti	f2 r0 1067
+	fmul	f2 f3 f2
+	fadd	f4 f4 f2
+	fldi	f3 r7 2
 	fldi	f2 r30 2
-	fsti	f2 r0 1068
-	ldi	r6 r0 1072
-	addi	r7 r6 -1
-	add	r6 r0 r30
-	call	L_setup_startp_constants.2148
-	ldi	r6 r23 118
-	ldi	r6 r6 0
-	fldi	f2 r6 0
-	fldi	f3 r29 0
-	fmul	f3 f2 f3
-	fldi	f4 r6 1
-	fldi	f2 r29 1
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fldi	f4 r6 2
-	fldi	f2 r29 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fbgt	f0 f2 L_else.26593
-	ldi	r22 r23 118
-	fldi	f3 r0 51
-	fdiv	f17 f2 f3
-	call	L_trace_diffuse_ray.2243
-	jump	L_cont.26591
-L_else.26593 : 
-	ldi	r22 r23 119
-	fldi	f3 r0 52
-	fdiv	f17 f2 f3
-	call	L_trace_diffuse_ray.2243
-L_cont.26591 : 
-	addi	r22 r0 116
-	add	r24 r0 r29
-	add	r25 r0 r30
-	call	L_iter_trace_diffuse_rays.2246
-L_cont.26564 : 
-	bne	r31 r4 L_else.26569
-	jump	L_cont.26567
-L_else.26569 : 
-	ldi	r23 r0 1077
-	fldi	f2 r30 0
-	fsti	f2 r0 1066
-	fldi	f2 r30 1
-	fsti	f2 r0 1067
-	fldi	f2 r30 2
-	fsti	f2 r0 1068
-	ldi	r6 r0 1072
-	addi	r7 r6 -1
-	add	r6 r0 r30
-	call	L_setup_startp_constants.2148
-	ldi	r6 r23 118
-	ldi	r6 r6 0
-	fldi	f2 r6 0
-	fldi	f3 r29 0
-	fmul	f3 f2 f3
-	fldi	f4 r6 1
-	fldi	f2 r29 1
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fldi	f4 r6 2
-	fldi	f2 r29 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fbgt	f0 f2 L_else.26590
-	ldi	r22 r23 118
-	fldi	f3 r0 51
-	fdiv	f17 f2 f3
-	call	L_trace_diffuse_ray.2243
-	jump	L_cont.26588
-L_else.26590 : 
-	ldi	r22 r23 119
-	fldi	f3 r0 52
-	fdiv	f17 f2 f3
-	call	L_trace_diffuse_ray.2243
-L_cont.26588 : 
-	addi	r22 r0 116
-	add	r24 r0 r29
-	add	r25 r0 r30
-	call	L_iter_trace_diffuse_rays.2246
-L_cont.26567 : 
-	addi	r6 r0 2
-	bne	r31 r6 L_else.26572
-	jump	L_cont.26570
-L_else.26572 : 
-	ldi	r23 r0 1078
-	fldi	f2 r30 0
-	fsti	f2 r0 1066
-	fldi	f2 r30 1
-	fsti	f2 r0 1067
-	fldi	f2 r30 2
-	fsti	f2 r0 1068
-	ldi	r6 r0 1072
-	addi	r7 r6 -1
-	add	r6 r0 r30
-	call	L_setup_startp_constants.2148
-	ldi	r6 r23 118
-	ldi	r6 r6 0
-	fldi	f2 r6 0
-	fldi	f3 r29 0
-	fmul	f3 f2 f3
-	fldi	f4 r6 1
-	fldi	f2 r29 1
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fldi	f4 r6 2
-	fldi	f2 r29 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fbgt	f0 f2 L_else.26587
-	ldi	r22 r23 118
-	fldi	f3 r0 51
-	fdiv	f17 f2 f3
-	call	L_trace_diffuse_ray.2243
-	jump	L_cont.26585
-L_else.26587 : 
-	ldi	r22 r23 119
-	fldi	f3 r0 52
-	fdiv	f17 f2 f3
-	call	L_trace_diffuse_ray.2243
-L_cont.26585 : 
-	addi	r22 r0 116
-	add	r24 r0 r29
-	add	r25 r0 r30
-	call	L_iter_trace_diffuse_rays.2246
-L_cont.26570 : 
-	addi	r6 r0 3
-	bne	r31 r6 L_else.26575
-	jump	L_cont.26573
-L_else.26575 : 
-	ldi	r23 r0 1079
-	fldi	f2 r30 0
-	fsti	f2 r0 1066
-	fldi	f2 r30 1
-	fsti	f2 r0 1067
-	fldi	f2 r30 2
-	fsti	f2 r0 1068
-	ldi	r6 r0 1072
-	addi	r7 r6 -1
-	add	r6 r0 r30
-	call	L_setup_startp_constants.2148
-	ldi	r6 r23 118
-	ldi	r6 r6 0
-	fldi	f2 r6 0
-	fldi	f3 r29 0
-	fmul	f3 f2 f3
-	fldi	f4 r6 1
-	fldi	f2 r29 1
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fldi	f4 r6 2
-	fldi	f2 r29 2
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fbgt	f0 f2 L_else.26584
-	ldi	r22 r23 118
-	fldi	f3 r0 51
-	fdiv	f17 f2 f3
-	call	L_trace_diffuse_ray.2243
-	jump	L_cont.26582
-L_else.26584 : 
-	ldi	r22 r23 119
-	fldi	f3 r0 52
-	fdiv	f17 f2 f3
-	call	L_trace_diffuse_ray.2243
-L_cont.26582 : 
-	addi	r22 r0 116
-	add	r24 r0 r29
-	add	r25 r0 r30
-	call	L_iter_trace_diffuse_rays.2246
-L_cont.26573 : 
-	addi	r6 r0 4
-	bne	r31 r6 L_else.26578
-	jump	L_cont.26576
-L_else.26578 : 
-	ldi	r23 r0 1080
-	fldi	f2 r30 0
-	fsti	f2 r0 1066
-	fldi	f2 r30 1
-	fsti	f2 r0 1067
-	fldi	f2 r30 2
-	fsti	f2 r0 1068
-	ldi	r6 r0 1072
-	addi	r7 r6 -1
-	add	r6 r0 r30
-	call	L_setup_startp_constants.2148
-	ldi	r6 r23 118
-	ldi	r6 r6 0
-	fldi	f2 r6 0
-	fldi	f3 r29 0
-	fmul	f3 f2 f3
-	fldi	f4 r6 1
-	fldi	f2 r29 1
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fldi	f4 r6 2
-	fldi	f2 r29 2
-	fmul	f2 f4 f2
-	fadd	f3 f3 f2
-	fbgt	f0 f3 L_else.26581
-	ldi	r22 r23 118
+	fmul	f2 f3 f2
+	fadd	f3 f4 f2
+	fbgt	f0 f3 L_else.22364
+	add	r1 r29 r8
+	ldi	r27 r1 0
+	add	r1 r29 r9
+	ldi	r28 r1 0
 	fldi	f2 r0 51
 	fdiv	f17 f3 f2
-	call	L_trace_diffuse_ray.2243
-	jump	L_cont.26579
-L_else.26581 : 
-	ldi	r22 r23 119
+	sti	r6 r2 0
+	addi	r2 r2 1
+	call	L_trace_diffuse_ray.2307
+	addi	r2 r2 -1
+	ldi	r6 r2 0
+	jump	L_cont.22362
+L_else.22364 : 
+	addi	r7 r6 1
+	muli	r8 r7 2
+	addi	r7 r8 1
+	add	r1 r29 r7
+	ldi	r27 r1 0
+	add	r1 r29 r8
+	ldi	r28 r1 0
 	fldi	f2 r0 52
 	fdiv	f17 f3 f2
-	call	L_trace_diffuse_ray.2243
-L_cont.26579 : 
-	addi	r22 r0 116
-	add	r24 r0 r29
-	add	r25 r0 r30
-	call	L_iter_trace_diffuse_rays.2246
-L_cont.26576 : 
-	add	r1 r28 r27
+	sti	r6 r2 0
+	addi	r2 r2 1
+	call	L_trace_diffuse_ray.2307
+	addi	r2 r2 -1
+	ldi	r6 r2 0
+L_cont.22362 : 
+	addi	r6 r6 -2
+	jump	L_iter_trace_diffuse_rays.2310
+L_else.22361 : 
+	return
+L_calc_diffuse_using_1point.2323 : 
+	add	r1 r8 r11
+	ldi	r8 r1 0
+	fldi	f2 r8 0
+	fsti	f2 r0 1052
+	fldi	f2 r8 1
+	fsti	f2 r0 1053
+	fldi	f2 r8 2
+	fsti	f2 r0 1054
+	ldi	r9 r9 0
+	add	r1 r10 r11
+	ldi	r8 r1 0
+	add	r1 r6 r11
+	ldi	r6 r1 0
+	bne	r9 r0 L_else.22368
+	jump	L_cont.22366
+L_else.22368 : 
+	ldi	r29 r0 1076
+	fldi	f2 r6 0
+	fsti	f2 r0 1066
+	fldi	f2 r6 1
+	fsti	f2 r0 1067
+	fldi	f2 r6 2
+	fsti	f2 r0 1068
+	ldi	r10 r0 1072
+	addi	r10 r10 -1
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	sti	r11 r2 3
+	sti	r9 r2 4
+	add	r7 r0 r10
+	addi	r2 r2 5
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -5
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	ldi	r11 r2 3
+	ldi	r9 r2 4
+	addi	r10 r0 118
+	sti	r6 r2 0
+	sti	r8 r2 1
+	sti	r7 r2 2
+	sti	r11 r2 3
+	sti	r9 r2 4
+	add	r30 r0 r8
+	add	r31 r0 r6
+	add	r6 r0 r10
+	addi	r2 r2 5
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -5
+	ldi	r6 r2 0
+	ldi	r8 r2 1
+	ldi	r7 r2 2
+	ldi	r11 r2 3
+	ldi	r9 r2 4
+L_cont.22366 : 
+	bne	r9 r4 L_else.22371
+	jump	L_cont.22369
+L_else.22371 : 
+	ldi	r29 r0 1077
+	fldi	f2 r6 0
+	fsti	f2 r0 1066
+	fldi	f2 r6 1
+	fsti	f2 r0 1067
+	fldi	f2 r6 2
+	fsti	f2 r0 1068
+	ldi	r10 r0 1072
+	addi	r10 r10 -1
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r9 r2 2
+	sti	r11 r2 3
+	sti	r7 r2 4
+	add	r7 r0 r10
+	addi	r2 r2 5
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -5
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r9 r2 2
+	ldi	r11 r2 3
+	ldi	r7 r2 4
+	addi	r10 r0 118
+	sti	r9 r2 0
+	sti	r11 r2 1
+	sti	r7 r2 2
+	sti	r8 r2 3
+	sti	r6 r2 4
+	add	r30 r0 r8
+	add	r31 r0 r6
+	add	r6 r0 r10
+	addi	r2 r2 5
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -5
+	ldi	r9 r2 0
+	ldi	r11 r2 1
+	ldi	r7 r2 2
+	ldi	r8 r2 3
+	ldi	r6 r2 4
+L_cont.22369 : 
+	addi	r10 r0 2
+	bne	r9 r10 L_else.22374
+	jump	L_cont.22372
+L_else.22374 : 
+	ldi	r29 r0 1078
+	fldi	f2 r6 0
+	fsti	f2 r0 1066
+	fldi	f2 r6 1
+	fsti	f2 r0 1067
+	fldi	f2 r6 2
+	fsti	f2 r0 1068
+	ldi	r10 r0 1072
+	addi	r10 r10 -1
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r9 r2 2
+	sti	r11 r2 3
+	sti	r7 r2 4
+	add	r7 r0 r10
+	addi	r2 r2 5
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -5
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r9 r2 2
+	ldi	r11 r2 3
+	ldi	r7 r2 4
+	addi	r10 r0 118
+	sti	r9 r2 0
+	sti	r11 r2 1
+	sti	r7 r2 2
+	sti	r8 r2 3
+	sti	r6 r2 4
+	add	r30 r0 r8
+	add	r31 r0 r6
+	add	r6 r0 r10
+	addi	r2 r2 5
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -5
+	ldi	r9 r2 0
+	ldi	r11 r2 1
+	ldi	r7 r2 2
+	ldi	r8 r2 3
+	ldi	r6 r2 4
+L_cont.22372 : 
+	addi	r10 r0 3
+	bne	r9 r10 L_else.22377
+	jump	L_cont.22375
+L_else.22377 : 
+	ldi	r29 r0 1079
+	fldi	f2 r6 0
+	fsti	f2 r0 1066
+	fldi	f2 r6 1
+	fsti	f2 r0 1067
+	fldi	f2 r6 2
+	fsti	f2 r0 1068
+	ldi	r10 r0 1072
+	addi	r10 r10 -1
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r9 r2 2
+	sti	r11 r2 3
+	sti	r7 r2 4
+	add	r7 r0 r10
+	addi	r2 r2 5
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -5
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r9 r2 2
+	ldi	r11 r2 3
+	ldi	r7 r2 4
+	addi	r10 r0 118
+	sti	r9 r2 0
+	sti	r11 r2 1
+	sti	r7 r2 2
+	sti	r8 r2 3
+	sti	r6 r2 4
+	add	r30 r0 r8
+	add	r31 r0 r6
+	add	r6 r0 r10
+	addi	r2 r2 5
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -5
+	ldi	r9 r2 0
+	ldi	r11 r2 1
+	ldi	r7 r2 2
+	ldi	r8 r2 3
+	ldi	r6 r2 4
+L_cont.22375 : 
+	addi	r10 r0 4
+	bne	r9 r10 L_else.22380
+	jump	L_cont.22378
+L_else.22380 : 
+	ldi	r29 r0 1080
+	fldi	f2 r6 0
+	fsti	f2 r0 1066
+	fldi	f2 r6 1
+	fsti	f2 r0 1067
+	fldi	f2 r6 2
+	fsti	f2 r0 1068
+	ldi	r9 r0 1072
+	addi	r9 r9 -1
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r11 r2 2
+	sti	r7 r2 3
+	add	r7 r0 r9
+	addi	r2 r2 4
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -4
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r11 r2 2
+	ldi	r7 r2 3
+	addi	r9 r0 118
+	sti	r11 r2 0
+	sti	r7 r2 1
+	add	r30 r0 r8
+	add	r31 r0 r6
+	add	r6 r0 r9
+	addi	r2 r2 2
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -2
+	ldi	r11 r2 0
+	ldi	r7 r2 1
+L_cont.22378 : 
+	add	r1 r7 r11
 	ldi	r6 r1 0
 	fldi	f4 r0 1055
-	fldi	f3 r6 0
-	fldi	f2 r0 1052
-	fmul	f2 f3 f2
+	fldi	f2 r6 0
+	fldi	f3 r0 1052
+	fmul	f2 f2 f3
 	fadd	f2 f4 f2
 	fsti	f2 r0 1055
-	fldi	f4 r0 1056
-	fldi	f3 r6 1
+	fldi	f3 r0 1056
+	fldi	f4 r6 1
 	fldi	f2 r0 1053
-	fmul	f2 f3 f2
-	fadd	f2 f4 f2
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
 	fsti	f2 r0 1056
 	fldi	f4 r0 1057
-	fldi	f3 r6 2
-	fldi	f2 r0 1054
-	fmul	f2 f3 f2
+	fldi	f2 r6 2
+	fldi	f3 r0 1054
+	fmul	f2 f2 f3
 	fadd	f2 f4 f2
 	fsti	f2 r0 1057
 	return
-L_do_without_neighbors.2268 : 
-	addi	r7 r0 4
-	bgt	r27 r7 L_else.26596
-	ldi	r7 r6 2
-	add	r1 r7 r27
-	ldi	r7 r1 0
-	bgt	r0 r7 L_else.26598
-	ldi	r7 r6 3
-	add	r1 r7 r27
-	ldi	r7 r1 0
-	bne	r7 r0 L_else.26601
-	jump	L_cont.26599
-L_else.26601 : 
-	ldi	r7 r6 5
-	ldi	r9 r6 7
-	ldi	r8 r6 1
-	ldi	r28 r6 4
-	add	r1 r7 r27
-	ldi	r7 r1 0
-	fldi	f2 r7 0
+L_do_without_neighbors.2332 : 
+	addi	r15 r0 4
+	bgt	r14 r15 L_else.22383
+	add	r1 r8 r14
+	ldi	r15 r1 0
+	bgt	r0 r15 L_else.22385
+	add	r1 r9 r14
+	ldi	r15 r1 0
+	bne	r15 r0 L_else.22388
+	jump	L_cont.22386
+L_else.22388 : 
+	add	r1 r11 r14
+	ldi	r15 r1 0
+	fldi	f2 r15 0
 	fsti	f2 r0 1052
-	fldi	f2 r7 1
+	fldi	f2 r15 1
 	fsti	f2 r0 1053
-	fldi	f2 r7 2
+	fldi	f2 r15 2
 	fsti	f2 r0 1054
-	ldi	r7 r6 6
-	ldi	r31 r7 0
-	add	r1 r9 r27
-	ldi	r30 r1 0
-	add	r1 r8 r27
-	ldi	r29 r1 0
-	bne	r31 r0 L_else.26611
-	jump	L_cont.26609
-L_else.26611 : 
-	ldi	r23 r0 1076
-	fldi	f2 r29 0
+	ldi	r17 r12 0
+	add	r1 r13 r14
+	ldi	r15 r1 0
+	add	r1 r7 r14
+	ldi	r16 r1 0
+	bne	r17 r0 L_else.22398
+	jump	L_cont.22396
+L_else.22398 : 
+	ldi	r29 r0 1076
+	fldi	f2 r16 0
 	fsti	f2 r0 1066
-	fldi	f2 r29 1
+	fldi	f2 r16 1
 	fsti	f2 r0 1067
-	fldi	f2 r29 2
+	fldi	f2 r16 2
 	fsti	f2 r0 1068
-	ldi	r7 r0 1072
-	addi	r7 r7 -1
-	sti	r6 r2 0
-	add	r6 r0 r29
-	addi	r2 r2 1
-	call	L_setup_startp_constants.2148
-	addi	r2 r2 -1
-	ldi	r6 r2 0
-	addi	r22 r0 118
-	sti	r6 r2 0
-	add	r24 r0 r30
-	add	r25 r0 r29
-	addi	r2 r2 1
-	call	L_iter_trace_diffuse_rays.2246
-	addi	r2 r2 -1
-	ldi	r6 r2 0
-L_cont.26609 : 
-	bne	r31 r4 L_else.26614
-	jump	L_cont.26612
-L_else.26614 : 
-	ldi	r23 r0 1077
-	fldi	f2 r29 0
+	ldi	r18 r0 1072
+	addi	r18 r18 -1
+	sti	r10 r2 0
+	sti	r8 r2 1
+	sti	r9 r2 2
+	sti	r13 r2 3
+	sti	r12 r2 4
+	sti	r11 r2 5
+	sti	r7 r2 6
+	sti	r6 r2 7
+	add	r6 r0 r16
+	add	r7 r0 r18
+	addi	r2 r2 8
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -8
+	ldi	r10 r2 0
+	ldi	r8 r2 1
+	ldi	r9 r2 2
+	ldi	r13 r2 3
+	ldi	r12 r2 4
+	ldi	r11 r2 5
+	ldi	r7 r2 6
+	ldi	r6 r2 7
+	addi	r18 r0 118
+	sti	r16 r2 0
+	sti	r15 r2 1
+	sti	r10 r2 2
+	sti	r14 r2 3
+	sti	r8 r2 4
+	sti	r9 r2 5
+	sti	r13 r2 6
+	sti	r12 r2 7
+	sti	r11 r2 8
+	sti	r7 r2 9
+	sti	r6 r2 10
+	sti	r17 r2 11
+	add	r30 r0 r15
+	add	r31 r0 r16
+	add	r6 r0 r18
+	addi	r2 r2 12
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -12
+	ldi	r16 r2 0
+	ldi	r15 r2 1
+	ldi	r10 r2 2
+	ldi	r14 r2 3
+	ldi	r8 r2 4
+	ldi	r9 r2 5
+	ldi	r13 r2 6
+	ldi	r12 r2 7
+	ldi	r11 r2 8
+	ldi	r7 r2 9
+	ldi	r6 r2 10
+	ldi	r17 r2 11
+L_cont.22396 : 
+	bne	r17 r4 L_else.22401
+	jump	L_cont.22399
+L_else.22401 : 
+	ldi	r29 r0 1077
+	fldi	f2 r16 0
 	fsti	f2 r0 1066
-	fldi	f2 r29 1
+	fldi	f2 r16 1
 	fsti	f2 r0 1067
-	fldi	f2 r29 2
+	fldi	f2 r16 2
 	fsti	f2 r0 1068
-	ldi	r7 r0 1072
-	addi	r7 r7 -1
-	sti	r6 r2 0
-	add	r6 r0 r29
-	addi	r2 r2 1
-	call	L_setup_startp_constants.2148
-	addi	r2 r2 -1
-	ldi	r6 r2 0
-	addi	r22 r0 118
-	sti	r6 r2 0
-	add	r24 r0 r30
-	add	r25 r0 r29
-	addi	r2 r2 1
-	call	L_iter_trace_diffuse_rays.2246
-	addi	r2 r2 -1
-	ldi	r6 r2 0
-L_cont.26612 : 
-	addi	r7 r0 2
-	bne	r31 r7 L_else.26617
-	jump	L_cont.26615
-L_else.26617 : 
-	ldi	r23 r0 1078
-	fldi	f2 r29 0
-	fsti	f2 r0 1066
-	fldi	f2 r29 1
-	fsti	f2 r0 1067
-	fldi	f2 r29 2
-	fsti	f2 r0 1068
-	ldi	r7 r0 1072
-	addi	r7 r7 -1
-	sti	r6 r2 0
-	add	r6 r0 r29
-	addi	r2 r2 1
-	call	L_setup_startp_constants.2148
-	addi	r2 r2 -1
-	ldi	r6 r2 0
-	addi	r22 r0 118
-	sti	r6 r2 0
-	add	r24 r0 r30
-	add	r25 r0 r29
-	addi	r2 r2 1
-	call	L_iter_trace_diffuse_rays.2246
-	addi	r2 r2 -1
-	ldi	r6 r2 0
-L_cont.26615 : 
-	addi	r7 r0 3
-	bne	r31 r7 L_else.26620
-	jump	L_cont.26618
-L_else.26620 : 
-	ldi	r23 r0 1079
-	fldi	f2 r29 0
-	fsti	f2 r0 1066
-	fldi	f2 r29 1
-	fsti	f2 r0 1067
-	fldi	f2 r29 2
-	fsti	f2 r0 1068
-	ldi	r7 r0 1072
-	addi	r7 r7 -1
-	sti	r6 r2 0
-	add	r6 r0 r29
-	addi	r2 r2 1
-	call	L_setup_startp_constants.2148
-	addi	r2 r2 -1
-	ldi	r6 r2 0
-	addi	r22 r0 118
-	sti	r6 r2 0
-	add	r24 r0 r30
-	add	r25 r0 r29
-	addi	r2 r2 1
-	call	L_iter_trace_diffuse_rays.2246
-	addi	r2 r2 -1
-	ldi	r6 r2 0
-L_cont.26618 : 
-	addi	r7 r0 4
-	bne	r31 r7 L_else.26623
-	jump	L_cont.26621
-L_else.26623 : 
-	ldi	r23 r0 1080
-	fldi	f2 r29 0
-	fsti	f2 r0 1066
-	fldi	f2 r29 1
-	fsti	f2 r0 1067
-	fldi	f2 r29 2
-	fsti	f2 r0 1068
-	ldi	r7 r0 1072
-	addi	r7 r7 -1
-	sti	r6 r2 0
-	add	r6 r0 r29
-	addi	r2 r2 1
-	call	L_setup_startp_constants.2148
-	addi	r2 r2 -1
-	ldi	r6 r2 0
-	addi	r22 r0 118
-	sti	r6 r2 0
-	add	r24 r0 r30
-	add	r25 r0 r29
-	addi	r2 r2 1
-	call	L_iter_trace_diffuse_rays.2246
-	addi	r2 r2 -1
-	ldi	r6 r2 0
-L_cont.26621 : 
-	add	r1 r28 r27
-	ldi	r7 r1 0
-	fldi	f4 r0 1055
-	fldi	f3 r7 0
-	fldi	f2 r0 1052
-	fmul	f2 f3 f2
-	fadd	f2 f4 f2
-	fsti	f2 r0 1055
-	fldi	f4 r0 1056
-	fldi	f3 r7 1
-	fldi	f2 r0 1053
-	fmul	f2 f3 f2
-	fadd	f2 f4 f2
-	fsti	f2 r0 1056
-	fldi	f4 r0 1057
-	fldi	f3 r7 2
-	fldi	f2 r0 1054
-	fmul	f2 f3 f2
-	fadd	f2 f4 f2
-	fsti	f2 r0 1057
-L_cont.26599 : 
-	addi	r7 r27 1
-	addi	r8 r0 4
-	bgt	r7 r8 L_else.26603
-	ldi	r8 r6 2
-	add	r1 r8 r7
-	ldi	r8 r1 0
-	bgt	r0 r8 L_else.26605
-	ldi	r8 r6 3
-	add	r1 r8 r7
-	ldi	r8 r1 0
-	bne	r8 r0 L_else.26608
-	jump	L_cont.26606
-L_else.26608 : 
+	ldi	r18 r0 1072
+	addi	r18 r18 -1
 	sti	r6 r2 0
 	sti	r7 r2 1
-	add	r27 r0 r7
-	addi	r2 r2 2
-	call	L_calc_diffuse_using_1point.2259
-	addi	r2 r2 -2
+	sti	r11 r2 2
+	sti	r12 r2 3
+	sti	r13 r2 4
+	sti	r9 r2 5
+	sti	r8 r2 6
+	sti	r10 r2 7
+	add	r6 r0 r16
+	add	r7 r0 r18
+	addi	r2 r2 8
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -8
 	ldi	r6 r2 0
 	ldi	r7 r2 1
-L_cont.26606 : 
-	addi	r27 r7 1
-	jump	L_do_without_neighbors.2268
-L_else.26605 : 
-	return
-L_else.26603 : 
-	return
-L_else.26598 : 
-	return
-L_else.26596 : 
-	return
-L_try_exploit_neighbors.2284 : 
-	add	r1 r9 r6
-	ldi	r14 r1 0
-	addi	r12 r0 4
-	bgt	r11 r12 L_else.26626
-	ldi	r12 r14 2
-	add	r1 r12 r11
-	ldi	r12 r1 0
-	bgt	r0 r12 L_else.26628
-	add	r1 r9 r6
-	ldi	r12 r1 0
-	ldi	r12 r12 2
-	add	r1 r12 r11
-	ldi	r13 r1 0
-	add	r1 r8 r6
-	ldi	r12 r1 0
-	ldi	r12 r12 2
-	add	r1 r12 r11
-	ldi	r12 r1 0
-	bne	r12 r13 L_else.26631
-	add	r1 r10 r6
-	ldi	r12 r1 0
-	ldi	r12 r12 2
-	add	r1 r12 r11
-	ldi	r12 r1 0
-	bne	r12 r13 L_else.26663
-	addi	r12 r6 -1
-	add	r1 r9 r12
-	ldi	r12 r1 0
-	ldi	r12 r12 2
-	add	r1 r12 r11
-	ldi	r12 r1 0
-	bne	r12 r13 L_else.26665
-	addi	r12 r6 1
-	add	r1 r9 r12
-	ldi	r12 r1 0
-	ldi	r12 r12 2
-	add	r1 r12 r11
-	ldi	r12 r1 0
-	bne	r12 r13 L_else.26667
-	addi	r12 r0 1
-	jump	L_cont.26629
-L_else.26667 : 
-	addi	r12 r0 0
-	jump	L_cont.26629
-L_else.26665 : 
-	addi	r12 r0 0
-	jump	L_cont.26629
-L_else.26663 : 
-	addi	r12 r0 0
-	jump	L_cont.26629
-L_else.26631 : 
-	addi	r12 r0 0
-L_cont.26629 : 
-	bne	r12 r0 L_else.26633
-	add	r1 r9 r6
-	ldi	r6 r1 0
-	addi	r7 r0 4
-	bgt	r11 r7 L_else.26635
-	ldi	r7 r6 2
-	add	r1 r7 r11
-	ldi	r7 r1 0
-	bgt	r0 r7 L_else.26637
-	ldi	r7 r6 3
-	add	r1 r7 r11
-	ldi	r7 r1 0
-	bne	r7 r0 L_else.26640
-	jump	L_cont.26638
-L_else.26640 : 
+	ldi	r11 r2 2
+	ldi	r12 r2 3
+	ldi	r13 r2 4
+	ldi	r9 r2 5
+	ldi	r8 r2 6
+	ldi	r10 r2 7
+	addi	r18 r0 118
+	sti	r17 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	sti	r11 r2 3
+	sti	r12 r2 4
+	sti	r13 r2 5
+	sti	r9 r2 6
+	sti	r8 r2 7
+	sti	r14 r2 8
+	sti	r10 r2 9
+	sti	r15 r2 10
+	sti	r16 r2 11
+	add	r30 r0 r15
+	add	r31 r0 r16
+	add	r6 r0 r18
+	addi	r2 r2 12
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -12
+	ldi	r17 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	ldi	r11 r2 3
+	ldi	r12 r2 4
+	ldi	r13 r2 5
+	ldi	r9 r2 6
+	ldi	r8 r2 7
+	ldi	r14 r2 8
+	ldi	r10 r2 9
+	ldi	r15 r2 10
+	ldi	r16 r2 11
+L_cont.22399 : 
+	addi	r18 r0 2
+	bne	r17 r18 L_else.22404
+	jump	L_cont.22402
+L_else.22404 : 
+	ldi	r29 r0 1078
+	fldi	f2 r16 0
+	fsti	f2 r0 1066
+	fldi	f2 r16 1
+	fsti	f2 r0 1067
+	fldi	f2 r16 2
+	fsti	f2 r0 1068
+	ldi	r18 r0 1072
+	addi	r18 r18 -1
 	sti	r6 r2 0
-	sti	r11 r2 1
-	add	r27 r0 r11
-	addi	r2 r2 2
-	call	L_calc_diffuse_using_1point.2259
-	addi	r2 r2 -2
+	sti	r7 r2 1
+	sti	r11 r2 2
+	sti	r12 r2 3
+	sti	r13 r2 4
+	sti	r9 r2 5
+	sti	r8 r2 6
+	sti	r10 r2 7
+	add	r6 r0 r16
+	add	r7 r0 r18
+	addi	r2 r2 8
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -8
 	ldi	r6 r2 0
-	ldi	r11 r2 1
-L_cont.26638 : 
-	addi	r27 r11 1
-	jump	L_do_without_neighbors.2268
-L_else.26637 : 
-	return
-L_else.26635 : 
-	return
-L_else.26633 : 
-	ldi	r12 r14 3
-	add	r1 r12 r11
-	ldi	r12 r1 0
-	bne	r12 r0 L_else.26643
-	jump	L_cont.26641
-L_else.26643 : 
-	add	r1 r8 r6
-	ldi	r12 r1 0
-	ldi	r15 r12 5
-	addi	r12 r6 -1
-	add	r1 r9 r12
-	ldi	r12 r1 0
-	ldi	r17 r12 5
-	add	r1 r9 r6
-	ldi	r12 r1 0
-	ldi	r16 r12 5
-	addi	r12 r6 1
-	add	r1 r9 r12
-	ldi	r12 r1 0
-	ldi	r14 r12 5
-	add	r1 r10 r6
-	ldi	r12 r1 0
-	ldi	r13 r12 5
-	add	r1 r15 r11
-	ldi	r12 r1 0
-	fldi	f2 r12 0
-	fsti	f2 r0 1052
-	fldi	f2 r12 1
-	fsti	f2 r0 1053
-	fldi	f2 r12 2
-	fsti	f2 r0 1054
-	add	r1 r17 r11
-	ldi	r12 r1 0
+	ldi	r7 r2 1
+	ldi	r11 r2 2
+	ldi	r12 r2 3
+	ldi	r13 r2 4
+	ldi	r9 r2 5
+	ldi	r8 r2 6
+	ldi	r10 r2 7
+	addi	r18 r0 118
+	sti	r17 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	sti	r11 r2 3
+	sti	r12 r2 4
+	sti	r13 r2 5
+	sti	r9 r2 6
+	sti	r8 r2 7
+	sti	r14 r2 8
+	sti	r10 r2 9
+	sti	r15 r2 10
+	sti	r16 r2 11
+	add	r30 r0 r15
+	add	r31 r0 r16
+	add	r6 r0 r18
+	addi	r2 r2 12
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -12
+	ldi	r17 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	ldi	r11 r2 3
+	ldi	r12 r2 4
+	ldi	r13 r2 5
+	ldi	r9 r2 6
+	ldi	r8 r2 7
+	ldi	r14 r2 8
+	ldi	r10 r2 9
+	ldi	r15 r2 10
+	ldi	r16 r2 11
+L_cont.22402 : 
+	addi	r18 r0 3
+	bne	r17 r18 L_else.22407
+	jump	L_cont.22405
+L_else.22407 : 
+	ldi	r29 r0 1079
+	fldi	f2 r16 0
+	fsti	f2 r0 1066
+	fldi	f2 r16 1
+	fsti	f2 r0 1067
+	fldi	f2 r16 2
+	fsti	f2 r0 1068
+	ldi	r18 r0 1072
+	addi	r18 r18 -1
+	sti	r6 r2 0
+	sti	r7 r2 1
+	sti	r11 r2 2
+	sti	r12 r2 3
+	sti	r13 r2 4
+	sti	r9 r2 5
+	sti	r8 r2 6
+	sti	r10 r2 7
+	add	r6 r0 r16
+	add	r7 r0 r18
+	addi	r2 r2 8
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -8
+	ldi	r6 r2 0
+	ldi	r7 r2 1
+	ldi	r11 r2 2
+	ldi	r12 r2 3
+	ldi	r13 r2 4
+	ldi	r9 r2 5
+	ldi	r8 r2 6
+	ldi	r10 r2 7
+	addi	r18 r0 118
+	sti	r17 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	sti	r11 r2 3
+	sti	r12 r2 4
+	sti	r13 r2 5
+	sti	r9 r2 6
+	sti	r8 r2 7
+	sti	r14 r2 8
+	sti	r10 r2 9
+	sti	r15 r2 10
+	sti	r16 r2 11
+	add	r30 r0 r15
+	add	r31 r0 r16
+	add	r6 r0 r18
+	addi	r2 r2 12
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -12
+	ldi	r17 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	ldi	r11 r2 3
+	ldi	r12 r2 4
+	ldi	r13 r2 5
+	ldi	r9 r2 6
+	ldi	r8 r2 7
+	ldi	r14 r2 8
+	ldi	r10 r2 9
+	ldi	r15 r2 10
+	ldi	r16 r2 11
+L_cont.22405 : 
+	addi	r18 r0 4
+	bne	r17 r18 L_else.22410
+	jump	L_cont.22408
+L_else.22410 : 
+	ldi	r29 r0 1080
+	fldi	f2 r16 0
+	fsti	f2 r0 1066
+	fldi	f2 r16 1
+	fsti	f2 r0 1067
+	fldi	f2 r16 2
+	fsti	f2 r0 1068
+	ldi	r17 r0 1072
+	addi	r17 r17 -1
+	sti	r6 r2 0
+	sti	r7 r2 1
+	sti	r11 r2 2
+	sti	r12 r2 3
+	sti	r13 r2 4
+	sti	r9 r2 5
+	sti	r8 r2 6
+	sti	r10 r2 7
+	add	r6 r0 r16
+	add	r7 r0 r17
+	addi	r2 r2 8
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -8
+	ldi	r6 r2 0
+	ldi	r7 r2 1
+	ldi	r11 r2 2
+	ldi	r12 r2 3
+	ldi	r13 r2 4
+	ldi	r9 r2 5
+	ldi	r8 r2 6
+	ldi	r10 r2 7
+	addi	r17 r0 118
+	sti	r6 r2 0
+	sti	r7 r2 1
+	sti	r11 r2 2
+	sti	r12 r2 3
+	sti	r13 r2 4
+	sti	r9 r2 5
+	sti	r8 r2 6
+	sti	r14 r2 7
+	sti	r10 r2 8
+	add	r30 r0 r15
+	add	r31 r0 r16
+	add	r6 r0 r17
+	addi	r2 r2 9
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -9
+	ldi	r6 r2 0
+	ldi	r7 r2 1
+	ldi	r11 r2 2
+	ldi	r12 r2 3
+	ldi	r13 r2 4
+	ldi	r9 r2 5
+	ldi	r8 r2 6
+	ldi	r14 r2 7
+	ldi	r10 r2 8
+L_cont.22408 : 
+	add	r1 r10 r14
+	ldi	r15 r1 0
+	fldi	f4 r0 1055
+	fldi	f2 r15 0
 	fldi	f3 r0 1052
-	fldi	f2 r12 0
+	fmul	f2 f2 f3
+	fadd	f2 f4 f2
+	fsti	f2 r0 1055
+	fldi	f3 r0 1056
+	fldi	f4 r15 1
+	fldi	f2 r0 1053
+	fmul	f2 f4 f2
+	fadd	f2 f3 f2
+	fsti	f2 r0 1056
+	fldi	f4 r0 1057
+	fldi	f2 r15 2
+	fldi	f3 r0 1054
+	fmul	f2 f2 f3
+	fadd	f2 f4 f2
+	fsti	f2 r0 1057
+L_cont.22386 : 
+	addi	r14 r14 1
+	addi	r15 r0 4
+	bgt	r14 r15 L_else.22390
+	add	r1 r8 r14
+	ldi	r15 r1 0
+	bgt	r0 r15 L_else.22392
+	add	r1 r9 r14
+	ldi	r15 r1 0
+	bne	r15 r0 L_else.22395
+	jump	L_cont.22393
+L_else.22395 : 
+	sti	r6 r2 0
+	sti	r7 r2 1
+	sti	r8 r2 2
+	sti	r9 r2 3
+	sti	r10 r2 4
+	sti	r11 r2 5
+	sti	r12 r2 6
+	sti	r13 r2 7
+	sti	r14 r2 8
+	add	r6 r0 r7
+	add	r8 r0 r11
+	add	r9 r0 r12
+	add	r7 r0 r10
+	add	r11 r0 r14
+	add	r10 r0 r13
+	addi	r2 r2 9
+	call	L_calc_diffuse_using_1point.2323
+	addi	r2 r2 -9
+	ldi	r6 r2 0
+	ldi	r7 r2 1
+	ldi	r8 r2 2
+	ldi	r9 r2 3
+	ldi	r10 r2 4
+	ldi	r11 r2 5
+	ldi	r12 r2 6
+	ldi	r13 r2 7
+	ldi	r14 r2 8
+L_cont.22393 : 
+	addi	r14 r14 1
+	jump	L_do_without_neighbors.2332
+L_else.22392 : 
+	return
+L_else.22390 : 
+	return
+L_else.22385 : 
+	return
+L_else.22383 : 
+	return
+L_try_exploit_neighbors.2348 : 
+	muli	r14 r6 8
+	addi	r12 r14 7
+	add	r1 r9 r12
+	ldi	r17 r1 0
+	addi	r12 r14 6
+	add	r1 r9 r12
+	ldi	r16 r1 0
+	addi	r24 r14 5
+	add	r1 r9 r24
+	ldi	r18 r1 0
+	addi	r23 r14 4
+	add	r1 r9 r23
+	ldi	r15 r1 0
+	addi	r12 r14 3
+	add	r1 r9 r12
+	ldi	r20 r1 0
+	addi	r25 r14 2
+	add	r1 r9 r25
+	ldi	r12 r1 0
+	addi	r13 r14 1
+	add	r1 r9 r13
+	ldi	r13 r1 0
+	add	r1 r9 r14
+	ldi	r14 r1 0
+	addi	r22 r0 4
+	bgt	r11 r22 L_else.22413
+	add	r1 r12 r11
+	ldi	r19 r1 0
+	bgt	r0 r19 L_else.22415
+	add	r19 r0 r20
+	add	r1 r12 r11
+	ldi	r26 r1 0
+	add	r1 r8 r25
+	ldi	r21 r1 0
+	add	r1 r21 r11
+	ldi	r21 r1 0
+	bne	r21 r26 L_else.22418
+	add	r1 r10 r25
+	ldi	r21 r1 0
+	add	r1 r21 r11
+	ldi	r21 r1 0
+	bne	r21 r26 L_else.22432
+	addi	r21 r6 -1
+	muli	r21 r21 8
+	addi	r21 r21 2
+	add	r1 r9 r21
+	ldi	r21 r1 0
+	add	r1 r21 r11
+	ldi	r21 r1 0
+	bne	r21 r26 L_else.22434
+	addi	r21 r6 1
+	muli	r21 r21 8
+	addi	r21 r21 2
+	add	r1 r9 r21
+	ldi	r21 r1 0
+	add	r1 r21 r11
+	ldi	r21 r1 0
+	bne	r21 r26 L_else.22436
+	addi	r21 r0 1
+	jump	L_cont.22416
+L_else.22436 : 
+	addi	r21 r0 0
+	jump	L_cont.22416
+L_else.22434 : 
+	addi	r21 r0 0
+	jump	L_cont.22416
+L_else.22432 : 
+	addi	r21 r0 0
+	jump	L_cont.22416
+L_else.22418 : 
+	addi	r21 r0 0
+L_cont.22416 : 
+	bne	r21 r0 L_else.22420
+	add	r10 r0 r19
+	add	r9 r0 r15
+	add	r8 r0 r18
+	add	r7 r0 r16
+	add	r6 r0 r17
+	bgt	r11 r22 L_else.22422
+	add	r1 r12 r11
+	ldi	r15 r1 0
+	bgt	r0 r15 L_else.22424
+	add	r1 r10 r11
+	ldi	r15 r1 0
+	bne	r15 r0 L_else.22427
+	jump	L_cont.22425
+L_else.22427 : 
+	sti	r14 r2 0
+	sti	r13 r2 1
+	sti	r12 r2 2
+	sti	r10 r2 3
+	sti	r9 r2 4
+	sti	r8 r2 5
+	sti	r7 r2 6
+	sti	r6 r2 7
+	sti	r11 r2 8
+	add	r10 r0 r6
+	add	r6 r0 r13
+	add	r1 r0 r7
+	add	r7 r0 r9
+	add	r9 r0 r1
+	addi	r2 r2 9
+	call	L_calc_diffuse_using_1point.2323
+	addi	r2 r2 -9
+	ldi	r14 r2 0
+	ldi	r13 r2 1
+	ldi	r12 r2 2
+	ldi	r10 r2 3
+	ldi	r9 r2 4
+	ldi	r8 r2 5
+	ldi	r7 r2 6
+	ldi	r6 r2 7
+	ldi	r11 r2 8
+L_cont.22425 : 
+	addi	r11 r11 1
+	add	r1 r0 r6
+	add	r6 r0 r14
+	add	r14 r0 r11
+	add	r11 r0 r8
+	add	r8 r0 r12
+	add	r12 r0 r7
+	add	r7 r0 r13
+	add	r13 r0 r1
+	add	r1 r0 r9
+	add	r9 r0 r10
+	add	r10 r0 r1
+	jump	L_do_without_neighbors.2332
+L_else.22424 : 
+	return
+L_else.22422 : 
+	return
+L_else.22420 : 
+	add	r1 r20 r11
+	ldi	r12 r1 0
+	bne	r12 r0 L_else.22430
+	jump	L_cont.22428
+L_else.22430 : 
+	add	r1 r8 r24
+	ldi	r14 r1 0
+	addi	r12 r6 -1
+	muli	r12 r12 8
+	addi	r12 r12 5
+	add	r1 r9 r12
+	ldi	r12 r1 0
+	add	r16 r0 r12
+	add	r1 r9 r24
+	ldi	r12 r1 0
+	add	r15 r0 r12
+	addi	r12 r6 1
+	muli	r12 r12 8
+	addi	r12 r12 5
+	add	r1 r9 r12
+	ldi	r12 r1 0
+	add	r1 r10 r24
+	ldi	r13 r1 0
+	add	r1 r14 r11
+	ldi	r14 r1 0
+	fldi	f2 r14 0
+	fsti	f2 r0 1052
+	fldi	f2 r14 1
+	fsti	f2 r0 1053
+	fldi	f2 r14 2
+	fsti	f2 r0 1054
+	add	r1 r16 r11
+	ldi	r14 r1 0
+	fldi	f3 r0 1052
+	fldi	f2 r14 0
 	fadd	f2 f3 f2
 	fsti	f2 r0 1052
 	fldi	f2 r0 1053
-	fldi	f3 r12 1
+	fldi	f3 r14 1
 	fadd	f2 f2 f3
 	fsti	f2 r0 1053
 	fldi	f3 r0 1054
-	fldi	f2 r12 2
+	fldi	f2 r14 2
 	fadd	f2 f3 f2
 	fsti	f2 r0 1054
-	add	r1 r16 r11
-	ldi	r12 r1 0
+	add	r1 r15 r11
+	ldi	r14 r1 0
 	fldi	f2 r0 1052
-	fldi	f3 r12 0
+	fldi	f3 r14 0
 	fadd	f2 f2 f3
 	fsti	f2 r0 1052
 	fldi	f3 r0 1053
-	fldi	f2 r12 1
+	fldi	f2 r14 1
 	fadd	f2 f3 f2
 	fsti	f2 r0 1053
 	fldi	f2 r0 1054
-	fldi	f3 r12 2
+	fldi	f3 r14 2
 	fadd	f2 f2 f3
 	fsti	f2 r0 1054
-	add	r1 r14 r11
+	add	r1 r12 r11
 	ldi	r12 r1 0
 	fldi	f3 r0 1052
 	fldi	f2 r12 0
@@ -11572,9 +6605,8 @@ L_else.26643 :
 	fldi	f3 r12 2
 	fadd	f2 f2 f3
 	fsti	f2 r0 1054
-	add	r1 r9 r6
+	add	r1 r9 r23
 	ldi	r12 r1 0
-	ldi	r12 r12 4
 	add	r1 r12 r11
 	ldi	r12 r1 0
 	fldi	f4 r0 1055
@@ -11595,347 +6627,214 @@ L_else.26643 :
 	fmul	f2 f2 f3
 	fadd	f2 f4 f2
 	fsti	f2 r0 1057
-L_cont.26641 : 
-	addi	r27 r11 1
-	add	r1 r9 r6
-	ldi	r13 r1 0
-	addi	r11 r0 4
-	bgt	r27 r11 L_else.26645
-	ldi	r11 r13 2
-	add	r1 r11 r27
-	ldi	r11 r1 0
-	bgt	r0 r11 L_else.26647
-	add	r1 r9 r6
-	ldi	r11 r1 0
-	ldi	r11 r11 2
-	add	r1 r11 r27
-	ldi	r12 r1 0
-	add	r1 r8 r6
-	ldi	r11 r1 0
-	ldi	r11 r11 2
-	add	r1 r11 r27
-	ldi	r11 r1 0
-	bne	r11 r12 L_else.26650
-	add	r1 r10 r6
-	ldi	r11 r1 0
-	ldi	r11 r11 2
-	add	r1 r11 r27
-	ldi	r11 r1 0
-	bne	r11 r12 L_else.26657
-	addi	r11 r6 -1
-	add	r1 r9 r11
-	ldi	r11 r1 0
-	ldi	r11 r11 2
-	add	r1 r11 r27
-	ldi	r11 r1 0
-	bne	r11 r12 L_else.26659
-	addi	r11 r6 1
-	add	r1 r9 r11
-	ldi	r11 r1 0
-	ldi	r11 r11 2
-	add	r1 r11 r27
-	ldi	r11 r1 0
-	bne	r11 r12 L_else.26661
-	addi	r11 r0 1
-	jump	L_cont.26648
-L_else.26661 : 
-	addi	r11 r0 0
-	jump	L_cont.26648
-L_else.26659 : 
-	addi	r11 r0 0
-	jump	L_cont.26648
-L_else.26657 : 
-	addi	r11 r0 0
-	jump	L_cont.26648
-L_else.26650 : 
-	addi	r11 r0 0
-L_cont.26648 : 
-	bne	r11 r0 L_else.26652
-	add	r1 r9 r6
-	ldi	r6 r1 0
-	jump	L_do_without_neighbors.2268
-L_else.26652 : 
-	ldi	r11 r13 3
-	add	r1 r11 r27
-	ldi	r11 r1 0
-	bne	r11 r0 L_else.26655
-	jump	L_cont.26653
-L_else.26655 : 
-	add	r1 r8 r6
-	ldi	r11 r1 0
-	ldi	r16 r11 5
-	addi	r11 r6 -1
-	add	r1 r9 r11
-	ldi	r11 r1 0
-	ldi	r15 r11 5
-	add	r1 r9 r6
-	ldi	r11 r1 0
-	ldi	r13 r11 5
-	addi	r11 r6 1
-	add	r1 r9 r11
-	ldi	r11 r1 0
-	ldi	r14 r11 5
-	add	r1 r10 r6
-	ldi	r11 r1 0
-	ldi	r12 r11 5
-	add	r1 r16 r27
-	ldi	r11 r1 0
-	fldi	f2 r11 0
-	fsti	f2 r0 1052
-	fldi	f2 r11 1
-	fsti	f2 r0 1053
-	fldi	f2 r11 2
-	fsti	f2 r0 1054
-	add	r1 r15 r27
-	ldi	r11 r1 0
-	fldi	f3 r0 1052
-	fldi	f2 r11 0
-	fadd	f2 f3 f2
-	fsti	f2 r0 1052
-	fldi	f3 r0 1053
-	fldi	f2 r11 1
-	fadd	f2 f3 f2
-	fsti	f2 r0 1053
-	fldi	f3 r0 1054
-	fldi	f2 r11 2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1054
-	add	r1 r13 r27
-	ldi	r11 r1 0
-	fldi	f3 r0 1052
-	fldi	f2 r11 0
-	fadd	f2 f3 f2
-	fsti	f2 r0 1052
-	fldi	f3 r0 1053
-	fldi	f2 r11 1
-	fadd	f2 f3 f2
-	fsti	f2 r0 1053
-	fldi	f3 r0 1054
-	fldi	f2 r11 2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1054
-	add	r1 r14 r27
-	ldi	r11 r1 0
-	fldi	f3 r0 1052
-	fldi	f2 r11 0
-	fadd	f2 f3 f2
-	fsti	f2 r0 1052
-	fldi	f3 r0 1053
-	fldi	f2 r11 1
-	fadd	f2 f3 f2
-	fsti	f2 r0 1053
-	fldi	f3 r0 1054
-	fldi	f2 r11 2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1054
-	add	r1 r12 r27
-	ldi	r11 r1 0
-	fldi	f3 r0 1052
-	fldi	f2 r11 0
-	fadd	f2 f3 f2
-	fsti	f2 r0 1052
-	fldi	f3 r0 1053
-	fldi	f2 r11 1
-	fadd	f2 f3 f2
-	fsti	f2 r0 1053
-	fldi	f3 r0 1054
-	fldi	f2 r11 2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1054
-	add	r1 r9 r6
-	ldi	r11 r1 0
-	ldi	r11 r11 4
-	add	r1 r11 r27
-	ldi	r11 r1 0
-	fldi	f4 r0 1055
-	fldi	f3 r11 0
-	fldi	f2 r0 1052
-	fmul	f2 f3 f2
-	fadd	f2 f4 f2
-	fsti	f2 r0 1055
-	fldi	f4 r0 1056
-	fldi	f3 r11 1
-	fldi	f2 r0 1053
-	fmul	f2 f3 f2
-	fadd	f2 f4 f2
-	fsti	f2 r0 1056
-	fldi	f4 r0 1057
-	fldi	f3 r11 2
-	fldi	f2 r0 1054
-	fmul	f2 f3 f2
-	fadd	f2 f4 f2
-	fsti	f2 r0 1057
-L_cont.26653 : 
-	addi	r11 r27 1
-	jump	L_try_exploit_neighbors.2284
-L_else.26647 : 
+L_cont.22428 : 
+	addi	r11 r11 1
+	jump	L_try_exploit_neighbors.2348
+L_else.22415 : 
 	return
-L_else.26645 : 
+L_else.22413 : 
 	return
-L_else.26628 : 
-	return
-L_else.26626 : 
-	return
-L_write_ppm_header.2291 : 
+L_write_ppm_header.2355 : 
 	addi	r6 r0 80
 	call	min_caml_print_char
 	addi	r6 r0 54
 	call	min_caml_print_char
 	addi	r6 r0 10
 	call	min_caml_print_char
-	ldi	r10 r0 1058
-	call	L_print_int.1900
+	ldi	r9 r0 1058
+	call	L_print_int.1964
 	addi	r6 r0 32
 	call	min_caml_print_char
-	ldi	r10 r0 1059
-	call	L_print_int.1900
+	ldi	r9 r0 1059
+	call	L_print_int.1964
 	addi	r6 r0 32
 	call	min_caml_print_char
-	addi	r10 r0 255
-	call	L_print_int.1900
+	addi	r9 r0 255
+	call	L_print_int.1964
 	addi	r6 r0 10
 	jump	min_caml_print_char
-L_write_rgb_element.2293 : 
+L_write_rgb_element.2357 : 
 	jump	min_caml_print_float
-L_pretrace_diffuse_rays.2297 : 
-	addi	r6 r0 4
-	bgt	r28 r6 L_else.26672
-	ldi	r6 r27 2
-	add	r1 r6 r28
-	ldi	r6 r1 0
-	bgt	r0 r6 L_else.26674
-	ldi	r6 r27 3
-	add	r1 r6 r28
-	ldi	r6 r1 0
-	bne	r6 r0 L_else.26677
-	jump	L_cont.26675
-L_else.26677 : 
-	ldi	r6 r27 6
-	ldi	r8 r6 0
-	fldi	f2 r0 29
-	fsti	f2 r0 1052
-	fsti	f2 r0 1053
-	fsti	f2 r0 1054
-	ldi	r6 r27 7
-	ldi	r7 r27 1
-	ldi	r23 r8 1076
-	add	r1 r6 r28
-	ldi	r24 r1 0
-	add	r1 r7 r28
-	ldi	r25 r1 0
-	fldi	f2 r25 0
+L_pretrace_diffuse_rays.2361 : 
+	addi	r15 r0 4
+	bgt	r14 r15 L_else.22441
+	add	r1 r8 r14
+	ldi	r15 r1 0
+	bgt	r0 r15 L_else.22443
+	add	r1 r9 r14
+	ldi	r15 r1 0
+	bne	r15 r0 L_else.22446
+	jump	L_cont.22444
+L_else.22446 : 
+	ldi	r15 r12 0
+	fsti	f0 r0 1052
+	fsti	f0 r0 1053
+	fsti	f0 r0 1054
+	ldi	r29 r15 1076
+	add	r1 r13 r14
+	ldi	r30 r1 0
+	add	r1 r7 r14
+	ldi	r31 r1 0
+	fldi	f2 r31 0
 	fsti	f2 r0 1066
-	fldi	f2 r25 1
+	fldi	f2 r31 1
 	fsti	f2 r0 1067
-	fldi	f2 r25 2
+	fldi	f2 r31 2
 	fsti	f2 r0 1068
-	ldi	r6 r0 1072
-	addi	r7 r6 -1
-	add	r6 r0 r25
-	call	L_setup_startp_constants.2148
-	addi	r22 r0 118
-	call	L_iter_trace_diffuse_rays.2246
-	ldi	r6 r27 5
-	add	r1 r6 r28
-	ldi	r6 r1 0
+	ldi	r15 r0 1072
+	addi	r15 r15 -1
+	sti	r6 r2 0
+	sti	r7 r2 1
+	sti	r10 r2 2
+	sti	r12 r2 3
+	sti	r13 r2 4
+	sti	r9 r2 5
+	sti	r8 r2 6
+	sti	r11 r2 7
+	add	r6 r0 r31
+	add	r7 r0 r15
+	addi	r2 r2 8
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -8
+	ldi	r6 r2 0
+	ldi	r7 r2 1
+	ldi	r10 r2 2
+	ldi	r12 r2 3
+	ldi	r13 r2 4
+	ldi	r9 r2 5
+	ldi	r8 r2 6
+	ldi	r11 r2 7
+	addi	r15 r0 118
+	sti	r6 r2 0
+	sti	r7 r2 1
+	sti	r10 r2 2
+	sti	r12 r2 3
+	sti	r13 r2 4
+	sti	r9 r2 5
+	sti	r8 r2 6
+	sti	r14 r2 7
+	sti	r11 r2 8
+	add	r6 r0 r15
+	addi	r2 r2 9
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -9
+	ldi	r6 r2 0
+	ldi	r7 r2 1
+	ldi	r10 r2 2
+	ldi	r12 r2 3
+	ldi	r13 r2 4
+	ldi	r9 r2 5
+	ldi	r8 r2 6
+	ldi	r14 r2 7
+	ldi	r11 r2 8
+	add	r1 r11 r14
+	ldi	r15 r1 0
 	fldi	f2 r0 1052
-	fsti	f2 r6 0
+	fsti	f2 r15 0
 	fldi	f2 r0 1053
-	fsti	f2 r6 1
+	fsti	f2 r15 1
 	fldi	f2 r0 1054
-	fsti	f2 r6 2
-L_cont.26675 : 
-	addi	r28 r28 1
-	addi	r6 r0 4
-	bgt	r28 r6 L_else.26679
-	ldi	r6 r27 2
-	add	r1 r6 r28
-	ldi	r6 r1 0
-	bgt	r0 r6 L_else.26681
-	ldi	r6 r27 3
-	add	r1 r6 r28
-	ldi	r6 r1 0
-	bne	r6 r0 L_else.26684
-	jump	L_cont.26682
-L_else.26684 : 
-	ldi	r6 r27 6
-	ldi	r8 r6 0
-	fldi	f2 r0 29
-	fsti	f2 r0 1052
-	fsti	f2 r0 1053
-	fsti	f2 r0 1054
-	ldi	r6 r27 7
-	ldi	r7 r27 1
-	ldi	r23 r8 1076
-	add	r1 r6 r28
-	ldi	r24 r1 0
-	add	r1 r7 r28
-	ldi	r25 r1 0
-	fldi	f2 r25 0
+	fsti	f2 r15 2
+L_cont.22444 : 
+	addi	r14 r14 1
+	addi	r15 r0 4
+	bgt	r14 r15 L_else.22448
+	add	r1 r8 r14
+	ldi	r15 r1 0
+	bgt	r0 r15 L_else.22450
+	add	r1 r9 r14
+	ldi	r15 r1 0
+	bne	r15 r0 L_else.22453
+	jump	L_cont.22451
+L_else.22453 : 
+	ldi	r15 r12 0
+	fsti	f0 r0 1052
+	fsti	f0 r0 1053
+	fsti	f0 r0 1054
+	ldi	r29 r15 1076
+	add	r1 r13 r14
+	ldi	r30 r1 0
+	add	r1 r7 r14
+	ldi	r31 r1 0
+	fldi	f2 r31 0
 	fsti	f2 r0 1066
-	fldi	f2 r25 1
+	fldi	f2 r31 1
 	fsti	f2 r0 1067
-	fldi	f2 r25 2
+	fldi	f2 r31 2
 	fsti	f2 r0 1068
-	ldi	r6 r0 1072
-	addi	r7 r6 -1
-	add	r6 r0 r25
-	call	L_setup_startp_constants.2148
-	ldi	r6 r23 118
-	ldi	r6 r6 0
-	fldi	f3 r6 0
-	fldi	f2 r24 0
-	fmul	f4 f3 f2
-	fldi	f2 r6 1
-	fldi	f3 r24 1
-	fmul	f2 f2 f3
-	fadd	f4 f4 f2
-	fldi	f2 r6 2
-	fldi	f3 r24 2
-	fmul	f2 f2 f3
-	fadd	f3 f4 f2
-	fbgt	f0 f3 L_else.26687
-	ldi	r22 r23 118
-	fldi	f2 r0 51
-	fdiv	f17 f3 f2
-	call	L_trace_diffuse_ray.2243
-	jump	L_cont.26685
-L_else.26687 : 
-	ldi	r22 r23 119
-	fldi	f2 r0 52
-	fdiv	f17 f3 f2
-	call	L_trace_diffuse_ray.2243
-L_cont.26685 : 
-	addi	r22 r0 116
-	call	L_iter_trace_diffuse_rays.2246
-	ldi	r6 r27 5
-	add	r1 r6 r28
-	ldi	r6 r1 0
+	ldi	r15 r0 1072
+	addi	r15 r15 -1
+	sti	r13 r2 0
+	sti	r12 r2 1
+	sti	r10 r2 2
+	sti	r9 r2 3
+	sti	r8 r2 4
+	sti	r7 r2 5
+	sti	r6 r2 6
+	sti	r11 r2 7
+	add	r6 r0 r31
+	add	r7 r0 r15
+	addi	r2 r2 8
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -8
+	ldi	r13 r2 0
+	ldi	r12 r2 1
+	ldi	r10 r2 2
+	ldi	r9 r2 3
+	ldi	r8 r2 4
+	ldi	r7 r2 5
+	ldi	r6 r2 6
+	ldi	r11 r2 7
+	addi	r15 r0 118
+	sti	r13 r2 0
+	sti	r12 r2 1
+	sti	r10 r2 2
+	sti	r9 r2 3
+	sti	r8 r2 4
+	sti	r7 r2 5
+	sti	r6 r2 6
+	sti	r14 r2 7
+	sti	r11 r2 8
+	add	r6 r0 r15
+	addi	r2 r2 9
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -9
+	ldi	r13 r2 0
+	ldi	r12 r2 1
+	ldi	r10 r2 2
+	ldi	r9 r2 3
+	ldi	r8 r2 4
+	ldi	r7 r2 5
+	ldi	r6 r2 6
+	ldi	r14 r2 7
+	ldi	r11 r2 8
+	add	r1 r11 r14
+	ldi	r15 r1 0
 	fldi	f2 r0 1052
-	fsti	f2 r6 0
+	fsti	f2 r15 0
 	fldi	f2 r0 1053
-	fsti	f2 r6 1
+	fsti	f2 r15 1
 	fldi	f2 r0 1054
-	fsti	f2 r6 2
-L_cont.26682 : 
-	addi	r28 r28 1
-	jump	L_pretrace_diffuse_rays.2297
-L_else.26681 : 
+	fsti	f2 r15 2
+L_cont.22451 : 
+	addi	r14 r14 1
+	jump	L_pretrace_diffuse_rays.2361
+L_else.22450 : 
 	return
-L_else.26679 : 
+L_else.22448 : 
 	return
-L_else.26674 : 
+L_else.22443 : 
 	return
-L_else.26672 : 
+L_else.22441 : 
 	return
-L_pretrace_pixels.2300 : 
-	bgt	r0 r7 L_else.26690
+L_pretrace_pixels.2364 : 
+	bgt	r0 r7 L_else.22456
 	fldi	f3 r0 1062
 	ldi	r9 r0 1060
 	sub	r9 r7 r9
 	foi	f2 r9
 	fmul	f3 f3 f2
-	addi	r27 r0 1069
+	addi	r26 r0 1069
 	fldi	f2 r0 1030
 	fmul	f2 f3 f2
 	fadd	f2 f2 f20
@@ -11948,8 +6847,8 @@ L_pretrace_pixels.2300 :
 	fmul	f2 f3 f2
 	fadd	f2 f2 f22
 	fsti	f2 r0 1071
-	fldi	f2 r0 1069
-	fmul	f3 f2 f2
+	fldi	f4 r0 1069
+	fmul	f3 f4 f4
 	fldi	f2 r0 1070
 	fmul	f2 f2 f2
 	fadd	f3 f3 f2
@@ -11957,15 +6856,14 @@ L_pretrace_pixels.2300 :
 	fmul	f2 f2 f2
 	fadd	f2 f3 f2
 	fsqrt	f2 f2
-	fbne	f2 f0 L_else.26693
+	fbne	f2 f0 L_else.22459
 	fldi	f3 r0 12
-	jump	L_cont.26691
-L_else.26693 : 
+	jump	L_cont.22457
+L_else.22459 : 
 	fldi	f3 r0 12
 	fdiv	f3 f3 f2
-L_cont.26691 : 
-	fldi	f2 r0 1069
-	fmul	f2 f2 f3
+L_cont.22457 : 
+	fmul	f2 f4 f3
 	fsti	f2 r0 1069
 	fldi	f2 r0 1070
 	fmul	f2 f2 f3
@@ -11973,175 +6871,224 @@ L_cont.26691 :
 	fldi	f2 r0 1071
 	fmul	f2 f2 f3
 	fsti	f2 r0 1071
-	fldi	f2 r0 29
-	fsti	f2 r0 1055
-	fsti	f2 r0 1056
-	fsti	f2 r0 1057
+	fsti	f0 r0 1055
+	fsti	f0 r0 1056
+	fsti	f0 r0 1057
 	fldi	f2 r0 1036
 	fsti	f2 r0 1063
 	fldi	f2 r0 1037
 	fsti	f2 r0 1064
 	fldi	f2 r0 1038
 	fsti	f2 r0 1065
-	addi	r26 r0 0
-	fldi	f17 r0 12
-	add	r1 r6 r7
-	ldi	r28 r1 0
-	fldi	f18 r0 29
-	sti	r8 r2 0
-	sti	r7 r2 1
-	sti	r6 r2 2
-	addi	r2 r2 3
-	call	L_trace_ray.2237
-	addi	r2 r2 -3
-	ldi	r8 r2 0
-	ldi	r7 r2 1
-	ldi	r6 r2 2
-	add	r1 r6 r7
+	addi	r25 r0 0
+	fldi	f18 r0 12
+	muli	r24 r7 8
+	addi	r17 r24 7
+	add	r1 r6 r17
+	ldi	r15 r1 0
+	addi	r18 r24 6
+	add	r1 r6 r18
+	ldi	r14 r1 0
+	addi	r19 r24 5
+	add	r1 r6 r19
+	ldi	r13 r1 0
+	addi	r20 r24 4
+	add	r1 r6 r20
+	ldi	r12 r1 0
+	addi	r21 r24 3
+	add	r1 r6 r21
+	ldi	r11 r1 0
+	addi	r22 r24 2
+	add	r1 r6 r22
+	ldi	r10 r1 0
+	addi	r23 r24 1
+	add	r1 r6 r23
+	ldi	r16 r1 0
+	add	r1 r6 r24
 	ldi	r9 r1 0
-	ldi	r9 r9 0
+	fldi	f19 r0 30
+	sti	r17 r2 0
+	sti	r19 r2 1
+	sti	r21 r2 2
+	sti	r23 r2 3
+	sti	r7 r2 4
+	sti	r22 r2 5
+	sti	r20 r2 6
+	sti	r8 r2 7
+	sti	r18 r2 8
+	sti	r24 r2 9
+	sti	r6 r2 10
+	add	r6 r0 r25
+	add	r7 r0 r26
+	add	r8 r0 r9
+	add	r9 r0 r16
+	addi	r2 r2 11
+	call	L_trace_ray.2301
+	addi	r2 r2 -11
+	ldi	r17 r2 0
+	ldi	r19 r2 1
+	ldi	r21 r2 2
+	ldi	r23 r2 3
+	ldi	r7 r2 4
+	ldi	r22 r2 5
+	ldi	r20 r2 6
+	ldi	r8 r2 7
+	ldi	r18 r2 8
+	ldi	r24 r2 9
+	ldi	r6 r2 10
+	add	r1 r6 r24
+	ldi	r9 r1 0
 	fldi	f2 r0 1055
 	fsti	f2 r9 0
 	fldi	f2 r0 1056
 	fsti	f2 r9 1
 	fldi	f2 r0 1057
 	fsti	f2 r9 2
-	add	r1 r6 r7
+	add	r1 r6 r18
 	ldi	r9 r1 0
-	ldi	r9 r9 6
 	sti	r8 r9 0
-	add	r1 r6 r7
-	ldi	r27 r1 0
-	ldi	r9 r27 2
-	ldi	r9 r9 0
-	bgt	r0 r9 L_else.26696
-	ldi	r9 r27 3
-	ldi	r9 r9 0
-	bne	r9 r0 L_else.26702
-	jump	L_cont.26700
-L_else.26702 : 
-	ldi	r9 r27 6
-	ldi	r11 r9 0
-	fldi	f2 r0 29
-	fsti	f2 r0 1052
-	fsti	f2 r0 1053
-	fsti	f2 r0 1054
-	ldi	r10 r27 7
-	ldi	r9 r27 1
-	ldi	r23 r11 1076
-	ldi	r24 r10 0
-	ldi	r25 r9 0
-	fldi	f2 r25 0
-	fsti	f2 r0 1066
-	fldi	f2 r25 1
-	fsti	f2 r0 1067
-	fldi	f2 r25 2
-	fsti	f2 r0 1068
-	ldi	r9 r0 1072
-	addi	r9 r9 -1
-	sti	r8 r2 0
-	sti	r6 r2 1
-	sti	r7 r2 2
-	add	r6 r0 r25
-	add	r7 r0 r9
-	addi	r2 r2 3
-	call	L_setup_startp_constants.2148
-	addi	r2 r2 -3
-	ldi	r8 r2 0
-	ldi	r6 r2 1
-	ldi	r7 r2 2
-	ldi	r9 r23 118
-	ldi	r9 r9 0
-	fldi	f3 r9 0
-	fldi	f2 r24 0
-	fmul	f4 f3 f2
-	fldi	f2 r9 1
-	fldi	f3 r24 1
-	fmul	f2 f2 f3
-	fadd	f4 f4 f2
-	fldi	f2 r9 2
-	fldi	f3 r24 2
-	fmul	f2 f2 f3
-	fadd	f3 f4 f2
-	fbgt	f0 f3 L_else.26705
-	ldi	r22 r23 118
-	fldi	f2 r0 51
-	fdiv	f17 f3 f2
-	sti	r8 r2 0
-	sti	r6 r2 1
-	sti	r7 r2 2
-	addi	r2 r2 3
-	call	L_trace_diffuse_ray.2243
-	addi	r2 r2 -3
-	ldi	r8 r2 0
-	ldi	r6 r2 1
-	ldi	r7 r2 2
-	jump	L_cont.26703
-L_else.26705 : 
-	ldi	r22 r23 119
-	fldi	f2 r0 52
-	fdiv	f17 f3 f2
-	sti	r8 r2 0
-	sti	r6 r2 1
-	sti	r7 r2 2
-	addi	r2 r2 3
-	call	L_trace_diffuse_ray.2243
-	addi	r2 r2 -3
-	ldi	r8 r2 0
-	ldi	r6 r2 1
-	ldi	r7 r2 2
-L_cont.26703 : 
-	addi	r22 r0 116
-	sti	r8 r2 0
-	sti	r6 r2 1
-	sti	r7 r2 2
-	addi	r2 r2 3
-	call	L_iter_trace_diffuse_rays.2246
-	addi	r2 r2 -3
-	ldi	r8 r2 0
-	ldi	r6 r2 1
-	ldi	r7 r2 2
-	ldi	r9 r27 5
-	ldi	r9 r9 0
-	fldi	f2 r0 1052
-	fsti	f2 r9 0
-	fldi	f2 r0 1053
-	fsti	f2 r9 1
-	fldi	f2 r0 1054
-	fsti	f2 r9 2
-L_cont.26700 : 
-	addi	r28 r0 1
-	sti	r8 r2 0
-	sti	r6 r2 1
-	sti	r7 r2 2
-	addi	r2 r2 3
-	call	L_pretrace_diffuse_rays.2297
-	addi	r2 r2 -3
-	ldi	r8 r2 0
-	ldi	r6 r2 1
-	ldi	r7 r2 2
-	jump	L_cont.26694
-L_else.26696 : 
-L_cont.26694 : 
-	addi	r7 r7 -1
-	addi	r8 r8 1
-	addi	r9 r0 5
-	bgt	r9 r8 L_else.26699
-	addi	r8 r8 -5
-	jump	L_cont.26697
-L_else.26699 : 
-L_cont.26697 : 
-	jump	L_pretrace_pixels.2300
-L_else.26690 : 
-	return
-L_scan_pixel.2311 : 
-	ldi	r11 r0 1058
-	bgt	r11 r6 L_else.26708
-	return
-L_else.26708 : 
-	add	r1 r9 r6
+	add	r1 r6 r17
+	ldi	r10 r1 0
+	add	r1 r6 r18
+	ldi	r9 r1 0
+	add	r1 r6 r19
+	ldi	r12 r1 0
+	add	r1 r6 r20
 	ldi	r11 r1 0
-	ldi	r11 r11 0
+	add	r1 r6 r21
+	ldi	r14 r1 0
+	add	r1 r6 r22
+	ldi	r13 r1 0
+	add	r1 r6 r23
+	ldi	r16 r1 0
+	add	r1 r6 r24
+	ldi	r15 r1 0
+	ldi	r17 r13 0
+	bgt	r0 r17 L_else.22462
+	ldi	r17 r14 0
+	bne	r17 r0 L_else.22468
+	jump	L_cont.22466
+L_else.22468 : 
+	ldi	r17 r9 0
+	fsti	f0 r0 1052
+	fsti	f0 r0 1053
+	fsti	f0 r0 1054
+	ldi	r29 r17 1076
+	ldi	r30 r10 0
+	ldi	r31 r16 0
+	fldi	f2 r31 0
+	fsti	f2 r0 1066
+	fldi	f2 r31 1
+	fsti	f2 r0 1067
+	fldi	f2 r31 2
+	fsti	f2 r0 1068
+	ldi	r17 r0 1072
+	addi	r17 r17 -1
+	sti	r7 r2 0
+	sti	r6 r2 1
+	sti	r8 r2 2
+	sti	r10 r2 3
+	sti	r9 r2 4
+	sti	r11 r2 5
+	sti	r13 r2 6
+	sti	r12 r2 7
+	add	r6 r0 r31
+	add	r7 r0 r17
+	addi	r2 r2 8
+	call	L_setup_startp_constants.2212
+	addi	r2 r2 -8
+	ldi	r7 r2 0
+	ldi	r6 r2 1
+	ldi	r8 r2 2
+	ldi	r10 r2 3
+	ldi	r9 r2 4
+	ldi	r11 r2 5
+	ldi	r13 r2 6
+	ldi	r12 r2 7
+	addi	r17 r0 118
+	sti	r7 r2 0
+	sti	r6 r2 1
+	sti	r8 r2 2
+	sti	r10 r2 3
+	sti	r9 r2 4
+	sti	r11 r2 5
+	sti	r14 r2 6
+	sti	r13 r2 7
+	sti	r16 r2 8
+	sti	r15 r2 9
+	sti	r12 r2 10
+	add	r6 r0 r17
+	addi	r2 r2 11
+	call	L_iter_trace_diffuse_rays.2310
+	addi	r2 r2 -11
+	ldi	r7 r2 0
+	ldi	r6 r2 1
+	ldi	r8 r2 2
+	ldi	r10 r2 3
+	ldi	r9 r2 4
+	ldi	r11 r2 5
+	ldi	r14 r2 6
+	ldi	r13 r2 7
+	ldi	r16 r2 8
+	ldi	r15 r2 9
+	ldi	r12 r2 10
+	ldi	r17 r12 0
+	fldi	f2 r0 1052
+	fsti	f2 r17 0
+	fldi	f2 r0 1053
+	fsti	f2 r17 1
+	fldi	f2 r0 1054
+	fsti	f2 r17 2
+L_cont.22466 : 
+	addi	r17 r0 1
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	add	r6 r0 r15
+	add	r7 r0 r16
+	add	r8 r0 r13
+	add	r13 r0 r10
+	add	r10 r0 r11
+	add	r11 r0 r12
+	add	r12 r0 r9
+	add	r9 r0 r14
+	add	r14 r0 r17
+	addi	r2 r2 3
+	call	L_pretrace_diffuse_rays.2361
+	addi	r2 r2 -3
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	jump	L_cont.22460
+L_else.22462 : 
+L_cont.22460 : 
+	addi	r9 r7 -1
+	addi	r8 r8 1
+	addi	r7 r0 5
+	bgt	r7 r8 L_else.22465
+	addi	r8 r8 -5
+	jump	L_cont.22463
+L_else.22465 : 
+L_cont.22463 : 
+	add	r7 r0 r9
+	jump	L_pretrace_pixels.2364
+L_else.22456 : 
+	return
+L_scan_pixel.2375 : 
+	ldi	r11 r0 1058
+	bgt	r11 r6 L_else.22471
+	return
+L_else.22471 : 
+	muli	r20 r6 8
+	addi	r18 r20 7
+	addi	r19 r20 6
+	addi	r13 r20 5
+	addi	r14 r20 4
+	addi	r15 r20 3
+	addi	r16 r20 2
+	addi	r17 r20 1
+	add	r1 r9 r20
+	ldi	r11 r1 0
 	fldi	f2 r11 0
 	fsti	f2 r0 1055
 	fldi	f2 r11 1
@@ -12150,330 +7097,113 @@ L_else.26708 :
 	fsti	f2 r0 1057
 	ldi	r12 r0 1059
 	addi	r11 r7 1
-	bgt	r12 r11 L_else.26711
-	addi	r12 r0 0
-	jump	L_cont.26709
-L_else.26711 : 
-	bgt	r7 r0 L_else.26751
-	addi	r12 r0 0
-	jump	L_cont.26709
-L_else.26751 : 
-	ldi	r13 r0 1058
-	addi	r12 r6 1
-	bgt	r13 r12 L_else.26753
-	addi	r12 r0 0
-	jump	L_cont.26709
-L_else.26753 : 
-	bgt	r6 r0 L_else.26755
-	addi	r12 r0 0
-	jump	L_cont.26709
-L_else.26755 : 
-	addi	r12 r0 1
-L_cont.26709 : 
-	bne	r12 r0 L_else.26714
-	add	r1 r9 r6
-	ldi	r12 r1 0
-	addi	r27 r0 0
-	ldi	r13 r12 2
-	ldi	r13 r13 0
-	bgt	r0 r13 L_else.26730
-	ldi	r13 r12 3
-	ldi	r13 r13 0
-	bne	r13 r0 L_else.26733
-	jump	L_cont.26731
-L_else.26733 : 
-	sti	r12 r2 0
-	sti	r11 r2 1
-	sti	r10 r2 2
-	sti	r8 r2 3
-	sti	r7 r2 4
-	sti	r9 r2 5
-	sti	r6 r2 6
-	add	r6 r0 r12
-	addi	r2 r2 7
-	call	L_calc_diffuse_using_1point.2259
-	addi	r2 r2 -7
-	ldi	r12 r2 0
-	ldi	r11 r2 1
-	ldi	r10 r2 2
-	ldi	r8 r2 3
-	ldi	r7 r2 4
-	ldi	r9 r2 5
-	ldi	r6 r2 6
-L_cont.26731 : 
-	addi	r27 r0 1
-	sti	r11 r2 0
-	sti	r10 r2 1
-	sti	r8 r2 2
-	sti	r7 r2 3
-	sti	r9 r2 4
-	sti	r6 r2 5
-	add	r6 r0 r12
-	addi	r2 r2 6
-	call	L_do_without_neighbors.2268
-	addi	r2 r2 -6
-	ldi	r11 r2 0
-	ldi	r10 r2 1
-	ldi	r8 r2 2
-	ldi	r7 r2 3
-	ldi	r9 r2 4
-	ldi	r6 r2 5
-	jump	L_cont.26712
-L_else.26730 : 
-	jump	L_cont.26712
-L_else.26714 : 
-	addi	r27 r0 0
-	add	r1 r9 r6
-	ldi	r14 r1 0
-	ldi	r12 r14 2
-	ldi	r12 r12 0
-	bgt	r0 r12 L_else.26735
-	add	r1 r9 r6
-	ldi	r12 r1 0
-	ldi	r12 r12 2
-	ldi	r13 r12 0
-	add	r1 r8 r6
-	ldi	r12 r1 0
-	ldi	r12 r12 2
-	ldi	r12 r12 0
-	bne	r12 r13 L_else.26738
-	add	r1 r10 r6
-	ldi	r12 r1 0
-	ldi	r12 r12 2
-	ldi	r12 r12 0
-	bne	r12 r13 L_else.26745
-	addi	r12 r6 -1
-	add	r1 r9 r12
-	ldi	r12 r1 0
-	ldi	r12 r12 2
-	ldi	r12 r12 0
-	bne	r12 r13 L_else.26747
-	addi	r12 r6 1
-	add	r1 r9 r12
-	ldi	r12 r1 0
-	ldi	r12 r12 2
-	ldi	r12 r12 0
-	bne	r12 r13 L_else.26749
-	addi	r12 r0 1
-	jump	L_cont.26736
-L_else.26749 : 
-	addi	r12 r0 0
-	jump	L_cont.26736
-L_else.26747 : 
-	addi	r12 r0 0
-	jump	L_cont.26736
-L_else.26745 : 
-	addi	r12 r0 0
-	jump	L_cont.26736
-L_else.26738 : 
-	addi	r12 r0 0
-L_cont.26736 : 
-	bne	r12 r0 L_else.26740
-	add	r1 r9 r6
-	ldi	r12 r1 0
-	sti	r11 r2 0
-	sti	r10 r2 1
-	sti	r8 r2 2
-	sti	r7 r2 3
-	sti	r9 r2 4
-	sti	r6 r2 5
-	add	r6 r0 r12
-	addi	r2 r2 6
-	call	L_do_without_neighbors.2268
-	addi	r2 r2 -6
-	ldi	r11 r2 0
-	ldi	r10 r2 1
-	ldi	r8 r2 2
-	ldi	r7 r2 3
-	ldi	r9 r2 4
-	ldi	r6 r2 5
-	jump	L_cont.26712
-L_else.26740 : 
-	ldi	r12 r14 3
-	ldi	r12 r12 0
-	bne	r12 r0 L_else.26743
-	jump	L_cont.26741
-L_else.26743 : 
-	add	r1 r8 r6
-	ldi	r12 r1 0
-	ldi	r16 r12 5
-	addi	r12 r6 -1
-	add	r1 r9 r12
-	ldi	r12 r1 0
-	ldi	r17 r12 5
-	add	r1 r9 r6
-	ldi	r12 r1 0
-	ldi	r15 r12 5
-	addi	r12 r6 1
-	add	r1 r9 r12
-	ldi	r12 r1 0
-	ldi	r14 r12 5
-	add	r1 r10 r6
-	ldi	r12 r1 0
-	ldi	r13 r12 5
-	ldi	r12 r16 0
-	fldi	f2 r12 0
-	fsti	f2 r0 1052
-	fldi	f2 r12 1
-	fsti	f2 r0 1053
-	fldi	f2 r12 2
-	fsti	f2 r0 1054
-	ldi	r12 r17 0
-	fldi	f3 r0 1052
-	fldi	f2 r12 0
-	fadd	f2 f3 f2
-	fsti	f2 r0 1052
-	fldi	f3 r0 1053
-	fldi	f2 r12 1
-	fadd	f2 f3 f2
-	fsti	f2 r0 1053
-	fldi	f3 r0 1054
-	fldi	f2 r12 2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1054
-	ldi	r12 r15 0
-	fldi	f3 r0 1052
-	fldi	f2 r12 0
-	fadd	f2 f3 f2
-	fsti	f2 r0 1052
-	fldi	f3 r0 1053
-	fldi	f2 r12 1
-	fadd	f2 f3 f2
-	fsti	f2 r0 1053
-	fldi	f3 r0 1054
-	fldi	f2 r12 2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1054
-	ldi	r12 r14 0
-	fldi	f3 r0 1052
-	fldi	f2 r12 0
-	fadd	f2 f3 f2
-	fsti	f2 r0 1052
-	fldi	f3 r0 1053
-	fldi	f2 r12 1
-	fadd	f2 f3 f2
-	fsti	f2 r0 1053
-	fldi	f3 r0 1054
-	fldi	f2 r12 2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1054
-	ldi	r12 r13 0
-	fldi	f3 r0 1052
-	fldi	f2 r12 0
-	fadd	f2 f3 f2
-	fsti	f2 r0 1052
-	fldi	f3 r0 1053
-	fldi	f2 r12 1
-	fadd	f2 f3 f2
-	fsti	f2 r0 1053
-	fldi	f3 r0 1054
-	fldi	f2 r12 2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1054
-	add	r1 r9 r6
-	ldi	r12 r1 0
-	ldi	r12 r12 4
-	ldi	r12 r12 0
-	fldi	f3 r0 1055
-	fldi	f4 r12 0
-	fldi	f2 r0 1052
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1055
-	fldi	f4 r0 1056
-	fldi	f2 r12 1
-	fldi	f3 r0 1053
-	fmul	f2 f2 f3
-	fadd	f2 f4 f2
-	fsti	f2 r0 1056
-	fldi	f3 r0 1057
-	fldi	f4 r12 2
-	fldi	f2 r0 1054
-	fmul	f2 f4 f2
-	fadd	f2 f3 f2
-	fsti	f2 r0 1057
-L_cont.26741 : 
-	addi	r12 r0 1
-	sti	r11 r2 0
-	sti	r10 r2 1
-	sti	r8 r2 2
-	sti	r7 r2 3
-	sti	r9 r2 4
-	sti	r6 r2 5
-	add	r11 r0 r12
-	addi	r2 r2 6
-	call	L_try_exploit_neighbors.2284
-	addi	r2 r2 -6
-	ldi	r11 r2 0
-	ldi	r10 r2 1
-	ldi	r8 r2 2
-	ldi	r7 r2 3
-	ldi	r9 r2 4
-	ldi	r6 r2 5
-	jump	L_cont.26712
-L_else.26735 : 
-L_cont.26712 : 
-	fldi	f2 r0 1055
-	call	L_write_rgb_element.2293
-	fldi	f2 r0 1056
-	call	L_write_rgb_element.2293
-	fldi	f2 r0 1057
-	call	L_write_rgb_element.2293
-	addi	r6 r6 1
-	ldi	r12 r0 1058
-	bgt	r12 r6 L_else.26716
-	return
-L_else.26716 : 
-	add	r1 r9 r6
-	ldi	r12 r1 0
-	ldi	r12 r12 0
-	fldi	f2 r12 0
-	fsti	f2 r0 1055
-	fldi	f2 r12 1
-	fsti	f2 r0 1056
-	fldi	f2 r12 2
-	fsti	f2 r0 1057
-	ldi	r12 r0 1059
-	bgt	r12 r11 L_else.26719
+	bgt	r12 r11 L_else.22474
 	addi	r11 r0 0
-	jump	L_cont.26717
-L_else.26719 : 
-	bgt	r7 r0 L_else.26724
+	jump	L_cont.22472
+L_else.22474 : 
+	bgt	r7 r0 L_else.22484
 	addi	r11 r0 0
-	jump	L_cont.26717
-L_else.26724 : 
+	jump	L_cont.22472
+L_else.22484 : 
 	ldi	r12 r0 1058
 	addi	r11 r6 1
-	bgt	r12 r11 L_else.26726
+	bgt	r12 r11 L_else.22486
 	addi	r11 r0 0
-	jump	L_cont.26717
-L_else.26726 : 
-	bgt	r6 r0 L_else.26728
+	jump	L_cont.22472
+L_else.22486 : 
+	bgt	r6 r0 L_else.22488
 	addi	r11 r0 0
-	jump	L_cont.26717
-L_else.26728 : 
+	jump	L_cont.22472
+L_else.22488 : 
 	addi	r11 r0 1
-L_cont.26717 : 
-	bne	r11 r0 L_else.26722
-	add	r1 r9 r6
+L_cont.22472 : 
+	bne	r11 r0 L_else.22477
+	add	r1 r9 r18
 	ldi	r11 r1 0
-	addi	r27 r0 0
+	add	r1 r9 r19
+	ldi	r12 r1 0
+	add	r1 r9 r13
+	ldi	r13 r1 0
+	add	r1 r9 r14
+	ldi	r14 r1 0
+	add	r1 r9 r15
+	ldi	r15 r1 0
+	add	r1 r9 r16
+	ldi	r16 r1 0
+	add	r1 r9 r17
+	ldi	r17 r1 0
+	add	r1 r9 r20
+	ldi	r18 r1 0
+	addi	r19 r0 0
+	ldi	r20 r16 0
+	bgt	r0 r20 L_else.22479
+	ldi	r20 r15 0
+	bne	r20 r0 L_else.22482
+	jump	L_cont.22480
+L_else.22482 : 
+	sti	r18 r2 0
+	sti	r17 r2 1
+	sti	r16 r2 2
+	sti	r15 r2 3
+	sti	r14 r2 4
+	sti	r13 r2 5
+	sti	r12 r2 6
+	sti	r11 r2 7
+	sti	r7 r2 8
+	sti	r8 r2 9
+	sti	r9 r2 10
+	sti	r10 r2 11
+	sti	r6 r2 12
+	add	r6 r0 r17
+	add	r7 r0 r14
+	add	r8 r0 r13
+	add	r9 r0 r12
+	add	r10 r0 r11
+	add	r11 r0 r19
+	addi	r2 r2 13
+	call	L_calc_diffuse_using_1point.2323
+	addi	r2 r2 -13
+	ldi	r18 r2 0
+	ldi	r17 r2 1
+	ldi	r16 r2 2
+	ldi	r15 r2 3
+	ldi	r14 r2 4
+	ldi	r13 r2 5
+	ldi	r12 r2 6
+	ldi	r11 r2 7
+	ldi	r7 r2 8
+	ldi	r8 r2 9
+	ldi	r9 r2 10
+	ldi	r10 r2 11
+	ldi	r6 r2 12
+L_cont.22480 : 
+	addi	r19 r0 1
 	sti	r7 r2 0
 	sti	r8 r2 1
 	sti	r9 r2 2
 	sti	r10 r2 3
 	sti	r6 r2 4
-	add	r6 r0 r11
+	add	r6 r0 r18
+	add	r7 r0 r17
+	add	r8 r0 r16
+	add	r9 r0 r15
+	add	r10 r0 r14
+	add	r14 r0 r19
+	add	r1 r0 r11
+	add	r11 r0 r13
+	add	r13 r0 r1
 	addi	r2 r2 5
-	call	L_do_without_neighbors.2268
+	call	L_do_without_neighbors.2332
 	addi	r2 r2 -5
 	ldi	r7 r2 0
 	ldi	r8 r2 1
 	ldi	r9 r2 2
 	ldi	r10 r2 3
 	ldi	r6 r2 4
-	jump	L_cont.26720
-L_else.26722 : 
+	jump	L_cont.22475
+L_else.22479 : 
+	jump	L_cont.22475
+L_else.22477 : 
 	addi	r11 r0 0
 	sti	r7 r2 0
 	sti	r8 r2 1
@@ -12481,32 +7211,31 @@ L_else.26722 :
 	sti	r10 r2 3
 	sti	r6 r2 4
 	addi	r2 r2 5
-	call	L_try_exploit_neighbors.2284
+	call	L_try_exploit_neighbors.2348
 	addi	r2 r2 -5
 	ldi	r7 r2 0
 	ldi	r8 r2 1
 	ldi	r9 r2 2
 	ldi	r10 r2 3
 	ldi	r6 r2 4
-L_cont.26720 : 
+L_cont.22475 : 
 	fldi	f2 r0 1055
-	call	L_write_rgb_element.2293
+	call	L_write_rgb_element.2357
 	fldi	f2 r0 1056
-	call	L_write_rgb_element.2293
+	call	L_write_rgb_element.2357
 	fldi	f2 r0 1057
-	call	L_write_rgb_element.2293
+	call	L_write_rgb_element.2357
 	addi	r6 r6 1
-	jump	L_scan_pixel.2311
-L_scan_line.2317 : 
+	jump	L_scan_pixel.2375
+L_scan_line.2381 : 
 	ldi	r11 r0 1059
-	bgt	r11 r6 L_else.26758
+	bgt	r11 r6 L_else.22491
 	return
-L_else.26758 : 
-	ldi	r11 r0 1059
+L_else.22491 : 
 	addi	r11 r11 -1
-	bgt	r11 r6 L_else.26761
-	jump	L_cont.26759
-L_else.26761 : 
+	bgt	r11 r6 L_else.22494
+	jump	L_cont.22492
+L_else.22494 : 
 	addi	r12 r6 1
 	fldi	f2 r0 1062
 	ldi	r11 r0 1061
@@ -12528,103 +7257,27 @@ L_else.26761 :
 	ldi	r11 r0 1058
 	addi	r11 r11 -1
 	sti	r6 r2 0
-	sti	r8 r2 1
-	sti	r9 r2 2
-	sti	r7 r2 3
+	sti	r7 r2 1
+	sti	r8 r2 2
+	sti	r9 r2 3
 	sti	r10 r2 4
 	add	r6 r0 r9
 	add	r7 r0 r11
 	add	r8 r0 r10
 	addi	r2 r2 5
-	call	L_pretrace_pixels.2300
-	addi	r2 r2 -5
-	ldi	r6 r2 0
-	ldi	r8 r2 1
-	ldi	r9 r2 2
-	ldi	r7 r2 3
-	ldi	r10 r2 4
-L_cont.26759 : 
-	addi	r12 r0 0
-	ldi	r11 r0 1058
-	bgt	r11 r0 L_else.26764
-	jump	L_cont.26762
-L_else.26764 : 
-	ldi	r11 r8 0
-	ldi	r11 r11 0
-	fldi	f2 r11 0
-	fsti	f2 r0 1055
-	fldi	f2 r11 1
-	fsti	f2 r0 1056
-	fldi	f2 r11 2
-	fsti	f2 r0 1057
-	ldi	r13 r0 1059
-	addi	r11 r6 1
-	bgt	r13 r11 L_else.26778
-	addi	r11 r0 0
-	jump	L_cont.26776
-L_else.26778 : 
-	bgt	r6 r0 L_else.26783
-	addi	r11 r0 0
-	jump	L_cont.26776
-L_else.26783 : 
-	ldi	r13 r0 1058
-	addi	r11 r0 1
-	bgt	r13 r11 L_else.26785
-	addi	r11 r0 0
-	jump	L_cont.26776
-L_else.26785 : 
-	addi	r11 r0 0
-L_cont.26776 : 
-	bne	r11 r0 L_else.26781
-	ldi	r11 r8 0
-	addi	r27 r0 0
-	sti	r6 r2 0
-	sti	r7 r2 1
-	sti	r8 r2 2
-	sti	r9 r2 3
-	sti	r10 r2 4
-	add	r6 r0 r11
-	addi	r2 r2 5
-	call	L_do_without_neighbors.2268
+	call	L_pretrace_pixels.2364
 	addi	r2 r2 -5
 	ldi	r6 r2 0
 	ldi	r7 r2 1
 	ldi	r8 r2 2
 	ldi	r9 r2 3
 	ldi	r10 r2 4
-	jump	L_cont.26779
-L_else.26781 : 
+L_cont.22492 : 
 	addi	r11 r0 0
-	sti	r6 r2 0
-	sti	r7 r2 1
-	sti	r8 r2 2
-	sti	r9 r2 3
-	sti	r10 r2 4
-	add	r10 r0 r9
-	add	r9 r0 r8
-	add	r8 r0 r7
-	add	r7 r0 r6
-	add	r6 r0 r12
-	addi	r2 r2 5
-	call	L_try_exploit_neighbors.2284
-	addi	r2 r2 -5
-	ldi	r6 r2 0
-	ldi	r7 r2 1
-	ldi	r8 r2 2
-	ldi	r9 r2 3
-	ldi	r10 r2 4
-L_cont.26779 : 
-	fldi	f2 r0 1055
-	call	L_write_rgb_element.2293
-	fldi	f2 r0 1056
-	call	L_write_rgb_element.2293
-	fldi	f2 r0 1057
-	call	L_write_rgb_element.2293
-	addi	r11 r0 1
 	sti	r10 r2 0
-	sti	r7 r2 1
+	sti	r8 r2 1
 	sti	r9 r2 2
-	sti	r8 r2 3
+	sti	r7 r2 3
 	sti	r6 r2 4
 	add	r10 r0 r9
 	add	r9 r0 r8
@@ -12632,45 +7285,43 @@ L_cont.26779 :
 	add	r7 r0 r6
 	add	r6 r0 r11
 	addi	r2 r2 5
-	call	L_scan_pixel.2311
+	call	L_scan_pixel.2375
 	addi	r2 r2 -5
 	ldi	r10 r2 0
-	ldi	r7 r2 1
+	ldi	r8 r2 1
 	ldi	r9 r2 2
-	ldi	r8 r2 3
+	ldi	r7 r2 3
 	ldi	r6 r2 4
-L_cont.26762 : 
 	addi	r11 r6 1
 	addi	r6 r10 2
 	addi	r10 r0 5
-	bgt	r10 r6 L_else.26767
+	bgt	r10 r6 L_else.22497
 	addi	r6 r6 -5
-	jump	L_cont.26765
-L_else.26767 : 
-L_cont.26765 : 
+	jump	L_cont.22495
+L_else.22497 : 
+L_cont.22495 : 
 	ldi	r10 r0 1059
-	bgt	r10 r11 L_else.26769
+	bgt	r10 r11 L_else.22499
 	return
-L_else.26769 : 
-	ldi	r10 r0 1059
+L_else.22499 : 
 	addi	r10 r10 -1
-	bgt	r10 r11 L_else.26772
-	jump	L_cont.26770
-L_else.26772 : 
+	bgt	r10 r11 L_else.22502
+	jump	L_cont.22500
+L_else.22502 : 
 	addi	r12 r11 1
-	fldi	f3 r0 1062
+	fldi	f2 r0 1062
 	ldi	r10 r0 1061
 	sub	r10 r12 r10
-	foi	f2 r10
-	fmul	f4 f3 f2
+	foi	f3 r10
+	fmul	f4 f2 f3
 	fldi	f2 r0 1033
-	fmul	f3 f4 f2
-	fldi	f2 r0 1027
-	fadd	f20 f3 f2
+	fmul	f2 f4 f2
+	fldi	f3 r0 1027
+	fadd	f20 f2 f3
 	fldi	f2 r0 1034
-	fmul	f3 f4 f2
-	fldi	f2 r0 1028
-	fadd	f21 f3 f2
+	fmul	f2 f4 f2
+	fldi	f3 r0 1028
+	fadd	f21 f2 f3
 	fldi	f2 r0 1035
 	fmul	f3 f4 f2
 	fldi	f2 r0 1029
@@ -12686,14 +7337,14 @@ L_else.26772 :
 	add	r6 r0 r7
 	add	r7 r0 r10
 	addi	r2 r2 5
-	call	L_pretrace_pixels.2300
+	call	L_pretrace_pixels.2364
 	addi	r2 r2 -5
 	ldi	r11 r2 0
 	ldi	r8 r2 1
 	ldi	r9 r2 2
 	ldi	r7 r2 3
 	ldi	r6 r2 4
-L_cont.26770 : 
+L_cont.22500 : 
 	addi	r10 r0 0
 	sti	r6 r2 0
 	sti	r9 r2 1
@@ -12704,7 +7355,7 @@ L_cont.26770 :
 	add	r10 r0 r7
 	add	r7 r0 r11
 	addi	r2 r2 5
-	call	L_scan_pixel.2311
+	call	L_scan_pixel.2375
 	addi	r2 r2 -5
 	ldi	r6 r2 0
 	ldi	r9 r2 1
@@ -12714,832 +7365,1208 @@ L_cont.26770 :
 	addi	r10 r11 1
 	addi	r6 r6 2
 	addi	r11 r0 5
-	bgt	r11 r6 L_else.26775
+	bgt	r11 r6 L_else.22505
 	addi	r6 r6 -5
-	jump	L_cont.26773
-L_else.26775 : 
-L_cont.26773 : 
+	jump	L_cont.22503
+L_else.22505 : 
+L_cont.22503 : 
+	ldi	r11 r0 1059
+	bgt	r11 r10 L_else.22507
+	return
+L_else.22507 : 
+	addi	r11 r11 -1
+	bgt	r11 r10 L_else.22510
+	jump	L_cont.22508
+L_else.22510 : 
+	addi	r12 r10 1
+	fldi	f2 r0 1062
+	ldi	r11 r0 1061
+	sub	r11 r12 r11
+	foi	f3 r11
+	fmul	f4 f2 f3
+	fldi	f2 r0 1033
+	fmul	f2 f4 f2
+	fldi	f3 r0 1027
+	fadd	f20 f2 f3
+	fldi	f2 r0 1034
+	fmul	f3 f4 f2
+	fldi	f2 r0 1028
+	fadd	f21 f3 f2
+	fldi	f2 r0 1035
+	fmul	f3 f4 f2
+	fldi	f2 r0 1029
+	fadd	f22 f3 f2
+	ldi	r11 r0 1058
+	addi	r11 r11 -1
+	sti	r10 r2 0
+	sti	r9 r2 1
+	sti	r7 r2 2
+	sti	r8 r2 3
+	sti	r6 r2 4
+	add	r7 r0 r11
 	add	r1 r0 r6
-	add	r6 r0 r10
-	add	r10 r0 r1
+	add	r6 r0 r8
+	add	r8 r0 r1
+	addi	r2 r2 5
+	call	L_pretrace_pixels.2364
+	addi	r2 r2 -5
+	ldi	r10 r2 0
+	ldi	r9 r2 1
+	ldi	r7 r2 2
+	ldi	r8 r2 3
+	ldi	r6 r2 4
+L_cont.22508 : 
+	addi	r11 r0 0
+	sti	r6 r2 0
+	sti	r7 r2 1
+	sti	r8 r2 2
+	sti	r9 r2 3
+	sti	r10 r2 4
+	add	r6 r0 r11
 	add	r1 r0 r7
-	add	r7 r0 r9
+	add	r7 r0 r10
+	add	r10 r0 r8
+	add	r8 r0 r9
+	add	r9 r0 r1
+	addi	r2 r2 5
+	call	L_scan_pixel.2375
+	addi	r2 r2 -5
+	ldi	r6 r2 0
+	ldi	r7 r2 1
+	ldi	r8 r2 2
+	ldi	r9 r2 3
+	ldi	r10 r2 4
+	addi	r10 r10 1
+	addi	r6 r6 2
+	addi	r11 r0 5
+	bgt	r11 r6 L_else.22513
+	addi	r6 r6 -5
+	jump	L_cont.22511
+L_else.22513 : 
+L_cont.22511 : 
+	ldi	r11 r0 1059
+	bgt	r11 r10 L_else.22515
+	return
+L_else.22515 : 
+	addi	r11 r11 -1
+	bgt	r11 r10 L_else.22518
+	jump	L_cont.22516
+L_else.22518 : 
+	addi	r12 r10 1
+	fldi	f2 r0 1062
+	ldi	r11 r0 1061
+	sub	r11 r12 r11
+	foi	f3 r11
+	fmul	f4 f2 f3
+	fldi	f2 r0 1033
+	fmul	f2 f4 f2
+	fldi	f3 r0 1027
+	fadd	f20 f2 f3
+	fldi	f2 r0 1034
+	fmul	f2 f4 f2
+	fldi	f3 r0 1028
+	fadd	f21 f2 f3
+	fldi	f2 r0 1035
+	fmul	f3 f4 f2
+	fldi	f2 r0 1029
+	fadd	f22 f3 f2
+	ldi	r11 r0 1058
+	addi	r11 r11 -1
+	sti	r10 r2 0
+	sti	r7 r2 1
+	sti	r8 r2 2
+	sti	r9 r2 3
+	sti	r6 r2 4
+	add	r7 r0 r11
+	add	r8 r0 r6
+	add	r6 r0 r9
+	addi	r2 r2 5
+	call	L_pretrace_pixels.2364
+	addi	r2 r2 -5
+	ldi	r10 r2 0
+	ldi	r7 r2 1
+	ldi	r8 r2 2
+	ldi	r9 r2 3
+	ldi	r6 r2 4
+L_cont.22516 : 
+	addi	r11 r0 0
+	sti	r6 r2 0
+	sti	r8 r2 1
+	sti	r9 r2 2
+	sti	r7 r2 3
+	sti	r10 r2 4
+	add	r6 r0 r11
+	add	r1 r0 r7
+	add	r7 r0 r10
+	add	r10 r0 r9
 	add	r9 r0 r8
 	add	r8 r0 r1
-	jump	L_scan_line.2317
-L_create_float5x3array.2323 : 
-	addi	r6 r0 3
-	fldi	f2 r0 29
-	call	min_caml_create_float_array
-	addi	r7 r0 5
-	add	r1 r0 r6
-	add	r6 r0 r7
-	add	r7 r0 r1
-	call	min_caml_create_array
-	add	r8 r0 r6
-	addi	r6 r0 3
-	fldi	f2 r0 29
-	call	min_caml_create_float_array
-	sti	r6 r8 1
-	addi	r6 r0 3
-	fldi	f2 r0 29
-	call	min_caml_create_float_array
-	sti	r6 r8 2
-	addi	r6 r0 3
-	fldi	f2 r0 29
-	call	min_caml_create_float_array
-	sti	r6 r8 3
-	addi	r6 r0 3
-	fldi	f2 r0 29
-	call	min_caml_create_float_array
-	sti	r6 r8 4
-	add	r6 r0 r8
-	return
-L_create_pixel.2325 : 
-	addi	r6 r0 3
-	fldi	f2 r0 29
-	call	min_caml_create_float_array
-	add	r10 r0 r6
-	call	L_create_float5x3array.2323
-	add	r11 r0 r6
+	addi	r2 r2 5
+	call	L_scan_pixel.2375
+	addi	r2 r2 -5
+	ldi	r6 r2 0
+	ldi	r8 r2 1
+	ldi	r9 r2 2
+	ldi	r7 r2 3
+	ldi	r10 r2 4
+	addi	r11 r10 1
+	addi	r10 r6 2
 	addi	r6 r0 5
-	addi	r7 r0 0
-	call	min_caml_create_array
+	bgt	r6 r10 L_else.22521
+	addi	r10 r10 -5
+	jump	L_cont.22519
+L_else.22521 : 
+L_cont.22519 : 
+	add	r6 r0 r11
+	add	r1 r0 r7
+	add	r7 r0 r8
+	add	r8 r0 r9
+	add	r9 r0 r1
+	jump	L_scan_line.2381
+L_create_float5x3array.2387 : 
+	addi	r6 r0 3
+	fldi	f2 r0 30
+	call	min_caml_create_float_array
 	add	r12 r0 r6
-	addi	r6 r0 5
+	addi	r14 r0 5
+	addi	r13 r0 1
 	addi	r7 r0 0
+	add	r6 r0 r14
 	call	min_caml_create_array
-	add	r13 r0 r6
-	call	L_create_float5x3array.2323
-	add	r14 r0 r6
-	call	L_create_float5x3array.2323
+	add	r11 r0 r6
+	addi	r10 r0 0
+	add	r6 r0 r11
+	add	r7 r0 r14
+	add	r8 r0 r12
+	add	r9 r0 r13
+	call	min_caml_init_array
+	addi	r6 r0 3
+	fldi	f2 r0 30
+	call	min_caml_create_float_array
+	sti	r6 r11 1
+	addi	r6 r0 3
+	fldi	f2 r0 30
+	call	min_caml_create_float_array
+	sti	r6 r11 2
+	addi	r6 r0 3
+	fldi	f2 r0 30
+	call	min_caml_create_float_array
+	sti	r6 r11 3
+	addi	r6 r0 3
+	fldi	f2 r0 30
+	call	min_caml_create_float_array
+	sti	r6 r11 4
+	add	r6 r0 r11
+	return
+L_create_pixel.2389 : 
+	addi	r6 r0 3
+	fldi	f2 r0 30
+	call	min_caml_create_float_array
 	add	r15 r0 r6
-	addi	r6 r0 1
-	addi	r7 r0 0
-	call	min_caml_create_array
+	call	L_create_float5x3array.2387
 	add	r16 r0 r6
-	call	L_create_float5x3array.2323
-	sti	r10 r3 0
-	sti	r11 r3 1
-	sti	r12 r3 2
-	sti	r13 r3 3
-	sti	r14 r3 4
-	sti	r15 r3 5
-	sti	r16 r3 6
-	sti	r6 r3 7
-	add	r6 r0 r3
-	addi	r3 r3 8
-	return
-L_init_line_elements.2327 : 
-	bgt	r0 r18 L_else.26790
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26792
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26794
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26796
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26798
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26800
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26802
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26804
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	jump	L_init_line_elements.2327
-L_else.26804 : 
-	add	r6 r0 r17
-	return
-L_else.26802 : 
-	add	r6 r0 r17
-	return
-L_else.26800 : 
-	add	r6 r0 r17
-	return
-L_else.26798 : 
-	add	r6 r0 r17
-	return
-L_else.26796 : 
-	add	r6 r0 r17
-	return
-L_else.26794 : 
-	add	r6 r0 r17
-	return
-L_else.26792 : 
-	add	r6 r0 r17
-	return
-L_else.26790 : 
-	add	r6 r0 r17
-	return
-L_create_pixelline.2330 : 
-	ldi	r17 r0 1058
-	call	L_create_pixel.2325
-	add	r7 r0 r6
-	add	r6 r0 r17
+	addi	r13 r0 5
+	addi	r12 r0 0
+	addi	r11 r0 1
+	add	r6 r0 r13
+	add	r7 r0 r12
 	call	min_caml_create_array
 	add	r17 r0 r6
+	addi	r10 r0 0
+	add	r6 r0 r17
+	add	r7 r0 r13
+	add	r8 r0 r12
+	add	r9 r0 r11
+	call	min_caml_init_array
+	addi	r12 r0 5
+	addi	r13 r0 0
+	addi	r11 r0 1
+	add	r6 r0 r12
+	add	r7 r0 r13
+	call	min_caml_create_array
+	add	r18 r0 r6
+	addi	r10 r0 0
+	add	r6 r0 r18
+	add	r7 r0 r12
+	add	r8 r0 r13
+	add	r9 r0 r11
+	call	min_caml_init_array
+	call	L_create_float5x3array.2387
+	add	r19 r0 r6
+	call	L_create_float5x3array.2387
+	add	r20 r0 r6
+	addi	r11 r0 1
+	addi	r12 r0 0
+	add	r6 r0 r11
+	add	r7 r0 r12
+	call	min_caml_create_array
+	add	r21 r0 r6
+	addi	r10 r0 0
+	add	r6 r0 r21
+	add	r7 r0 r11
+	add	r8 r0 r12
+	add	r9 r0 r11
+	call	min_caml_init_array
+	call	L_create_float5x3array.2387
+	add	r13 r0 r6
+	add	r12 r0 r21
+	add	r11 r0 r20
+	add	r10 r0 r19
+	add	r9 r0 r18
+	add	r8 r0 r17
+	add	r7 r0 r16
+	add	r6 r0 r15
+	return
+L_init_line_elements.2391 : 
+	bgt	r0 r23 L_else.22533
+	call	L_create_pixel.2389
+	muli	r15 r23 8
+	addi	r14 r15 7
+	add	r1 r22 r14
+	sti	r13 r1 0
+	addi	r13 r15 6
+	add	r1 r22 r13
+	sti	r12 r1 0
+	addi	r12 r15 5
+	add	r1 r22 r12
+	sti	r11 r1 0
+	addi	r11 r15 4
+	add	r1 r22 r11
+	sti	r10 r1 0
+	addi	r10 r15 3
+	add	r1 r22 r10
+	sti	r9 r1 0
+	addi	r9 r15 2
+	add	r1 r22 r9
+	sti	r8 r1 0
+	addi	r8 r15 1
+	add	r1 r22 r8
+	sti	r7 r1 0
+	add	r1 r22 r15
+	sti	r6 r1 0
+	addi	r23 r23 -1
+	bgt	r0 r23 L_else.22535
+	call	L_create_pixel.2389
+	muli	r14 r23 8
+	addi	r15 r14 7
+	add	r1 r22 r15
+	sti	r13 r1 0
+	addi	r13 r14 6
+	add	r1 r22 r13
+	sti	r12 r1 0
+	addi	r12 r14 5
+	add	r1 r22 r12
+	sti	r11 r1 0
+	addi	r11 r14 4
+	add	r1 r22 r11
+	sti	r10 r1 0
+	addi	r10 r14 3
+	add	r1 r22 r10
+	sti	r9 r1 0
+	addi	r9 r14 2
+	add	r1 r22 r9
+	sti	r8 r1 0
+	addi	r8 r14 1
+	add	r1 r22 r8
+	sti	r7 r1 0
+	add	r1 r22 r14
+	sti	r6 r1 0
+	addi	r23 r23 -1
+	jump	L_init_line_elements.2391
+L_else.22535 : 
+	add	r6 r0 r22
+	return
+L_else.22533 : 
+	add	r6 r0 r22
+	return
+L_create_pixelline.2394 : 
+	ldi	r23 r0 1058
+	call	L_create_pixel.2389
+	add	r19 r0 r13
+	add	r18 r0 r12
+	add	r17 r0 r11
+	add	r16 r0 r10
+	add	r15 r0 r9
+	add	r14 r0 r8
+	add	r13 r0 r7
+	add	r11 r0 r6
+	addi	r12 r0 8
+	muli	r6 r23 8
+	addi	r7 r0 0
+	call	min_caml_create_array
+	add	r22 r0 r6
+	addi	r10 r0 7
+	add	r6 r0 r22
+	add	r7 r0 r23
+	add	r8 r0 r19
+	add	r9 r0 r12
+	call	min_caml_init_array
+	addi	r10 r0 6
+	add	r6 r0 r22
+	add	r7 r0 r23
+	add	r8 r0 r18
+	add	r9 r0 r12
+	call	min_caml_init_array
+	addi	r10 r0 5
+	add	r6 r0 r22
+	add	r7 r0 r23
+	add	r8 r0 r17
+	add	r9 r0 r12
+	call	min_caml_init_array
+	addi	r10 r0 4
+	add	r6 r0 r22
+	add	r7 r0 r23
+	add	r8 r0 r16
+	add	r9 r0 r12
+	call	min_caml_init_array
+	addi	r10 r0 3
+	add	r6 r0 r22
+	add	r7 r0 r23
+	add	r8 r0 r15
+	add	r9 r0 r12
+	call	min_caml_init_array
+	addi	r10 r0 2
+	add	r6 r0 r22
+	add	r7 r0 r23
+	add	r8 r0 r14
+	add	r9 r0 r12
+	call	min_caml_init_array
+	addi	r10 r0 1
+	add	r6 r0 r22
+	add	r7 r0 r23
+	add	r8 r0 r13
+	add	r9 r0 r12
+	call	min_caml_init_array
+	addi	r10 r0 0
+	add	r6 r0 r22
+	add	r7 r0 r23
+	add	r8 r0 r11
+	add	r9 r0 r12
+	call	min_caml_init_array
 	ldi	r6 r0 1058
-	addi	r18 r6 -2
-	bgt	r0 r18 L_else.26807
-	call	L_create_pixel.2325
-	add	r1 r17 r18
+	addi	r23 r6 -2
+	bgt	r0 r23 L_else.22538
+	call	L_create_pixel.2389
+	muli	r14 r23 8
+	addi	r15 r14 7
+	add	r1 r22 r15
+	sti	r13 r1 0
+	addi	r13 r14 6
+	add	r1 r22 r13
+	sti	r12 r1 0
+	addi	r12 r14 5
+	add	r1 r22 r12
+	sti	r11 r1 0
+	addi	r11 r14 4
+	add	r1 r22 r11
+	sti	r10 r1 0
+	addi	r10 r14 3
+	add	r1 r22 r10
+	sti	r9 r1 0
+	addi	r9 r14 2
+	add	r1 r22 r9
+	sti	r8 r1 0
+	addi	r8 r14 1
+	add	r1 r22 r8
+	sti	r7 r1 0
+	add	r1 r22 r14
 	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26809
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26811
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26813
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26815
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26817
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	bgt	r0 r18 L_else.26819
-	call	L_create_pixel.2325
-	add	r1 r17 r18
-	sti	r6 r1 0
-	addi	r18 r18 -1
-	jump	L_init_line_elements.2327
-L_else.26819 : 
-	add	r6 r0 r17
+	addi	r23 r23 -1
+	jump	L_init_line_elements.2391
+L_else.22538 : 
+	add	r6 r0 r22
 	return
-L_else.26817 : 
-	add	r6 r0 r17
-	return
-L_else.26815 : 
-	add	r6 r0 r17
-	return
-L_else.26813 : 
-	add	r6 r0 r17
-	return
-L_else.26811 : 
-	add	r6 r0 r17
-	return
-L_else.26809 : 
-	add	r6 r0 r17
-	return
-L_else.26807 : 
-	add	r6 r0 r17
-	return
-L_tan.2332 : 
+L_tan.2396 : 
 	fadd	f2 f0 f10
-	call	L_sin.1878
+	call	L_sin.1942
 	fadd	f11 f0 f2
 	fadd	f2 f0 f10
-	call	L_cos.1880
+	call	L_cos.1944
 	fdiv	f2 f11 f2
 	return
-L_adjust_position.2334 : 
+L_adjust_position.2398 : 
 	fmul	f2 f2 f2
 	fldi	f3 r0 50
 	fadd	f2 f2 f3
 	fsqrt	f16 f2
 	fldi	f2 r0 12
 	fdiv	f2 f2 f16
-	call	L_atan.1882
+	call	L_atan.1946
 	fmul	f10 f2 f15
-	call	L_tan.2332
+	call	L_tan.2396
 	fmul	f2 f2 f16
 	return
-L_calc_dirvec.2337 : 
+L_calc_dirvec.2401 : 
 	addi	r9 r0 5
-	bgt	r9 r6 L_else.26824
+	bgt	r9 r6 L_else.22543
 	fmul	f4 f2 f2
 	fmul	f5 f3 f3
 	fadd	f4 f4 f5
-	fldi	f5 r0 12
-	fadd	f4 f4 f5
+	fldi	f7 r0 12
+	fadd	f4 f4 f7
 	fsqrt	f4 f4
 	fdiv	f5 f2 f4
 	fdiv	f6 f3 f4
-	fldi	f2 r0 12
-	fdiv	f2 f2 f4
+	fdiv	f4 f7 f4
 	ldi	r7 r7 1076
-	add	r1 r7 r8
+	muli	r6 r8 2
+	add	r1 r7 r6
 	ldi	r6 r1 0
-	ldi	r6 r6 0
 	fsti	f5 r6 0
 	fsti	f6 r6 1
-	fsti	f2 r6 2
+	fsti	f4 r6 2
 	addi	r6 r8 40
+	muli	r6 r6 2
 	add	r1 r7 r6
 	ldi	r6 r1 0
-	ldi	r6 r6 0
-	fsub	f4 f0 f6
+	fsub	f2 f0 f6
 	fsti	f5 r6 0
-	fsti	f2 r6 1
-	fsti	f4 r6 2
-	addi	r6 r8 80
-	add	r1 r7 r6
-	ldi	r6 r1 0
-	ldi	r6 r6 0
-	fsub	f3 f0 f5
-	fsti	f2 r6 0
-	fsti	f3 r6 1
-	fsti	f4 r6 2
-	addi	r6 r8 1
-	add	r1 r7 r6
-	ldi	r6 r1 0
-	ldi	r6 r6 0
-	fsub	f2 f0 f2
-	fsti	f3 r6 0
 	fsti	f4 r6 1
 	fsti	f2 r6 2
-	addi	r6 r8 41
+	addi	r6 r8 80
+	muli	r6 r6 2
 	add	r1 r7 r6
 	ldi	r6 r1 0
-	ldi	r6 r6 0
+	fsub	f3 f0 f5
+	fsti	f4 r6 0
+	fsti	f3 r6 1
+	fsti	f2 r6 2
+	addi	r6 r8 1
+	muli	r6 r6 2
+	add	r1 r7 r6
+	ldi	r6 r1 0
+	fsub	f4 f0 f4
 	fsti	f3 r6 0
 	fsti	f2 r6 1
-	fsti	f6 r6 2
-	addi	r6 r8 81
+	fsti	f4 r6 2
+	addi	r6 r8 41
+	muli	r6 r6 2
 	add	r1 r7 r6
 	ldi	r6 r1 0
-	ldi	r6 r6 0
-	fsti	f2 r6 0
+	fsti	f3 r6 0
+	fsti	f4 r6 1
+	fsti	f6 r6 2
+	addi	r6 r8 81
+	muli	r6 r6 2
+	add	r1 r7 r6
+	ldi	r6 r1 0
+	fsti	f4 r6 0
 	fsti	f5 r6 1
 	fsti	f6 r6 2
 	return
-L_else.26824 : 
+L_else.22543 : 
 	fadd	f2 f0 f3
 	fadd	f15 f0 f17
-	call	L_adjust_position.2334
+	call	L_adjust_position.2398
 	fadd	f19 f0 f2
 	addi	r6 r6 1
 	fadd	f2 f0 f19
 	fadd	f15 f0 f18
-	call	L_adjust_position.2334
+	call	L_adjust_position.2398
 	fadd	f3 f0 f2
 	fadd	f2 f0 f19
-	jump	L_calc_dirvec.2337
-L_calc_dirvecs.2345 : 
-	bgt	r0 r10 L_else.26827
+	jump	L_calc_dirvec.2401
+L_calc_dirvecs.2409 : 
+	bgt	r0 r10 L_else.22546
 	foi	f21 r10
 	fldi	f2 r0 53
 	fmul	f3 f21 f2
 	fldi	f2 r0 54
 	fsub	f17 f3 f2
 	addi	r6 r0 0
-	fldi	f2 r0 29
-	fldi	f3 r0 29
+	fldi	f2 r0 30
 	add	r7 r0 r11
 	add	r8 r0 r12
+	fadd	f3 f0 f2
 	fadd	f18 f0 f20
-	call	L_calc_dirvec.2337
+	call	L_calc_dirvec.2401
 	fldi	f2 r0 53
-	fmul	f3 f21 f2
-	fldi	f2 r0 50
-	fadd	f17 f3 f2
+	fmul	f2 f21 f2
+	fldi	f3 r0 50
+	fadd	f17 f2 f3
 	addi	r6 r0 0
-	fldi	f2 r0 29
-	fldi	f3 r0 29
+	fldi	f2 r0 30
 	addi	r13 r12 2
 	add	r7 r0 r11
 	add	r8 r0 r13
+	fadd	f3 f0 f2
 	fadd	f18 f0 f20
-	call	L_calc_dirvec.2337
+	call	L_calc_dirvec.2401
 	addi	r14 r10 -1
 	addi	r10 r11 1
 	addi	r6 r0 5
-	bgt	r6 r10 L_else.26830
+	bgt	r6 r10 L_else.22549
 	addi	r10 r10 -5
-	jump	L_cont.26828
-L_else.26830 : 
-L_cont.26828 : 
-	bgt	r0 r14 L_else.26832
+	jump	L_cont.22547
+L_else.22549 : 
+L_cont.22547 : 
+	bgt	r0 r14 L_else.22551
 	foi	f21 r14
 	fldi	f2 r0 53
 	fmul	f3 f21 f2
 	fldi	f2 r0 54
 	fsub	f17 f3 f2
 	addi	r6 r0 0
-	fldi	f2 r0 29
-	fldi	f3 r0 29
+	fldi	f2 r0 30
 	add	r7 r0 r10
 	add	r8 r0 r12
+	fadd	f3 f0 f2
 	fadd	f18 f0 f20
-	call	L_calc_dirvec.2337
+	call	L_calc_dirvec.2401
 	fldi	f2 r0 53
-	fmul	f3 f21 f2
-	fldi	f2 r0 50
-	fadd	f17 f3 f2
+	fmul	f2 f21 f2
+	fldi	f3 r0 50
+	fadd	f17 f2 f3
 	addi	r6 r0 0
-	fldi	f2 r0 29
-	fldi	f3 r0 29
+	fldi	f2 r0 30
 	add	r7 r0 r10
 	add	r8 r0 r13
+	fadd	f3 f0 f2
 	fadd	f18 f0 f20
-	call	L_calc_dirvec.2337
+	call	L_calc_dirvec.2401
 	addi	r7 r14 -1
 	addi	r11 r10 1
 	addi	r6 r0 5
-	bgt	r6 r11 L_else.26835
+	bgt	r6 r11 L_else.22554
 	addi	r11 r11 -5
-	jump	L_cont.26833
-L_else.26835 : 
-L_cont.26833 : 
+	jump	L_cont.22552
+L_else.22554 : 
+L_cont.22552 : 
 	add	r10 r0 r7
-	jump	L_calc_dirvecs.2345
-L_else.26832 : 
+	jump	L_calc_dirvecs.2409
+L_else.22551 : 
 	return
-L_else.26827 : 
+L_else.22546 : 
 	return
-L_calc_dirvec_rows.2350 : 
-	bgt	r0 r15 L_else.26838
-	foi	f3 r15
+L_calc_dirvec_rows.2414 : 
+	bgt	r0 r15 L_else.22557
+	foi	f2 r15
+	fldi	f4 r0 53
+	fmul	f2 f2 f4
+	fldi	f3 r0 54
+	fsub	f20 f2 f3
+	addi	r6 r0 4
+	foi	f21 r6
+	fmul	f2 f21 f4
+	fsub	f17 f2 f3
+	addi	r6 r0 0
+	fldi	f2 r0 30
+	add	r7 r0 r16
+	add	r8 r0 r17
+	fadd	f3 f0 f2
+	fadd	f18 f0 f20
+	call	L_calc_dirvec.2401
+	fldi	f2 r0 53
+	fmul	f2 f21 f2
+	fldi	f3 r0 50
+	fadd	f17 f2 f3
+	addi	r6 r0 0
+	fldi	f2 r0 30
+	addi	r8 r17 2
+	add	r7 r0 r16
+	fadd	f3 f0 f2
+	fadd	f18 f0 f20
+	call	L_calc_dirvec.2401
+	addi	r10 r0 3
+	addi	r11 r16 1
+	addi	r6 r0 5
+	bgt	r6 r11 L_else.22560
+	addi	r11 r11 -5
+	jump	L_cont.22558
+L_else.22560 : 
+L_cont.22558 : 
+	add	r12 r0 r17
+	call	L_calc_dirvecs.2409
+	addi	r18 r15 -1
+	addi	r15 r16 2
+	addi	r6 r0 5
+	bgt	r6 r15 L_else.22563
+	addi	r15 r15 -5
+	jump	L_cont.22561
+L_else.22563 : 
+L_cont.22561 : 
+	addi	r16 r17 4
+	bgt	r0 r18 L_else.22565
+	foi	f3 r18
 	fldi	f2 r0 53
 	fmul	f3 f3 f2
 	fldi	f2 r0 54
 	fsub	f20 f3 f2
-	addi	r6 r0 4
-	foi	f21 r6
-	fldi	f2 r0 53
-	fmul	f3 f21 f2
-	fldi	f2 r0 54
-	fsub	f17 f3 f2
-	addi	r6 r0 0
-	fldi	f2 r0 29
-	fldi	f3 r0 29
-	add	r7 r0 r16
-	add	r8 r0 r17
-	fadd	f18 f0 f20
-	call	L_calc_dirvec.2337
-	fldi	f2 r0 53
-	fmul	f3 f21 f2
-	fldi	f2 r0 50
-	fadd	f17 f3 f2
-	addi	r6 r0 0
-	fldi	f2 r0 29
-	fldi	f3 r0 29
-	addi	r8 r17 2
-	add	r7 r0 r16
-	fadd	f18 f0 f20
-	call	L_calc_dirvec.2337
-	addi	r10 r0 3
-	addi	r11 r16 1
-	addi	r6 r0 5
-	bgt	r6 r11 L_else.26841
-	addi	r11 r11 -5
-	jump	L_cont.26839
-L_else.26841 : 
-L_cont.26839 : 
-	add	r12 r0 r17
-	call	L_calc_dirvecs.2345
-	addi	r18 r15 -1
-	addi	r15 r16 2
-	addi	r6 r0 5
-	bgt	r6 r15 L_else.26844
-	addi	r15 r15 -5
-	jump	L_cont.26842
-L_else.26844 : 
-L_cont.26842 : 
-	addi	r16 r17 4
-	bgt	r0 r18 L_else.26846
-	foi	f2 r18
-	fldi	f3 r0 53
-	fmul	f2 f2 f3
-	fldi	f3 r0 54
-	fsub	f20 f2 f3
 	addi	r10 r0 4
 	add	r11 r0 r15
 	add	r12 r0 r16
-	call	L_calc_dirvecs.2345
+	call	L_calc_dirvecs.2409
 	addi	r8 r18 -1
 	addi	r6 r15 2
 	addi	r7 r0 5
-	bgt	r7 r6 L_else.26849
+	bgt	r7 r6 L_else.22568
 	addi	r6 r6 -5
-	jump	L_cont.26847
-L_else.26849 : 
-L_cont.26847 : 
+	jump	L_cont.22566
+L_else.22568 : 
+L_cont.22566 : 
 	addi	r17 r16 4
 	add	r15 r0 r8
 	add	r16 r0 r6
-	jump	L_calc_dirvec_rows.2350
-L_else.26846 : 
+	jump	L_calc_dirvec_rows.2414
+L_else.22565 : 
 	return
-L_else.26838 : 
+L_else.22557 : 
 	return
-L_create_dirvec.2354 : 
+L_create_dirvec.2418 : 
 	addi	r6 r0 3
-	fldi	f2 r0 29
+	fldi	f2 r0 30
 	call	min_caml_create_float_array
-	add	r10 r0 r6
-	ldi	r6 r0 1072
-	add	r7 r0 r10
+	add	r11 r0 r6
+	ldi	r13 r0 1072
+	addi	r14 r0 1
+	addi	r7 r0 0
+	add	r6 r0 r13
 	call	min_caml_create_array
-	sti	r10 r3 0
-	sti	r6 r3 1
-	add	r6 r0 r3
-	addi	r3 r3 2
-	return
-L_create_dirvec_elements.2356 : 
-	bgt	r0 r12 L_else.26853
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
-	sti	r6 r1 0
-	addi	r12 r12 -1
-	bgt	r0 r12 L_else.26855
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
-	sti	r6 r1 0
-	addi	r12 r12 -1
-	bgt	r0 r12 L_else.26857
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
-	sti	r6 r1 0
-	addi	r12 r12 -1
-	bgt	r0 r12 L_else.26859
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
-	sti	r6 r1 0
-	addi	r12 r12 -1
-	bgt	r0 r12 L_else.26861
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
-	sti	r6 r1 0
-	addi	r12 r12 -1
-	bgt	r0 r12 L_else.26863
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
-	sti	r6 r1 0
-	addi	r12 r12 -1
-	bgt	r0 r12 L_else.26865
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
-	sti	r6 r1 0
-	addi	r12 r12 -1
-	bgt	r0 r12 L_else.26867
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
-	sti	r6 r1 0
-	addi	r12 r12 -1
-	jump	L_create_dirvec_elements.2356
-L_else.26867 : 
-	return
-L_else.26865 : 
-	return
-L_else.26863 : 
-	return
-L_else.26861 : 
-	return
-L_else.26859 : 
-	return
-L_else.26857 : 
-	return
-L_else.26855 : 
-	return
-L_else.26853 : 
-	return
-L_create_dirvecs.2359 : 
-	bgt	r0 r13 L_else.26870
-	addi	r11 r0 1076
-	addi	r12 r0 120
-	call	L_create_dirvec.2354
-	add	r7 r0 r6
+	add	r12 r0 r6
+	addi	r10 r0 0
 	add	r6 r0 r12
+	add	r7 r0 r13
+	add	r8 r0 r11
+	add	r9 r0 r14
+	call	min_caml_init_array
+	add	r7 r0 r12
+	add	r6 r0 r11
+	return
+L_create_dirvec_elements.2420 : 
+	bgt	r0 r16 L_else.22573
+	call	L_create_dirvec.2418
+	muli	r9 r16 2
+	addi	r8 r9 1
+	add	r1 r15 r8
+	sti	r7 r1 0
+	add	r1 r15 r9
+	sti	r6 r1 0
+	addi	r16 r16 -1
+	bgt	r0 r16 L_else.22575
+	call	L_create_dirvec.2418
+	muli	r8 r16 2
+	addi	r9 r8 1
+	add	r1 r15 r9
+	sti	r7 r1 0
+	add	r1 r15 r8
+	sti	r6 r1 0
+	addi	r16 r16 -1
+	bgt	r0 r16 L_else.22577
+	call	L_create_dirvec.2418
+	muli	r8 r16 2
+	addi	r9 r8 1
+	add	r1 r15 r9
+	sti	r7 r1 0
+	add	r1 r15 r8
+	sti	r6 r1 0
+	addi	r16 r16 -1
+	bgt	r0 r16 L_else.22579
+	call	L_create_dirvec.2418
+	muli	r8 r16 2
+	addi	r9 r8 1
+	add	r1 r15 r9
+	sti	r7 r1 0
+	add	r1 r15 r8
+	sti	r6 r1 0
+	addi	r16 r16 -1
+	bgt	r0 r16 L_else.22581
+	call	L_create_dirvec.2418
+	muli	r8 r16 2
+	addi	r9 r8 1
+	add	r1 r15 r9
+	sti	r7 r1 0
+	add	r1 r15 r8
+	sti	r6 r1 0
+	addi	r16 r16 -1
+	bgt	r0 r16 L_else.22583
+	call	L_create_dirvec.2418
+	muli	r8 r16 2
+	addi	r9 r8 1
+	add	r1 r15 r9
+	sti	r7 r1 0
+	add	r1 r15 r8
+	sti	r6 r1 0
+	addi	r16 r16 -1
+	bgt	r0 r16 L_else.22585
+	call	L_create_dirvec.2418
+	muli	r8 r16 2
+	addi	r9 r8 1
+	add	r1 r15 r9
+	sti	r7 r1 0
+	add	r1 r15 r8
+	sti	r6 r1 0
+	addi	r16 r16 -1
+	bgt	r0 r16 L_else.22587
+	call	L_create_dirvec.2418
+	muli	r8 r16 2
+	addi	r9 r8 1
+	add	r1 r15 r9
+	sti	r7 r1 0
+	add	r1 r15 r8
+	sti	r6 r1 0
+	addi	r16 r16 -1
+	jump	L_create_dirvec_elements.2420
+L_else.22587 : 
+	return
+L_else.22585 : 
+	return
+L_else.22583 : 
+	return
+L_else.22581 : 
+	return
+L_else.22579 : 
+	return
+L_else.22577 : 
+	return
+L_else.22575 : 
+	return
+L_else.22573 : 
+	return
+L_create_dirvecs.2423 : 
+	bgt	r0 r17 L_else.22590
+	addi	r15 r0 1076
+	addi	r16 r0 120
+	call	L_create_dirvec.2418
+	add	r14 r0 r7
+	add	r11 r0 r6
+	addi	r13 r0 2
+	muli	r6 r16 2
+	addi	r7 r0 0
 	call	min_caml_create_array
-	add	r1 r11 r13
+	add	r12 r0 r6
+	addi	r10 r0 1
+	add	r6 r0 r12
+	add	r7 r0 r16
+	add	r8 r0 r14
+	add	r9 r0 r13
+	call	min_caml_init_array
+	addi	r10 r0 0
+	add	r6 r0 r12
+	add	r7 r0 r16
+	add	r8 r0 r11
+	add	r9 r0 r13
+	call	min_caml_init_array
+	add	r1 r15 r17
+	sti	r12 r1 0
+	ldi	r15 r17 1076
+	addi	r16 r0 118
+	call	L_create_dirvec.2418
+	muli	r8 r16 2
+	addi	r9 r8 1
+	add	r1 r15 r9
+	sti	r7 r1 0
+	add	r1 r15 r8
 	sti	r6 r1 0
-	ldi	r11 r13 1076
-	addi	r12 r0 118
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
+	addi	r16 r0 117
+	call	L_create_dirvec.2418
+	muli	r9 r16 2
+	addi	r8 r9 1
+	add	r1 r15 r8
+	sti	r7 r1 0
+	add	r1 r15 r9
 	sti	r6 r1 0
-	addi	r12 r0 117
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
+	addi	r16 r0 116
+	call	L_create_dirvec.2418
+	muli	r8 r16 2
+	addi	r9 r8 1
+	add	r1 r15 r9
+	sti	r7 r1 0
+	add	r1 r15 r8
 	sti	r6 r1 0
-	addi	r12 r0 116
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
+	addi	r16 r0 115
+	call	L_create_dirvec.2418
+	muli	r9 r16 2
+	addi	r8 r9 1
+	add	r1 r15 r8
+	sti	r7 r1 0
+	add	r1 r15 r9
 	sti	r6 r1 0
-	addi	r12 r0 115
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
+	addi	r16 r0 114
+	call	L_create_dirvec.2418
+	muli	r8 r16 2
+	addi	r9 r8 1
+	add	r1 r15 r9
+	sti	r7 r1 0
+	add	r1 r15 r8
 	sti	r6 r1 0
-	addi	r12 r0 114
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
+	addi	r16 r0 113
+	call	L_create_dirvec.2418
+	muli	r9 r16 2
+	addi	r8 r9 1
+	add	r1 r15 r8
+	sti	r7 r1 0
+	add	r1 r15 r9
 	sti	r6 r1 0
-	addi	r12 r0 113
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
+	addi	r16 r0 112
+	call	L_create_dirvec.2418
+	muli	r8 r16 2
+	addi	r9 r8 1
+	add	r1 r15 r9
+	sti	r7 r1 0
+	add	r1 r15 r8
 	sti	r6 r1 0
-	addi	r12 r0 112
-	call	L_create_dirvec.2354
-	add	r1 r11 r12
-	sti	r6 r1 0
-	addi	r12 r0 111
-	call	L_create_dirvec_elements.2356
-	addi	r13 r13 -1
-	jump	L_create_dirvecs.2359
-L_else.26870 : 
+	addi	r16 r0 111
+	call	L_create_dirvec_elements.2420
+	addi	r17 r17 -1
+	jump	L_create_dirvecs.2423
+L_else.22590 : 
 	return
-L_init_dirvec_constants.2361 : 
-	bgt	r0 r15 L_else.26873
-	add	r1 r14 r15
-	ldi	r11 r1 0
+L_init_dirvec_constants.2425 : 
+	bgt	r0 r18 L_else.22593
+	muli	r7 r18 2
+	addi	r6 r7 1
+	add	r1 r17 r6
+	ldi	r15 r1 0
+	add	r1 r17 r7
+	ldi	r14 r1 0
 	ldi	r6 r0 1072
-	addi	r12 r6 -1
-	bgt	r0 r12 L_else.26876
-	ldi	r10 r12 1970
-	ldi	r13 r11 1
-	ldi	r8 r11 0
-	ldi	r7 r10 1
-	bne	r7 r4 L_else.26893
-	call	L_setup_rect_table.2134
-	add	r1 r13 r12
+	addi	r16 r6 -1
+	bgt	r0 r16 L_else.22596
+	muli	r6 r16 11
+	ldi	r13 r6 1928
+	ldi	r12 r6 1925
+	ldi	r11 r6 1923
+	ldi	r8 r6 1922
+	ldi	r6 r6 1920
+	add	r7 r0 r6
+	add	r6 r0 r8
+	bne	r7 r4 L_else.22621
+	add	r10 r0 r14
+	call	L_setup_rect_table.2198
+	add	r1 r15 r16
 	sti	r6 r1 0
-	jump	L_cont.26891
-L_else.26893 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.26902
-	call	L_setup_surface_table.2137
-	add	r1 r13 r12
+	jump	L_cont.22619
+L_else.22621 : 
+	addi	r8 r0 2
+	bne	r7 r8 L_else.22623
+	add	r10 r0 r14
+	call	L_setup_surface_table.2201
+	add	r1 r15 r16
 	sti	r6 r1 0
-	jump	L_cont.26891
-L_else.26902 : 
-	call	L_setup_second_table.2140
-	add	r1 r13 r12
+	jump	L_cont.22619
+L_else.22623 : 
+	add	r10 r0 r14
+	add	r12 r0 r11
+	add	r11 r0 r6
+	call	L_setup_second_table.2204
+	add	r1 r15 r16
 	sti	r6 r1 0
-L_cont.26891 : 
-	addi	r13 r12 -1
-	bgt	r0 r13 L_else.26895
-	ldi	r10 r13 1970
-	ldi	r12 r11 1
-	ldi	r8 r11 0
-	ldi	r7 r10 1
-	bne	r7 r4 L_else.26898
-	call	L_setup_rect_table.2134
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.26896
-L_else.26898 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.26900
-	call	L_setup_surface_table.2137
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.26896
-L_else.26900 : 
-	call	L_setup_second_table.2140
-	add	r1 r12 r13
-	sti	r6 r1 0
-L_cont.26896 : 
-	addi	r12 r13 -1
-	call	L_iter_setup_dirvec_constants.2143
-	jump	L_cont.26874
-L_else.26895 : 
-	jump	L_cont.26874
-L_else.26876 : 
-L_cont.26874 : 
-	addi	r15 r15 -1
-	bgt	r0 r15 L_else.26878
-	add	r1 r14 r15
-	ldi	r11 r1 0
-	ldi	r6 r0 1072
-	addi	r12 r6 -1
-	bgt	r0 r12 L_else.26881
-	ldi	r10 r12 1970
-	ldi	r13 r11 1
-	ldi	r8 r11 0
-	ldi	r7 r10 1
-	bne	r7 r4 L_else.26888
-	call	L_setup_rect_table.2134
-	add	r1 r13 r12
-	sti	r6 r1 0
-	jump	L_cont.26886
-L_else.26888 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.26890
-	call	L_setup_surface_table.2137
-	add	r1 r13 r12
-	sti	r6 r1 0
-	jump	L_cont.26886
-L_else.26890 : 
-	call	L_setup_second_table.2140
-	add	r1 r13 r12
-	sti	r6 r1 0
-L_cont.26886 : 
-	addi	r12 r12 -1
-	call	L_iter_setup_dirvec_constants.2143
-	jump	L_cont.26879
-L_else.26881 : 
-L_cont.26879 : 
-	addi	r15 r15 -1
-	bgt	r0 r15 L_else.26883
-	add	r1 r14 r15
-	ldi	r11 r1 0
-	ldi	r6 r0 1072
-	addi	r12 r6 -1
-	call	L_iter_setup_dirvec_constants.2143
-	addi	r15 r15 -1
-	bgt	r0 r15 L_else.26885
-	add	r1 r14 r15
-	ldi	r11 r1 0
-	call	L_setup_dirvec_constants.2146
-	addi	r15 r15 -1
-	jump	L_init_dirvec_constants.2361
-L_else.26885 : 
-	return
-L_else.26883 : 
-	return
-L_else.26878 : 
-	return
-L_else.26873 : 
-	return
-L_init_vecset_constants.2364 : 
-	bgt	r0 r16 L_else.26905
-	ldi	r14 r16 1076
-	ldi	r11 r14 119
-	ldi	r6 r0 1072
-	addi	r13 r6 -1
-	bgt	r0 r13 L_else.26908
-	ldi	r10 r13 1970
-	ldi	r12 r11 1
-	ldi	r8 r11 0
-	ldi	r7 r10 1
-	bne	r7 r4 L_else.26917
-	call	L_setup_rect_table.2134
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.26915
-L_else.26917 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.26919
-	call	L_setup_surface_table.2137
-	add	r1 r12 r13
-	sti	r6 r1 0
-	jump	L_cont.26915
-L_else.26919 : 
-	call	L_setup_second_table.2140
-	add	r1 r12 r13
-	sti	r6 r1 0
-L_cont.26915 : 
-	addi	r12 r13 -1
-	call	L_iter_setup_dirvec_constants.2143
-	jump	L_cont.26906
-L_else.26908 : 
-L_cont.26906 : 
-	ldi	r11 r14 118
-	ldi	r6 r0 1072
-	addi	r12 r6 -1
-	call	L_iter_setup_dirvec_constants.2143
-	ldi	r11 r14 117
-	call	L_setup_dirvec_constants.2146
-	addi	r15 r0 116
-	call	L_init_dirvec_constants.2361
+L_cont.22619 : 
 	addi	r16 r16 -1
-	bgt	r0 r16 L_else.26910
-	ldi	r14 r16 1076
-	ldi	r11 r14 119
+	call	L_iter_setup_dirvec_constants.2207
+	jump	L_cont.22594
+L_else.22596 : 
+L_cont.22594 : 
+	addi	r18 r18 -1
+	bgt	r0 r18 L_else.22598
+	muli	r6 r18 2
+	addi	r7 r6 1
+	add	r1 r17 r7
+	ldi	r15 r1 0
+	add	r1 r17 r6
+	ldi	r14 r1 0
 	ldi	r6 r0 1072
-	addi	r12 r6 -1
-	call	L_iter_setup_dirvec_constants.2143
-	ldi	r11 r14 118
-	call	L_setup_dirvec_constants.2146
-	addi	r15 r0 117
-	call	L_init_dirvec_constants.2361
+	addi	r16 r6 -1
+	bgt	r0 r16 L_else.22601
+	muli	r6 r16 11
+	ldi	r13 r6 1928
+	ldi	r12 r6 1925
+	ldi	r11 r6 1923
+	ldi	r8 r6 1922
+	ldi	r6 r6 1920
+	add	r7 r0 r6
+	add	r6 r0 r8
+	bne	r7 r4 L_else.22616
+	add	r10 r0 r14
+	call	L_setup_rect_table.2198
+	add	r1 r15 r16
+	sti	r6 r1 0
+	jump	L_cont.22614
+L_else.22616 : 
+	addi	r8 r0 2
+	bne	r7 r8 L_else.22618
+	add	r10 r0 r14
+	call	L_setup_surface_table.2201
+	add	r1 r15 r16
+	sti	r6 r1 0
+	jump	L_cont.22614
+L_else.22618 : 
+	add	r10 r0 r14
+	add	r12 r0 r11
+	add	r11 r0 r6
+	call	L_setup_second_table.2204
+	add	r1 r15 r16
+	sti	r6 r1 0
+L_cont.22614 : 
 	addi	r16 r16 -1
-	bgt	r0 r16 L_else.26912
-	ldi	r14 r16 1076
-	ldi	r11 r14 119
-	call	L_setup_dirvec_constants.2146
-	addi	r15 r0 118
-	call	L_init_dirvec_constants.2361
-	addi	r16 r16 -1
-	bgt	r0 r16 L_else.26914
-	ldi	r14 r16 1076
-	addi	r15 r0 119
-	call	L_init_dirvec_constants.2361
-	addi	r16 r16 -1
-	jump	L_init_vecset_constants.2364
-L_else.26914 : 
-	return
-L_else.26912 : 
-	return
-L_else.26910 : 
-	return
-L_else.26905 : 
-	return
-L_add_reflection.2368 : 
-	call	L_create_dirvec.2354
-	add	r16 r0 r6
-	ldi	r6 r16 0
-	fsti	f3 r6 0
-	fsti	f4 r6 1
-	fsti	f5 r6 2
+	call	L_iter_setup_dirvec_constants.2207
+	jump	L_cont.22599
+L_else.22601 : 
+L_cont.22599 : 
+	addi	r18 r18 -1
+	bgt	r0 r18 L_else.22603
+	muli	r7 r18 2
+	addi	r6 r7 1
+	add	r1 r17 r6
+	ldi	r15 r1 0
+	add	r1 r17 r7
+	ldi	r14 r1 0
 	ldi	r6 r0 1072
-	addi	r12 r6 -1
-	bgt	r0 r12 L_else.26923
-	ldi	r10 r12 1970
-	ldi	r11 r16 1
-	ldi	r8 r16 0
-	ldi	r7 r10 1
-	bne	r7 r4 L_else.26926
-	call	L_setup_rect_table.2134
-	add	r1 r11 r12
+	addi	r16 r6 -1
+	bgt	r0 r16 L_else.22606
+	muli	r6 r16 11
+	ldi	r13 r6 1928
+	ldi	r12 r6 1925
+	ldi	r11 r6 1923
+	ldi	r8 r6 1922
+	ldi	r6 r6 1920
+	add	r7 r0 r6
+	add	r6 r0 r8
+	bne	r7 r4 L_else.22611
+	add	r10 r0 r14
+	call	L_setup_rect_table.2198
+	add	r1 r15 r16
 	sti	r6 r1 0
-	jump	L_cont.26924
-L_else.26926 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.26935
-	call	L_setup_surface_table.2137
-	add	r1 r11 r12
+	jump	L_cont.22609
+L_else.22611 : 
+	addi	r8 r0 2
+	bne	r7 r8 L_else.22613
+	add	r10 r0 r14
+	call	L_setup_surface_table.2201
+	add	r1 r15 r16
 	sti	r6 r1 0
-	jump	L_cont.26924
-L_else.26935 : 
-	call	L_setup_second_table.2140
-	add	r1 r11 r12
+	jump	L_cont.22609
+L_else.22613 : 
+	add	r10 r0 r14
+	add	r12 r0 r11
+	add	r11 r0 r6
+	call	L_setup_second_table.2204
+	add	r1 r15 r16
 	sti	r6 r1 0
-L_cont.26924 : 
-	addi	r11 r12 -1
-	bgt	r0 r11 L_else.26928
-	ldi	r10 r11 1970
-	ldi	r12 r16 1
-	ldi	r8 r16 0
-	ldi	r7 r10 1
-	bne	r7 r4 L_else.26931
-	call	L_setup_rect_table.2134
-	add	r1 r12 r11
+L_cont.22609 : 
+	addi	r16 r16 -1
+	call	L_iter_setup_dirvec_constants.2207
+	jump	L_cont.22604
+L_else.22606 : 
+L_cont.22604 : 
+	addi	r18 r18 -1
+	bgt	r0 r18 L_else.22608
+	muli	r6 r18 2
+	addi	r7 r6 1
+	add	r1 r17 r7
+	ldi	r15 r1 0
+	add	r1 r17 r6
+	ldi	r14 r1 0
+	ldi	r6 r0 1072
+	addi	r16 r6 -1
+	call	L_iter_setup_dirvec_constants.2207
+	addi	r18 r18 -1
+	jump	L_init_dirvec_constants.2425
+L_else.22608 : 
+	return
+L_else.22603 : 
+	return
+L_else.22598 : 
+	return
+L_else.22593 : 
+	return
+L_init_vecset_constants.2428 : 
+	bgt	r0 r19 L_else.22626
+	ldi	r17 r19 1076
+	addi	r6 r0 119
+	muli	r7 r6 2
+	addi	r6 r7 1
+	add	r1 r17 r6
+	ldi	r15 r1 0
+	add	r1 r17 r7
+	ldi	r14 r1 0
+	ldi	r6 r0 1072
+	addi	r16 r6 -1
+	bgt	r0 r16 L_else.22629
+	muli	r7 r16 11
+	ldi	r13 r7 1928
+	ldi	r12 r7 1925
+	ldi	r11 r7 1923
+	ldi	r6 r7 1922
+	ldi	r7 r7 1920
+	bne	r7 r4 L_else.22654
+	add	r10 r0 r14
+	call	L_setup_rect_table.2198
+	add	r1 r15 r16
 	sti	r6 r1 0
-	jump	L_cont.26929
-L_else.26931 : 
-	addi	r6 r0 2
-	bne	r7 r6 L_else.26933
-	call	L_setup_surface_table.2137
-	add	r1 r12 r11
+	jump	L_cont.22652
+L_else.22654 : 
+	addi	r8 r0 2
+	bne	r7 r8 L_else.22656
+	add	r10 r0 r14
+	call	L_setup_surface_table.2201
+	add	r1 r15 r16
 	sti	r6 r1 0
-	jump	L_cont.26929
-L_else.26933 : 
-	call	L_setup_second_table.2140
-	add	r1 r12 r11
+	jump	L_cont.22652
+L_else.22656 : 
+	add	r10 r0 r14
+	add	r12 r0 r11
+	add	r11 r0 r6
+	call	L_setup_second_table.2204
+	add	r1 r15 r16
 	sti	r6 r1 0
-L_cont.26929 : 
-	addi	r12 r11 -1
-	add	r11 r0 r16
-	call	L_iter_setup_dirvec_constants.2143
-	jump	L_cont.26921
-L_else.26928 : 
-	jump	L_cont.26921
-L_else.26923 : 
-L_cont.26921 : 
-	addi	r7 r0 1185
-	sti	r15 r3 0
-	sti	r16 r3 1
-	fsti	f9 r3 2
-	add	r6 r0 r3
-	addi	r3 r3 3
-	add	r1 r7 r14
+L_cont.22652 : 
+	addi	r16 r16 -1
+	call	L_iter_setup_dirvec_constants.2207
+	jump	L_cont.22627
+L_else.22629 : 
+L_cont.22627 : 
+	addi	r6 r0 118
+	muli	r6 r6 2
+	addi	r7 r6 1
+	add	r1 r17 r7
+	ldi	r15 r1 0
+	add	r1 r17 r6
+	ldi	r14 r1 0
+	ldi	r6 r0 1072
+	addi	r16 r6 -1
+	bgt	r0 r16 L_else.22632
+	muli	r6 r16 11
+	ldi	r13 r6 1928
+	ldi	r12 r6 1925
+	ldi	r11 r6 1923
+	ldi	r8 r6 1922
+	ldi	r6 r6 1920
+	add	r7 r0 r6
+	add	r6 r0 r8
+	bne	r7 r4 L_else.22649
+	add	r10 r0 r14
+	call	L_setup_rect_table.2198
+	add	r1 r15 r16
 	sti	r6 r1 0
+	jump	L_cont.22647
+L_else.22649 : 
+	addi	r8 r0 2
+	bne	r7 r8 L_else.22651
+	add	r10 r0 r14
+	call	L_setup_surface_table.2201
+	add	r1 r15 r16
+	sti	r6 r1 0
+	jump	L_cont.22647
+L_else.22651 : 
+	add	r10 r0 r14
+	add	r12 r0 r11
+	add	r11 r0 r6
+	call	L_setup_second_table.2204
+	add	r1 r15 r16
+	sti	r6 r1 0
+L_cont.22647 : 
+	addi	r16 r16 -1
+	call	L_iter_setup_dirvec_constants.2207
+	jump	L_cont.22630
+L_else.22632 : 
+L_cont.22630 : 
+	addi	r6 r0 117
+	muli	r7 r6 2
+	addi	r6 r7 1
+	add	r1 r17 r6
+	ldi	r15 r1 0
+	add	r1 r17 r7
+	ldi	r14 r1 0
+	ldi	r6 r0 1072
+	addi	r16 r6 -1
+	call	L_iter_setup_dirvec_constants.2207
+	addi	r18 r0 116
+	call	L_init_dirvec_constants.2425
+	addi	r20 r19 -1
+	bgt	r0 r20 L_else.22634
+	ldi	r17 r19 1075
+	addi	r6 r0 119
+	muli	r7 r6 2
+	addi	r6 r7 1
+	add	r1 r17 r6
+	ldi	r15 r1 0
+	add	r1 r17 r7
+	ldi	r14 r1 0
+	ldi	r6 r0 1072
+	addi	r16 r6 -1
+	bgt	r0 r16 L_else.22637
+	muli	r6 r16 11
+	ldi	r13 r6 1928
+	ldi	r12 r6 1925
+	ldi	r11 r6 1923
+	ldi	r8 r6 1922
+	ldi	r6 r6 1920
+	add	r7 r0 r6
+	add	r6 r0 r8
+	bne	r7 r4 L_else.22644
+	add	r10 r0 r14
+	call	L_setup_rect_table.2198
+	add	r1 r15 r16
+	sti	r6 r1 0
+	jump	L_cont.22642
+L_else.22644 : 
+	addi	r8 r0 2
+	bne	r7 r8 L_else.22646
+	add	r10 r0 r14
+	call	L_setup_surface_table.2201
+	add	r1 r15 r16
+	sti	r6 r1 0
+	jump	L_cont.22642
+L_else.22646 : 
+	add	r10 r0 r14
+	add	r12 r0 r11
+	add	r11 r0 r6
+	call	L_setup_second_table.2204
+	add	r1 r15 r16
+	sti	r6 r1 0
+L_cont.22642 : 
+	addi	r16 r16 -1
+	call	L_iter_setup_dirvec_constants.2207
+	jump	L_cont.22635
+L_else.22637 : 
+L_cont.22635 : 
+	addi	r6 r0 118
+	muli	r6 r6 2
+	addi	r7 r6 1
+	add	r1 r17 r7
+	ldi	r15 r1 0
+	add	r1 r17 r6
+	ldi	r14 r1 0
+	ldi	r6 r0 1072
+	addi	r16 r6 -1
+	call	L_iter_setup_dirvec_constants.2207
+	addi	r18 r0 117
+	call	L_init_dirvec_constants.2425
+	addi	r20 r20 -1
+	bgt	r0 r20 L_else.22639
+	ldi	r17 r19 1074
+	addi	r6 r0 119
+	muli	r7 r6 2
+	addi	r6 r7 1
+	add	r1 r17 r6
+	ldi	r15 r1 0
+	add	r1 r17 r7
+	ldi	r14 r1 0
+	ldi	r6 r0 1072
+	addi	r16 r6 -1
+	call	L_iter_setup_dirvec_constants.2207
+	addi	r18 r0 118
+	call	L_init_dirvec_constants.2425
+	addi	r20 r20 -1
+	bgt	r0 r20 L_else.22641
+	ldi	r17 r19 1073
+	addi	r18 r0 119
+	call	L_init_dirvec_constants.2425
+	addi	r19 r20 -1
+	jump	L_init_vecset_constants.2428
+L_else.22641 : 
+	return
+L_else.22639 : 
+	return
+L_else.22634 : 
+	return
+L_else.22626 : 
 	return
 min_caml_start : 
 	addi	r7 r0 128
-	addi	r6 r0 128
 	sti	r7 r0 1058
-	sti	r6 r0 1059
+	sti	r7 r0 1059
 	addi	r6 r0 64
 	sti	r6 r0 1060
 	addi	r6 r0 64
@@ -13548,455 +8575,535 @@ min_caml_start :
 	foi	f2 r7
 	fdiv	f2 f3 f2
 	fsti	f2 r0 1062
-	call	L_create_pixelline.2330
+	call	L_create_pixelline.2394
 	sti	r6 r2 0
 	addi	r2 r2 1
-	call	L_create_pixelline.2330
+	call	L_create_pixelline.2394
 	addi	r2 r2 -1
 	add	r7 r0 r6
 	ldi	r6 r2 0
-	sti	r7 r2 0
-	sti	r6 r2 1
+	sti	r6 r2 0
+	sti	r7 r2 1
 	addi	r2 r2 2
-	call	L_create_pixelline.2330
+	call	L_create_pixelline.2394
 	addi	r2 r2 -2
 	add	r8 r0 r6
-	ldi	r7 r2 0
-	ldi	r6 r2 1
-	call	L_read_screen_settings.2029
+	ldi	r6 r2 0
+	ldi	r7 r2 1
+	call	L_read_screen_settings.2093
 	sti	r6 r2 0
 	addi	r2 r2 1
-	call	L_read_light.2031
+	call	L_read_light.2095
 	addi	r2 r2 -1
 	ldi	r6 r2 0
-	addi	r21 r0 0
-	sti	r7 r2 0
-	sti	r8 r2 1
-	sti	r6 r2 2
-	add	r8 r0 r21
-	addi	r2 r2 3
-	call	L_read_nth_object.2036
-	addi	r2 r2 -3
-	add	r9 r0 r6
-	ldi	r7 r2 0
-	ldi	r8 r2 1
-	ldi	r6 r2 2
-	bne	r9 r0 L_else.26938
-	sti	r21 r0 1072
-	jump	L_cont.26936
-L_else.26938 : 
-	addi	r21 r0 1
-	sti	r7 r2 0
-	sti	r8 r2 1
-	sti	r6 r2 2
-	add	r8 r0 r21
-	addi	r2 r2 3
-	call	L_read_nth_object.2036
-	addi	r2 r2 -3
-	add	r9 r0 r6
-	ldi	r7 r2 0
-	ldi	r8 r2 1
-	ldi	r6 r2 2
-	bne	r9 r0 L_else.26970
-	sti	r21 r0 1072
-	jump	L_cont.26936
-L_else.26970 : 
-	addi	r21 r0 2
-	sti	r7 r2 0
-	sti	r8 r2 1
-	sti	r6 r2 2
-	add	r8 r0 r21
-	addi	r2 r2 3
-	call	L_read_nth_object.2036
-	addi	r2 r2 -3
-	add	r9 r0 r6
-	ldi	r7 r2 0
-	ldi	r8 r2 1
-	ldi	r6 r2 2
-	bne	r9 r0 L_else.26972
-	sti	r21 r0 1072
-	jump	L_cont.26936
-L_else.26972 : 
-	addi	r21 r0 3
-	sti	r7 r2 0
-	sti	r8 r2 1
-	sti	r6 r2 2
-	add	r8 r0 r21
-	addi	r2 r2 3
-	call	L_read_nth_object.2036
-	addi	r2 r2 -3
-	add	r9 r0 r6
-	ldi	r7 r2 0
-	ldi	r8 r2 1
-	ldi	r6 r2 2
-	bne	r9 r0 L_else.26974
-	sti	r21 r0 1072
-	jump	L_cont.26936
-L_else.26974 : 
-	addi	r21 r0 4
-	sti	r7 r2 0
-	sti	r8 r2 1
-	sti	r6 r2 2
-	addi	r2 r2 3
-	call	L_read_object.2038
-	addi	r2 r2 -3
-	ldi	r7 r2 0
-	ldi	r8 r2 1
-	ldi	r6 r2 2
-L_cont.26936 : 
-	addi	r11 r0 0
-	addi	r9 r0 0
-	sti	r6 r2 0
-	sti	r8 r2 1
+	addi	r10 r0 0
+	sti	r8 r2 0
+	sti	r6 r2 1
 	sti	r7 r2 2
-	add	r7 r0 r9
 	addi	r2 r2 3
-	call	L_read_net_item.2042
+	call	L_read_nth_object.2100
 	addi	r2 r2 -3
 	add	r9 r0 r6
-	ldi	r6 r2 0
-	ldi	r8 r2 1
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	bne	r9 r0 L_else.22659
+	sti	r0 r0 1072
+	jump	L_cont.22657
+L_else.22659 : 
+	addi	r10 r0 1
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	addi	r2 r2 3
+	call	L_read_nth_object.2100
+	addi	r2 r2 -3
+	add	r9 r0 r6
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	bne	r9 r0 L_else.22702
+	sti	r4 r0 1072
+	jump	L_cont.22657
+L_else.22702 : 
+	addi	r25 r0 2
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	add	r10 r0 r25
+	addi	r2 r2 3
+	call	L_read_nth_object.2100
+	addi	r2 r2 -3
+	add	r9 r0 r6
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	bne	r9 r0 L_else.22704
+	sti	r25 r0 1072
+	jump	L_cont.22657
+L_else.22704 : 
+	addi	r25 r0 3
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	add	r10 r0 r25
+	addi	r2 r2 3
+	call	L_read_nth_object.2100
+	addi	r2 r2 -3
+	add	r9 r0 r6
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	bne	r9 r0 L_else.22706
+	sti	r25 r0 1072
+	jump	L_cont.22657
+L_else.22706 : 
+	addi	r25 r0 4
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	addi	r2 r2 3
+	call	L_read_object.2102
+	addi	r2 r2 -3
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+L_cont.22657 : 
+	addi	r16 r0 0
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	add	r7 r0 r16
+	addi	r2 r2 3
+	call	L_read_net_item.2106
+	addi	r2 r2 -3
+	add	r9 r0 r6
+	ldi	r8 r2 0
+	ldi	r6 r2 1
 	ldi	r7 r2 2
 	ldi	r10 r9 0
-	bne	r10 r5 L_else.26941
-	jump	L_cont.26939
-L_else.26941 : 
-	addi	r10 r0 1083
-	add	r1 r10 r11
+	bne	r10 r5 L_else.22662
+	jump	L_cont.22660
+L_else.22662 : 
+	addi	r15 r0 1083
+	add	r1 r15 r16
 	sti	r9 r1 0
-	addi	r11 r0 1
+	addi	r16 r0 1
 	addi	r9 r0 0
-	sti	r6 r2 0
-	sti	r8 r2 1
+	sti	r8 r2 0
+	sti	r6 r2 1
 	sti	r7 r2 2
 	add	r7 r0 r9
 	addi	r2 r2 3
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	addi	r2 r2 -3
 	add	r9 r0 r6
-	ldi	r6 r2 0
-	ldi	r8 r2 1
+	ldi	r8 r2 0
+	ldi	r6 r2 1
 	ldi	r7 r2 2
-	ldi	r12 r9 0
-	bne	r12 r5 L_else.26962
-	jump	L_cont.26939
-L_else.26962 : 
-	add	r1 r10 r11
+	ldi	r10 r9 0
+	bne	r10 r5 L_else.22694
+	jump	L_cont.22660
+L_else.22694 : 
+	add	r1 r15 r16
 	sti	r9 r1 0
-	addi	r11 r0 2
+	addi	r16 r0 2
 	addi	r9 r0 0
-	sti	r6 r2 0
-	sti	r8 r2 1
+	sti	r8 r2 0
+	sti	r6 r2 1
 	sti	r7 r2 2
 	add	r7 r0 r9
 	addi	r2 r2 3
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	addi	r2 r2 -3
 	add	r9 r0 r6
-	ldi	r6 r2 0
-	ldi	r8 r2 1
+	ldi	r8 r2 0
+	ldi	r6 r2 1
 	ldi	r7 r2 2
-	ldi	r12 r9 0
-	bne	r12 r5 L_else.26964
-	jump	L_cont.26939
-L_else.26964 : 
-	add	r1 r10 r11
+	ldi	r10 r9 0
+	bne	r10 r5 L_else.22696
+	jump	L_cont.22660
+L_else.22696 : 
+	add	r1 r15 r16
 	sti	r9 r1 0
-	addi	r11 r0 3
+	addi	r16 r0 3
 	addi	r9 r0 0
-	sti	r6 r2 0
-	sti	r8 r2 1
+	sti	r8 r2 0
+	sti	r6 r2 1
 	sti	r7 r2 2
 	add	r7 r0 r9
 	addi	r2 r2 3
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	addi	r2 r2 -3
 	add	r9 r0 r6
-	ldi	r6 r2 0
-	ldi	r8 r2 1
+	ldi	r8 r2 0
+	ldi	r6 r2 1
 	ldi	r7 r2 2
-	ldi	r12 r9 0
-	bne	r12 r5 L_else.26966
-	jump	L_cont.26939
-L_else.26966 : 
-	add	r1 r10 r11
+	ldi	r10 r9 0
+	bne	r10 r5 L_else.22698
+	jump	L_cont.22660
+L_else.22698 : 
+	add	r1 r15 r16
 	sti	r9 r1 0
-	addi	r11 r0 4
+	addi	r16 r0 4
 	addi	r9 r0 0
-	sti	r6 r2 0
-	sti	r8 r2 1
+	sti	r8 r2 0
+	sti	r6 r2 1
 	sti	r7 r2 2
 	add	r7 r0 r9
 	addi	r2 r2 3
-	call	L_read_net_item.2042
+	call	L_read_net_item.2106
 	addi	r2 r2 -3
 	add	r9 r0 r6
-	ldi	r6 r2 0
-	ldi	r8 r2 1
+	ldi	r8 r2 0
+	ldi	r6 r2 1
 	ldi	r7 r2 2
-	ldi	r12 r9 0
-	bne	r12 r5 L_else.26968
-	jump	L_cont.26939
-L_else.26968 : 
-	add	r1 r10 r11
+	ldi	r10 r9 0
+	bne	r10 r5 L_else.22700
+	jump	L_cont.22660
+L_else.22700 : 
+	add	r1 r15 r16
 	sti	r9 r1 0
-	addi	r10 r0 5
-	sti	r6 r2 0
-	sti	r8 r2 1
+	addi	r15 r0 5
+	sti	r8 r2 0
+	sti	r6 r2 1
 	sti	r7 r2 2
 	addi	r2 r2 3
-	call	L_read_and_network.2046
+	call	L_read_and_network.2110
 	addi	r2 r2 -3
-	ldi	r6 r2 0
-	ldi	r8 r2 1
+	ldi	r8 r2 0
+	ldi	r6 r2 1
 	ldi	r7 r2 2
-L_cont.26939 : 
-	addi	r10 r0 0
-	sti	r6 r2 0
-	sti	r8 r2 1
+L_cont.22660 : 
+	addi	r15 r0 0
+	sti	r8 r2 0
+	sti	r6 r2 1
 	sti	r7 r2 2
 	addi	r2 r2 3
-	call	L_read_or_network.2044
+	call	L_read_or_network.2108
 	addi	r2 r2 -3
 	add	r9 r0 r6
-	ldi	r6 r2 0
-	ldi	r8 r2 1
+	ldi	r8 r2 0
+	ldi	r6 r2 1
 	ldi	r7 r2 2
-	sti	r9 r0 1183
-	sti	r6 r2 0
-	sti	r8 r2 1
+	sti	r9 r0 1133
+	sti	r8 r2 0
+	sti	r6 r2 1
 	sti	r7 r2 2
 	addi	r2 r2 3
-	call	L_write_ppm_header.2291
+	call	L_write_ppm_header.2355
 	addi	r2 r2 -3
-	ldi	r6 r2 0
-	ldi	r8 r2 1
+	ldi	r8 r2 0
+	ldi	r6 r2 1
 	ldi	r7 r2 2
-	addi	r13 r0 4
-	sti	r6 r2 0
-	sti	r8 r2 1
+	addi	r17 r0 4
+	sti	r8 r2 0
+	sti	r6 r2 1
 	sti	r7 r2 2
 	addi	r2 r2 3
-	call	L_create_dirvecs.2359
+	call	L_create_dirvecs.2423
 	addi	r2 r2 -3
-	ldi	r6 r2 0
-	ldi	r8 r2 1
+	ldi	r8 r2 0
+	ldi	r6 r2 1
 	ldi	r7 r2 2
 	addi	r9 r0 9
 	addi	r11 r0 0
-	addi	r12 r0 0
 	foi	f2 r9
 	fldi	f3 r0 53
 	fmul	f2 f2 f3
 	fldi	f3 r0 54
 	fsub	f20 f2 f3
 	addi	r10 r0 4
-	sti	r6 r2 0
-	sti	r8 r2 1
-	sti	r7 r2 2
+	sti	r7 r2 0
+	sti	r6 r2 1
+	sti	r8 r2 2
+	add	r12 r0 r11
 	addi	r2 r2 3
-	call	L_calc_dirvecs.2345
+	call	L_calc_dirvecs.2409
 	addi	r2 r2 -3
-	ldi	r6 r2 0
-	ldi	r8 r2 1
-	ldi	r7 r2 2
+	ldi	r7 r2 0
+	ldi	r6 r2 1
+	ldi	r8 r2 2
 	addi	r15 r0 8
 	addi	r16 r0 2
 	addi	r17 r0 4
-	sti	r6 r2 0
-	sti	r8 r2 1
+	sti	r7 r2 0
+	sti	r6 r2 1
+	sti	r8 r2 2
+	addi	r2 r2 3
+	call	L_calc_dirvec_rows.2414
+	addi	r2 r2 -3
+	ldi	r7 r2 0
+	ldi	r6 r2 1
+	ldi	r8 r2 2
+	ldi	r17 r0 1080
+	addi	r18 r0 119
+	sti	r8 r2 0
+	sti	r6 r2 1
 	sti	r7 r2 2
 	addi	r2 r2 3
-	call	L_calc_dirvec_rows.2350
+	call	L_init_dirvec_constants.2425
 	addi	r2 r2 -3
-	ldi	r6 r2 0
-	ldi	r8 r2 1
+	ldi	r8 r2 0
+	ldi	r6 r2 1
 	ldi	r7 r2 2
-	addi	r9 r0 4
-	ldi	r14 r9 1076
-	addi	r15 r0 119
-	sti	r6 r2 0
-	sti	r8 r2 1
+	addi	r19 r0 3
+	sti	r8 r2 0
+	sti	r6 r2 1
 	sti	r7 r2 2
 	addi	r2 r2 3
-	call	L_init_dirvec_constants.2361
+	call	L_init_vecset_constants.2428
 	addi	r2 r2 -3
-	ldi	r6 r2 0
-	ldi	r8 r2 1
+	ldi	r8 r2 0
+	ldi	r6 r2 1
 	ldi	r7 r2 2
-	addi	r16 r0 3
-	sti	r6 r2 0
-	sti	r8 r2 1
-	sti	r7 r2 2
-	addi	r2 r2 3
-	call	L_init_vecset_constants.2364
-	addi	r2 r2 -3
-	ldi	r6 r2 0
-	ldi	r8 r2 1
-	ldi	r7 r2 2
-	addi	r11 r0 1905
-	ldi	r9 r11 0
+	ldi	r9 r0 1854
 	fldi	f2 r0 1039
 	fsti	f2 r9 0
 	fldi	f2 r0 1040
 	fsti	f2 r9 1
 	fldi	f2 r0 1041
 	fsti	f2 r9 2
+	ldi	r15 r0 1855
+	ldi	r14 r0 1854
 	ldi	r9 r0 1072
-	addi	r12 r9 -1
-	bgt	r0 r12 L_else.26944
-	ldi	r10 r12 1970
-	ldi	r13 r11 1
-	ldi	r9 r11 0
-	ldi	r15 r10 1
-	bne	r15 r4 L_else.26958
-	sti	r7 r2 0
-	sti	r8 r2 1
-	sti	r6 r2 2
-	add	r8 r0 r9
-	addi	r2 r2 3
-	call	L_setup_rect_table.2134
-	addi	r2 r2 -3
-	add	r9 r0 r6
-	ldi	r7 r2 0
-	ldi	r8 r2 1
-	ldi	r6 r2 2
-	add	r1 r13 r12
-	sti	r9 r1 0
-	jump	L_cont.26956
-L_else.26958 : 
-	addi	r14 r0 2
-	bne	r15 r14 L_else.26960
-	sti	r7 r2 0
-	sti	r8 r2 1
-	sti	r6 r2 2
-	add	r8 r0 r9
-	addi	r2 r2 3
-	call	L_setup_surface_table.2137
-	addi	r2 r2 -3
-	add	r9 r0 r6
-	ldi	r7 r2 0
-	ldi	r8 r2 1
-	ldi	r6 r2 2
-	add	r1 r13 r12
-	sti	r9 r1 0
-	jump	L_cont.26956
-L_else.26960 : 
-	sti	r7 r2 0
-	sti	r8 r2 1
-	sti	r6 r2 2
-	add	r8 r0 r9
-	addi	r2 r2 3
-	call	L_setup_second_table.2140
-	addi	r2 r2 -3
-	add	r9 r0 r6
-	ldi	r7 r2 0
-	ldi	r8 r2 1
-	ldi	r6 r2 2
-	add	r1 r13 r12
-	sti	r9 r1 0
-L_cont.26956 : 
-	addi	r12 r12 -1
-	sti	r6 r2 0
-	sti	r8 r2 1
+	addi	r16 r9 -1
+	bgt	r0 r16 L_else.22665
+	muli	r9 r16 11
+	ldi	r13 r9 1928
+	ldi	r17 r9 1925
+	ldi	r11 r9 1923
+	ldi	r12 r9 1922
+	ldi	r9 r9 1920
+	add	r10 r0 r9
+	add	r9 r0 r12
+	add	r12 r0 r17
+	bne	r10 r4 L_else.22690
+	sti	r8 r2 0
+	sti	r6 r2 1
 	sti	r7 r2 2
+	add	r10 r0 r14
 	addi	r2 r2 3
-	call	L_iter_setup_dirvec_constants.2143
+	call	L_setup_rect_table.2198
 	addi	r2 r2 -3
-	ldi	r6 r2 0
-	ldi	r8 r2 1
+	add	r9 r0 r6
+	ldi	r8 r2 0
+	ldi	r6 r2 1
 	ldi	r7 r2 2
-	jump	L_cont.26942
-L_else.26944 : 
-L_cont.26942 : 
+	add	r1 r15 r16
+	sti	r9 r1 0
+	jump	L_cont.22688
+L_else.22690 : 
+	addi	r12 r0 2
+	bne	r10 r12 L_else.22692
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	add	r10 r0 r14
+	addi	r2 r2 3
+	call	L_setup_surface_table.2201
+	addi	r2 r2 -3
+	add	r9 r0 r6
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	add	r1 r15 r16
+	sti	r9 r1 0
+	jump	L_cont.22688
+L_else.22692 : 
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	add	r10 r0 r14
+	add	r12 r0 r11
+	add	r11 r0 r9
+	addi	r2 r2 3
+	call	L_setup_second_table.2204
+	addi	r2 r2 -3
+	add	r9 r0 r6
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	add	r1 r15 r16
+	sti	r9 r1 0
+L_cont.22688 : 
+	addi	r16 r16 -1
+	sti	r7 r2 0
+	sti	r6 r2 1
+	sti	r8 r2 2
+	addi	r2 r2 3
+	call	L_iter_setup_dirvec_constants.2207
+	addi	r2 r2 -3
+	ldi	r7 r2 0
+	ldi	r6 r2 1
+	ldi	r8 r2 2
+	jump	L_cont.22663
+L_else.22665 : 
+L_cont.22663 : 
 	ldi	r9 r0 1072
-	addi	r12 r9 -1
-	bgt	r0 r12 L_else.26947
-	ldi	r10 r12 1970
-	ldi	r11 r10 2
-	addi	r9 r0 2
-	bne	r11 r9 L_else.26949
-	ldi	r9 r10 7
-	fldi	f3 r9 0
-	fldi	f2 r0 12
-	fbgt	f2 f3 L_else.26951
-	jump	L_cont.26945
-L_else.26951 : 
-	ldi	r9 r10 1
-	bne	r9 r4 L_else.26953
-	addi	r9 r0 4
-	mul	r18 r12 r9
-	ldi	r17 r0 1075
+	addi	r14 r9 -1
+	bgt	r0 r14 L_else.22668
+	muli	r11 r14 11
+	ldi	r10 r11 1926
+	ldi	r9 r11 1923
+	ldi	r12 r11 1921
+	ldi	r11 r11 1920
+	addi	r13 r0 2
+	bne	r12 r13 L_else.22681
+	fldi	f2 r10 0
 	fldi	f3 r0 12
-	ldi	r9 r10 7
-	fldi	f2 r9 0
-	fsub	f12 f3 f2
+	fbgt	f3 f2 L_else.22683
+	jump	L_cont.22666
+L_else.22683 : 
+	bne	r11 r4 L_else.22685
+	muli	r18 r14 4
+	ldi	r17 r0 1075
+	fldi	f2 r10 0
+	fsub	f11 f3 f2
 	fldi	f2 r0 1039
-	fsub	f10 f0 f2
+	fsub	f12 f0 f2
 	fldi	f2 r0 1040
-	fsub	f11 f0 f2
-	fldi	f2 r0 1041
 	fsub	f13 f0 f2
-	addi	r15 r18 1
+	fldi	f2 r0 1041
+	fsub	f14 f0 f2
+	addi	r20 r18 1
 	fldi	f3 r0 1039
 	sti	r7 r2 0
-	sti	r8 r2 1
-	sti	r6 r2 2
-	add	r14 r0 r17
-	fadd	f9 f0 f12
-	fadd	f4 f0 f11
-	fadd	f5 f0 f13
+	sti	r6 r2 1
+	sti	r8 r2 2
 	addi	r2 r2 3
-	call	L_add_reflection.2368
+	call	L_create_dirvec.2418
 	addi	r2 r2 -3
+	add	r21 r0 r7
+	add	r22 r0 r6
 	ldi	r7 r2 0
-	ldi	r8 r2 1
-	ldi	r6 r2 2
-	addi	r14 r17 1
-	addi	r15 r18 2
-	fldi	f4 r0 1040
+	ldi	r6 r2 1
+	ldi	r8 r2 2
+	fsti	f3 r22 0
+	fsti	f13 r22 1
+	fsti	f14 r22 2
+	ldi	r9 r0 1072
+	addi	r16 r9 -1
 	sti	r7 r2 0
-	sti	r8 r2 1
-	sti	r6 r2 2
-	fadd	f9 f0 f12
-	fadd	f3 f0 f10
-	fadd	f5 f0 f13
+	sti	r6 r2 1
+	sti	r8 r2 2
+	add	r14 r0 r22
+	add	r15 r0 r21
 	addi	r2 r2 3
-	call	L_add_reflection.2368
+	call	L_iter_setup_dirvec_constants.2207
 	addi	r2 r2 -3
 	ldi	r7 r2 0
-	ldi	r8 r2 1
-	ldi	r6 r2 2
-	addi	r14 r17 2
-	addi	r15 r18 3
-	fldi	f5 r0 1041
-	sti	r7 r2 0
-	sti	r8 r2 1
-	sti	r6 r2 2
-	fadd	f9 f0 f12
-	fadd	f3 f0 f10
-	fadd	f4 f0 f11
+	ldi	r6 r2 1
+	ldi	r8 r2 2
+	addi	r19 r0 1134
+	fadd	f2 f0 f11
+	muli	r9 r17 4
+	addi	r10 r9 3
+	add	r1 r19 r10
+	fsti	f2 r1 0
+	addi	r10 r9 2
+	add	r1 r19 r10
+	sti	r21 r1 0
+	addi	r10 r9 1
+	add	r1 r19 r10
+	sti	r22 r1 0
+	add	r1 r19 r9
+	sti	r20 r1 0
+	addi	r21 r17 1
+	addi	r20 r18 2
+	fldi	f3 r0 1040
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
 	addi	r2 r2 3
-	call	L_add_reflection.2368
+	call	L_create_dirvec.2418
 	addi	r2 r2 -3
-	ldi	r7 r2 0
-	ldi	r8 r2 1
-	ldi	r6 r2 2
+	add	r22 r0 r7
+	add	r23 r0 r6
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	fsti	f12 r23 0
+	fsti	f3 r23 1
+	fsti	f14 r23 2
+	ldi	r9 r0 1072
+	addi	r16 r9 -1
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	add	r14 r0 r23
+	add	r15 r0 r22
+	addi	r2 r2 3
+	call	L_iter_setup_dirvec_constants.2207
+	addi	r2 r2 -3
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	fadd	f2 f0 f11
+	muli	r10 r21 4
+	addi	r9 r10 3
+	add	r1 r19 r9
+	fsti	f2 r1 0
+	addi	r9 r10 2
+	add	r1 r19 r9
+	sti	r22 r1 0
+	addi	r9 r10 1
+	add	r1 r19 r9
+	sti	r23 r1 0
+	add	r1 r19 r10
+	sti	r20 r1 0
+	addi	r21 r17 2
+	addi	r18 r18 3
+	fldi	f3 r0 1041
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	addi	r2 r2 3
+	call	L_create_dirvec.2418
+	addi	r2 r2 -3
+	add	r20 r0 r7
+	add	r22 r0 r6
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	fsti	f12 r22 0
+	fsti	f13 r22 1
+	fsti	f3 r22 2
+	ldi	r9 r0 1072
+	addi	r16 r9 -1
+	sti	r8 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	add	r14 r0 r22
+	add	r15 r0 r20
+	addi	r2 r2 3
+	call	L_iter_setup_dirvec_constants.2207
+	addi	r2 r2 -3
+	ldi	r8 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	muli	r10 r21 4
+	addi	r9 r10 3
+	add	r1 r19 r9
+	fsti	f11 r1 0
+	addi	r9 r10 2
+	add	r1 r19 r9
+	sti	r20 r1 0
+	addi	r9 r10 1
+	add	r1 r19 r9
+	sti	r22 r1 0
+	add	r1 r19 r10
+	sti	r18 r1 0
 	addi	r9 r17 3
 	sti	r9 r0 1075
-	jump	L_cont.26945
-L_else.26953 : 
-	addi	r11 r0 2
-	bne	r9 r11 L_else.26955
-	addi	r9 r0 4
-	mul	r9 r12 r9
-	addi	r15 r9 1
-	ldi	r17 r0 1075
-	fldi	f3 r0 12
-	ldi	r9 r10 7
-	fldi	f2 r9 0
-	fsub	f9 f3 f2
-	ldi	r9 r10 4
+	jump	L_cont.22666
+L_else.22685 : 
+	bne	r11 r13 L_else.22687
+	muli	r11 r14 4
+	addi	r17 r11 1
+	ldi	r20 r0 1075
+	fldi	f2 r10 0
+	fsub	f11 f3 f2
 	fldi	f3 r0 1039
 	fldi	f2 r9 0
 	fmul	f4 f3 f2
@@ -14008,51 +9115,119 @@ L_else.26953 :
 	fldi	f3 r9 2
 	fmul	f2 f2 f3
 	fadd	f6 f4 f2
-	fldi	f3 r0 30
-	ldi	r9 r10 4
-	fldi	f2 r9 0
-	fmul	f2 f3 f2
-	fmul	f2 f2 f6
-	fldi	f3 r0 1039
-	fsub	f3 f2 f3
-	fldi	f4 r0 30
-	ldi	r9 r10 4
-	fldi	f2 r9 1
-	fmul	f2 f4 f2
-	fmul	f4 f2 f6
+	fldi	f2 r0 29
+	fldi	f3 r9 0
+	fmul	f2 f2 f3
+	fmul	f3 f2 f6
+	fldi	f2 r0 1039
+	fsub	f5 f3 f2
+	fldi	f2 r0 29
+	fldi	f3 r9 1
+	fmul	f2 f2 f3
+	fmul	f3 f2 f6
 	fldi	f2 r0 1040
+	fsub	f3 f3 f2
+	fldi	f2 r0 29
+	fldi	f4 r9 2
+	fmul	f2 f2 f4
+	fmul	f4 f2 f6
+	fldi	f2 r0 1041
 	fsub	f4 f4 f2
-	fldi	f5 r0 30
-	ldi	r9 r10 4
-	fldi	f2 r9 2
-	fmul	f2 f5 f2
-	fmul	f2 f2 f6
-	fldi	f5 r0 1041
-	fsub	f5 f2 f5
 	sti	r7 r2 0
-	sti	r8 r2 1
-	sti	r6 r2 2
-	add	r14 r0 r17
+	sti	r6 r2 1
+	sti	r8 r2 2
 	addi	r2 r2 3
-	call	L_add_reflection.2368
+	call	L_create_dirvec.2418
+	addi	r2 r2 -3
+	add	r19 r0 r7
+	add	r18 r0 r6
+	ldi	r7 r2 0
+	ldi	r6 r2 1
+	ldi	r8 r2 2
+	fsti	f5 r18 0
+	fsti	f3 r18 1
+	fsti	f4 r18 2
+	ldi	r9 r0 1072
+	addi	r16 r9 -1
+	sti	r7 r2 0
+	sti	r6 r2 1
+	sti	r8 r2 2
+	add	r14 r0 r18
+	add	r15 r0 r19
+	addi	r2 r2 3
+	call	L_iter_setup_dirvec_constants.2207
 	addi	r2 r2 -3
 	ldi	r7 r2 0
-	ldi	r8 r2 1
-	ldi	r6 r2 2
-	addi	r9 r17 1
+	ldi	r6 r2 1
+	ldi	r8 r2 2
+	addi	r10 r0 1134
+	muli	r11 r20 4
+	addi	r9 r11 3
+	add	r1 r10 r9
+	fsti	f11 r1 0
+	addi	r9 r11 2
+	add	r1 r10 r9
+	sti	r19 r1 0
+	addi	r9 r11 1
+	add	r1 r10 r9
+	sti	r18 r1 0
+	add	r1 r10 r11
+	sti	r17 r1 0
+	addi	r9 r20 1
 	sti	r9 r0 1075
-	jump	L_cont.26945
-L_else.26955 : 
-	jump	L_cont.26945
-L_else.26949 : 
-	jump	L_cont.26945
-L_else.26947 : 
-L_cont.26945 : 
+	jump	L_cont.22666
+L_else.22687 : 
+	jump	L_cont.22666
+L_else.22681 : 
+	jump	L_cont.22666
+L_else.22668 : 
+L_cont.22666 : 
 	addi	r10 r0 0
+	fldi	f2 r0 1062
+	ldi	r9 r0 1061
+	sub	r9 r10 r9
+	foi	f3 r9
+	fmul	f3 f2 f3
+	fldi	f2 r0 1033
+	fmul	f2 f3 f2
+	fldi	f4 r0 1027
+	fadd	f20 f2 f4
+	fldi	f2 r0 1034
+	fmul	f2 f3 f2
+	fldi	f4 r0 1028
+	fadd	f21 f2 f4
+	fldi	f2 r0 1035
+	fmul	f2 f3 f2
+	fldi	f3 r0 1029
+	fadd	f22 f2 f3
+	ldi	r9 r0 1058
+	addi	r9 r9 -1
+	sti	r6 r2 0
+	sti	r7 r2 1
+	sti	r8 r2 2
+	add	r6 r0 r7
+	add	r8 r0 r10
+	add	r7 r0 r9
+	addi	r2 r2 3
+	call	L_pretrace_pixels.2364
+	addi	r2 r2 -3
+	ldi	r6 r2 0
+	ldi	r7 r2 1
+	ldi	r8 r2 2
 	addi	r9 r0 0
+	addi	r11 r0 2
+	ldi	r10 r0 1059
+	bgt	r10 r0 L_else.22671
+	jump	L_cont.22669
+L_else.22671 : 
+	ldi	r10 r0 1059
+	addi	r10 r10 -1
+	bgt	r10 r0 L_else.22674
+	jump	L_cont.22672
+L_else.22674 : 
 	fldi	f3 r0 1062
-	ldi	r11 r0 1061
-	sub	r10 r10 r11
+	ldi	r10 r0 1061
+	sub	r10 r4 r10
 	foi	f2 r10
 	fmul	f4 f3 f2
 	fldi	f2 r0 1033
@@ -14069,26 +9244,109 @@ L_cont.26945 :
 	fadd	f22 f3 f2
 	ldi	r10 r0 1058
 	addi	r10 r10 -1
-	sti	r8 r2 0
-	sti	r7 r2 1
-	sti	r6 r2 2
-	add	r6 r0 r7
-	add	r8 r0 r9
+	sti	r9 r2 0
+	sti	r6 r2 1
+	sti	r7 r2 2
+	sti	r8 r2 3
+	add	r6 r0 r8
 	add	r7 r0 r10
+	add	r8 r0 r11
+	addi	r2 r2 4
+	call	L_pretrace_pixels.2364
+	addi	r2 r2 -4
+	ldi	r9 r2 0
+	ldi	r6 r2 1
+	ldi	r7 r2 2
+	ldi	r8 r2 3
+L_cont.22672 : 
+	addi	r10 r0 0
+	sti	r7 r2 0
+	sti	r8 r2 1
+	sti	r6 r2 2
+	add	r1 r0 r6
+	add	r6 r0 r10
+	add	r10 r0 r8
+	add	r8 r0 r1
+	add	r1 r0 r7
+	add	r7 r0 r9
+	add	r9 r0 r1
 	addi	r2 r2 3
-	call	L_pretrace_pixels.2300
+	call	L_scan_pixel.2375
 	addi	r2 r2 -3
-	ldi	r8 r2 0
-	ldi	r7 r2 1
+	ldi	r7 r2 0
+	ldi	r8 r2 1
 	ldi	r6 r2 2
-	addi	r9 r0 0
-	addi	r10 r0 2
+	addi	r9 r0 1
+	addi	r10 r0 4
+	ldi	r11 r0 1059
+	bgt	r11 r9 L_else.22676
+	jump	L_cont.22669
+L_else.22676 : 
+	ldi	r11 r0 1059
+	addi	r11 r11 -1
+	bgt	r11 r9 L_else.22679
+	jump	L_cont.22677
+L_else.22679 : 
+	addi	r12 r0 2
+	fldi	f3 r0 1062
+	ldi	r11 r0 1061
+	sub	r11 r12 r11
+	foi	f2 r11
+	fmul	f4 f3 f2
+	fldi	f2 r0 1033
+	fmul	f3 f4 f2
+	fldi	f2 r0 1027
+	fadd	f20 f3 f2
+	fldi	f2 r0 1034
+	fmul	f3 f4 f2
+	fldi	f2 r0 1028
+	fadd	f21 f3 f2
+	fldi	f2 r0 1035
+	fmul	f3 f4 f2
+	fldi	f2 r0 1029
+	fadd	f22 f3 f2
+	ldi	r11 r0 1058
+	addi	r11 r11 -1
+	sti	r9 r2 0
+	sti	r7 r2 1
+	sti	r8 r2 2
+	sti	r6 r2 3
+	add	r7 r0 r11
+	add	r8 r0 r10
+	addi	r2 r2 4
+	call	L_pretrace_pixels.2364
+	addi	r2 r2 -4
+	ldi	r9 r2 0
+	ldi	r7 r2 1
+	ldi	r8 r2 2
+	ldi	r6 r2 3
+L_cont.22677 : 
+	addi	r10 r0 0
+	sti	r7 r2 0
+	sti	r6 r2 1
+	sti	r8 r2 2
+	add	r1 r0 r6
+	add	r6 r0 r10
+	add	r10 r0 r1
+	add	r1 r0 r7
+	add	r7 r0 r9
+	add	r9 r0 r8
+	add	r8 r0 r1
+	addi	r2 r2 3
+	call	L_scan_pixel.2375
+	addi	r2 r2 -3
+	ldi	r7 r2 0
+	ldi	r6 r2 1
+	ldi	r8 r2 2
+	addi	r9 r0 2
+	addi	r10 r0 1
 	add	r1 r0 r6
 	add	r6 r0 r9
-	add	r9 r0 r8
-	add	r8 r0 r7
-	add	r7 r0 r1
-	call	L_scan_line.2317
+	add	r9 r0 r7
+	add	r7 r0 r8
+	add	r8 r0 r1
+	call	L_scan_line.2381
+L_cont.22669 : 
 	return
 min_caml_end : 
 	call	min_caml_start
