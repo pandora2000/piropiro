@@ -680,12 +680,12 @@ static long long memory_count[MEMORY_SIZE];
   sum2 = sum2  + stall_buf_all[INSTNUM][1];
 
 //chacheのhit率を調べる
-int cache[1024] = {0};
-int cache_cnt[1024][2] = {0};
+int cache[2048] = {0};
+int cache_cnt[2048][2] = {0};
 
 
 int cache_read(int mem,int next2inst){
-  int num = mem%1024;
+  int num = mem%2048;
 
   cache_cnt[num][0]++;
   if(cache[num] == mem){
@@ -700,7 +700,7 @@ int cache_read(int mem,int next2inst){
 }
 
 void cache_write(int mem){
-  int num = mem%1024;
+  int num = mem%2048;
   cache[num] = mem;
 }
 
@@ -708,7 +708,7 @@ void cache_hit_print(){
   int sum = 0;
   int hit_sum = 0;
   int i;
-  for(i=0;i<1024;i++){
+  for(i=0;i<2048;i++){
     sum = sum + cache_cnt[i][0];
     hit_sum = hit_sum + cache_cnt[i][1];
   }
@@ -772,19 +772,19 @@ void print_stall_buf(void){
 
 void print_memory_count(){
   int i;
-  long long memory_count2[1024] = {0};
+  long long memory_count2[2048] = {0};
   long long sum=0;
   printf("memory のアクセス回数\n");
   for (i = 0; i < MEMORY_SIZE; i++) {
-      memory_count2[i%1024] = memory_count2[i%1024] + memory_count[i];
+      memory_count2[i%2048] = memory_count2[i%2048] + memory_count[i];
       sum = sum + memory_count[i];
     if(memory_count[i] > 100){
     printf("%d %10lld\n",i,memory_count[i]);
     }
   }
 
-  printf("mod1024のアクセス回数\n");
-  for(i = 0;i<1024;i++){
+  printf("mod2048のアクセス回数\n");
+  for(i = 0;i<2048;i++){
     printf("%d %10lld  %f\n",i,memory_count2[i],(double)memory_count2[i] * 100 /sum);
   }
   return;
